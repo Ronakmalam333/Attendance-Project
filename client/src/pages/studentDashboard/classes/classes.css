@@ -1,0 +1,231 @@
+.classes-contain {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 24px;
+  font-family: "Arial", sans-serif;
+  background: #f4f7fa;
+  min-height: 100vh;
+  box-sizing: border-box;
+  transition: padding 0.3s;
+}
+
+.classes-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  border-bottom: 2px solid #e5e9ef;
+  padding-bottom: 16px;
+}
+
+.univ-logo {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.06);
+  transition: width 0.3s, height 0.3s;
+}
+
+.timetable-wrapper {
+  margin: 32px 0 16px 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
+  padding: 20px;
+  overflow-x: auto;
+}
+
+.timetable {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  font-size: 1.05rem;
+  min-width: 700px;
+  transition: font-size 0.3s, min-width 0.3s;
+}
+
+.timetable th, .timetable td {
+  padding: 12px 10px;
+  text-align: center;
+  border-bottom: 1px solid #e0e3e6;
+}
+
+.timetable th {
+  background: #3498db;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.timetable tr:nth-child(even) td:not(.lunch-cell) {
+  background: #f9f9f9;
+}
+
+.timetable td.lunch-cell, .timetable .lunch-cell {
+  background: #fffbe7 !important;
+  color: #d48b00;
+  font-weight: 700;
+  font-size: 1.12rem;
+  border-bottom: none;
+}
+
+.timetable tr:hover td:not(.lunch-cell) {
+  background: #f1f1f1;
+}
+
+.subjects-section {
+  margin: 30px 0 12px 0;
+  background: white;
+  padding: 18px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
+}
+
+.subjects-section h3 {
+  font-size: 1.15rem;
+  margin-bottom: 10px;
+  color: #2c3e50;
+}
+
+.subjects-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 32px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.subjects-list li {
+  font-size: 1rem;
+  color: #223;
+  background: #f7f9fd;
+  border-radius: 6px;
+  padding: 7px 14px;
+}
+
+.subjects-list span {
+  color: #555;
+}
+
+.classes-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 32px;
+  font-size: 1rem;
+  color: #222;
+  border-top: 1px dashed #cfd8dc;
+  padding: 14px;
+  background: white;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.04);
+}
+
+.footer-names {
+  display: flex;
+  gap: 28px;
+}
+
+@media (max-width: 1200px) {
+  .classes-contain {
+    padding: 14px;
+  }
+  .timetable {
+    min-width: 550px;
+    font-size: 0.98rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .classes-contain {
+    padding: 8px;
+  }
+  .classes-header {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .univ-logo {
+    width: 60px;
+    height: 60px;
+  }
+  .timetable {
+    font-size: 0.93rem;
+    min-width: 420px;
+  }
+  .subjects-section h3 {
+    font-size: 1.07rem;
+  }
+  .classes-footer {
+    flex-direction: column;
+    gap: 10px;
+    font-size: 0.98rem;
+    border-radius: 0 0 8px 8px;
+  }
+  .footer-names {
+    gap: 11px;
+  }
+}
+
+@media (max-width: 600px) {
+  .classes-contain {
+    padding: 2px;
+    font-size: 0.96rem;
+  }
+  .univ-logo {
+    width: 44px;
+    height: 44px;
+  }
+  .timetable {
+    font-size: 0.85rem;
+    min-width: 340px;
+  }
+  .subjects-list li {
+    font-size: 0.91rem;
+    padding: 4px 8px;
+  }
+  .footer-names {
+    gap: 7px;
+  }
+}
+@media (max-width: 700px) {
+  .timetable {
+    min-width: 420px;
+    font-size: 0.87rem;
+  }
+  .timetable th, .timetable td {
+    padding: 6px 3px;
+    font-size: 0.87rem;
+  }
+}
+@media (max-width: 450px) {
+  .timetable {
+    min-width: 290px;
+    font-size: 0.72rem;
+  }
+  .timetable th, .timetable td {
+    padding: 4px 2px;
+    font-size: 0.72rem;
+  }
+}
+@media (max-width: 430px) {
+  .classes-header,
+  .timetable-wrapper,
+  .subjects-section,
+  .classes-footer {
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+  }
+  .timetable {
+    font-size: 0.75rem;
+    min-width: 220px;
+  }
+  .univ-logo {
+    width: 30px;
+    height: 30px;
+  }
+}

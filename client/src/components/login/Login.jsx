@@ -1,0 +1,199 @@
+import React, { useState, useContext } from "react";
+import "./login.css";
+import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import loginImg from "./loginImg.jpg";
+import { AuthContext } from "../../context/AuthContext";
+
+function Login() {
+  const navigate = useNavigate();
+  const [emailFocused, setEmailFocused] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
+  const [emailValue, setEmailValue] = useState("");
+  const [passwordValue, setPasswordValue] = useState("");
+  const [eye, setEye] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+  const { login } = useContext(AuthContext);
+
+  const handleEmailFocus = () => setEmailFocused(true);
+  const handleEmailBlur = () => setEmailFocused(false);
+  const handlePasswordFocus = () => setPasswordFocused(true);
+  const handlePasswordBlur = () => setPasswordFocused(false);
+  const handleEye = () => setEye(!eye);
+
+  const onSubmit = async (data) => {
+    const loginData = {
+      username: data.username,
+      password: data.password,
+      role: data.role,
+    };
+
+    console.log("Sending login request with:", loginData);
+
+    try {
+      const response = await fetch("http://localhost:5000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginData),
+      });
+
+      const result = await response.json();
+
+      console.log("Login Response:", result);
+      console.log("Response OK:", response.ok);
+
+      if (response.ok) {
+        login({ ...result.user, role: result.role }, result.token);
+        console.log(
+          "Navigating to:",
+          data.role === "student" ? "/student" : "/staff"
+        );
+        navigate(data.role === "student" ? "/student" : "/staff");
+      } else {
+        alert("Login failed: " + result.message);
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+      alert("Login failed: Network error");
+    }
+  };
+
+  return (
+    <div className='signin-contain'>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <h1>Sign In</h1>
+        <p>
+          Don't have an Account?{" "}
+          <span onClick={() => navigate("/signup")}>Sign up</span>
+        </p>
+        <div className='input-area'>
+          <div className='role-input2'>
+            <label>
+              <input
+                {...register("role", { required: "Please select a role" })}
+                type='radio'
+                value='student'
+              />{" "}
+              Student
+            </label>
+            <label>
+              <input
+                {...register("role", { required: "Please select a role" })}
+                type='radio'
+                value='staff'
+              />{" "}
+              Staff
+            </label>
+            {errors.role && <p className='error'>{errors.role.message}</p>}
+          </div>
+
+          <div
+            className={`input input-email ${
+              emailFocused || emailValue ? "focused" : ""
+            }`}
+          >
+            <label htmlFor='username' className='label email-label'>
+              Email / UID
+            </label>
+            <input
+              type='text'
+              className='email'
+              id='username'
+              onFocus={handleEmailFocus}
+              onBlur={handleEmailBlur}
+              onChange={(e) => setEmailValue(e.target.value)}
+              {...register("username", {
+                required: "Email / UID is required",
+              })}
+            />
+            {errors.username && (
+              <p className='error'>{errors.username.message}</p>
+            )}
+            <span className='bottom-border'></span>
+          </div>
+
+          <div
+            className={`input input-pass ${
+              passwordFocused || passwordValue ? "focused" : ""
+            }`}
+          >
+            <label htmlFor='password' className='label pass-label'>
+              Password
+            </label>
+            <input
+              type={eye ? "text" : "password"}
+              className='pass'
+              id='password'
+              onFocus={handlePasswordFocus}
+              onBlur={handlePasswordBlur}
+              onChange={(e) => setPasswordValue(e.target.value)}
+              {...register("password", {
+                required: "Password is required",
+                minLength: {
+                  value: 4,
+                  message: "Password must be at least 4 characters",
+                },
+              })}
+            />
+            {errors.password && (
+              <p className='error'>{errors.password.message}</p>
+            )}
+            <span className='bottom-border'></span>
+          </div>
+
+          <span className='forgot'>Forgot Password?</span>
+        </div>
+
+        <div className='submit-container'>
+          <button type='submit' className='submit'>
+            Login
+          </button>
+          <p>or</p>
+          <div className='google'>
+            <svg
+              width='35px'
+              height='35px'
+              viewBox='0 0 32 32'
+              xmlns='http://www.w3.org/2000/svg'
+            >
+              <path
+                d='M23.75,16A7.7446,7.7446,0,0,1,8.7177,18.6259L4.2849,22.1721A13.244,13.244,0,0,0,29.25,16'
+                fill='#00ac47'
+              />
+              <path
+                d='M23.75,16a7.7387,7.7387,0,0,1-3.2516,6.2987l4.3824,3.5059A13.2042,13.2042,0,0,0,29.25,16'
+                fill='#4285f4'
+              />
+              <path
+                d='M8.25,16a7.698,7.698,0,0,1,.4677-2.6259L4.2849,9.8279a13.177,13.177,0,0,0,0,12.3442l4.4328-3.5462A7.698,7.698,0,0,1,8.25,16Z'
+                fill='#ffba00'
+              />
+              <path
+                d='M16,8.25a7.699,7.699,0,0,1,4.558,1.4958l4.06-3.7893A13.2152,13.2152,0,0,0,4.2849,9.8279l4.4328,3.5462A7.756,7.756,0,0,1,16,8.25Z'
+                fill='#ea4435'
+              />
+              <path
+                d='M29.25,15v1L27,19.5H16.5V14H28.25A1,1,0,0,1,29.25,15Z'
+                fill='#4285f4'
+              />
+            </svg>
+            <p>Sign in with Google</p>
+          </div>
+        </div>
+      </form>
+
+      <div
+        className='signin-banner'
+        style={{ backgroundImage: `url(${loginImg})` }}
+      ></div>
+    </div>
+  );
+}
+
+export default Login;

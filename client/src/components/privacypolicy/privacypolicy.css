@@ -1,0 +1,121 @@
+.privacy-policy-container {
+  width: 100%;
+  height: 90%;
+  padding: 50px;
+  box-sizing: border-box;
+  overflow-y: scroll;
+  background-color: transparent;
+  animation: fadeIn 1s ease-in-out;
+  -ms-overflow-style: none;
+}
+.privacy-policy-container::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-500px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.privacy-policy-container h1 {
+  font-size: 2.5rem;
+  color: var(--color2);
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.privacy-policy-container h2 {
+  font-size: 1.75rem;
+  color: #34495e;
+  margin-top: 30px;
+  margin-bottom: 15px;
+  font-weight: 600;
+  display: inline-block;
+  padding-bottom: 5px;
+}
+
+.privacy-policy-container p {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 15px;
+  color: #555;
+}
+
+.privacy-policy-container ul {
+  margin-bottom: 15px;
+  padding-left: 20px;
+}
+
+.privacy-policy-container li {
+  margin-bottom: 10px;
+  color: #555;
+  position: relative;
+  padding-left: 20px;
+}
+
+.privacy-policy-container li::before {
+  content: "•";
+  color: #3498db;
+  font-size: 1.5rem;
+  position: absolute;
+  left: 0;
+  top: -5px;
+}
+
+strong {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .privacy-policy-container {
+    padding: 10px;
+  }
+
+  .privacy-policy-container h1 {
+    font-size: 2rem;
+  }
+
+  .privacy-policy-container h2 {
+    font-size: 1.5rem;
+  }
+
+  .privacy-policy-container p {
+    font-size: 0.9rem;
+  }
+}
+
+.privacy-policy-container section {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.privacy-policy-container section:last-child {
+  background: var(--secondary-color);
+  color: var(--color);
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 30px;
+}
+
+.privacy-policy-container section:last-child h2 {
+  color: var(--color);
+  border-bottom: 2px solid var(--color);
+}
+
+.privacy-policy-container section:last-child p {
+  color: var(--color);
+}
+
+.privacy-policy-container section:last-child strong {
+  color: var(--color);
+}

@@ -1,0 +1,45 @@
+
+.home-contain{
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+        -ms-overflow-style: none;
+    }
+    .home-contain::-webkit-scrollbar {
+        display: none;
+}
+
+.home{
+    width: 100vw;
+    height: 90vh;
+    display: flex;
+    justify-content: space-around;
+    animation: fadeIn 1s ease-in-out;
+}
+
+/*! Extra Small Devices (Portrait Phones) */
+@media only screen and (max-width: 575px) {
+    .home{
+        flex-direction: column-reverse;
+        gap: 50px;
+    }
+}
+
+/*! Small devices (phones, 576px and up) */
+@media (min-width: 575px) and (max-width: 768px) {
+    .home{
+        flex-direction: column-reverse;
+        gap: 50px;
+    }
+}
+
+/*! Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) and (max-width: 992px) {
+    .home{
+        flex-direction: column-reverse;
+    }
+}
+
+/*! Large devices (desktops, 992px and up) */
+@media (min-width: 992px) and (max-width: 1200px) {
+}

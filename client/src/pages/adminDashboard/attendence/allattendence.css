@@ -1,0 +1,136 @@
+/* Container */
+.attendance-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  animation: fadeIn 0.8s ease-in-out;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Header Section */
+.attendance-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.attendance-header h1 {
+  font-size: 2rem;
+  color: #333;
+}
+
+/* File Controls */
+.file-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.upload-btn,
+.export-btn {
+  padding: 0.8rem 1.6rem;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: background 0.3s ease, transform 0.2s;
+}
+
+.upload-btn {
+  background: #2196F3;
+  color: white;
+  border: none;
+}
+
+.upload-btn.loading {
+  background: #90a4ae;
+  cursor: not-allowed;
+}
+
+.export-btn {
+  background: #4CAF50;
+  color: white;
+  border: none;
+}
+
+.export-btn:disabled {
+  background: #c8e6c9;
+  color: #666;
+  cursor: not-allowed;
+}
+
+/* Error Styling */
+.error-message {
+  color: #d32f2f;
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: #ffebee;
+  border-left: 5px solid #c62828;
+  border-radius: 4px;
+}
+
+/* Grid for Data + Chart */
+.data-section {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+@media screen and (max-width: 768px) {
+  .data-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Table Styling */
+.attendance-table table {
+  width: 100%;
+  border-collapse: collapse;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.attendance-table th,
+.attendance-table td {
+  padding: 14px 12px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 15px;
+}
+
+.attendance-table th {
+  background-color: #f1f1f1;
+  font-weight: bold;
+  color: #444;
+}
+
+.attendance-table select {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background: white;
+}
+
+/* Chart Area */
+.attendance-chart {
+  padding: 1rem;
+  background: #fafafa;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  text-align: center;
+}
+
+/* No Data */
+.no-data {
+  color: #888;
+  text-align: center;
+  padding: 2rem;
+  font-style: italic;
+}
+
+/* Fade In Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

@@ -1,0 +1,7 @@
+
+.students-contain{
+    width: 100%;
+    height: 90%;
+    padding: 20px;
+    animation: fadeIn 1s ease-in-out;
+}

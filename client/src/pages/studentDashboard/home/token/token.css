@@ -1,0 +1,102 @@
+.token_contain {
+    position: relative;
+    width: 45%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.current-time{
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 2rem;
+}
+
+.token_box {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+}
+
+.token_box::after{
+    content: "";
+    position: absolute;
+    width: 3px;
+    height: 80%;
+    background: #999;
+    left: 0;
+    border-radius: 20px;
+}
+
+.token_input, .submit_btn {
+    width: 50%;
+    height: 50px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    border: none;
+}
+
+.token_input{
+    background: var(--secondary-color);
+    outline: none;
+    font-size: 1.2rem;
+}
+
+.token_input:focus{
+    border: 2px solid var(--color2);
+}
+
+.token_input:focus::placeholder{
+    color: var(--color2);
+}
+
+.submit_btn{
+    background: #222;
+    color: white;
+    cursor: pointer;
+    transition: 0.5s;
+}
+
+.submit_btn:hover{
+    transition: 0.5s;
+    box-shadow: 0 0 10px #999;
+    background: #222222c2;
+}
+
+/*! Extra Small Devices (Portrait Phones) */
+@media only screen and (max-width: 575px) {
+    .token_contain {
+        width: 100%;
+    }
+    .current-time{
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        font-size: 2rem;
+    }
+    
+    .token_box {
+        margin-top: 60px;
+        gap: 30px;
+    }
+
+    .token_box::after{
+        display: none;
+    }
+
+    .token_input, .submit_btn {
+        width: 60%;
+    }
+}

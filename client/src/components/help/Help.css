@@ -1,0 +1,149 @@
+.help-container {
+    width: 100%;
+    height: 90%;
+    padding: 50px;
+    box-sizing: border-box;
+    overflow-y: scroll;
+    background-color: transparent;
+    animation: fadeIn 1s ease-in-out;
+    scrollbar-width: none;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateX(-500px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .support-title h1 {
+    font-size: 2.5rem;
+    color: var(--color2);
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    transition: color 0.3s ease;
+  }
+  
+  .help-content {
+    margin-top: 20px;
+  }
+  
+  .faq-section h2 {
+    font-size: 1.75rem;
+    color: var(--color);
+    margin-top: 30px;
+    margin-bottom: 15px;
+    font-weight: 600;
+    display: inline-block;
+    padding-bottom: 5px;
+    border-bottom: 2px solid var(--color2);
+  }
+  
+  .faq-section ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  .faq-section li {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: var(--primary-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .faq-section li:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .faq-section strong {
+    color: var(--color2);
+    font-weight: 600;
+  }
+  
+  .faq-section p {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-top: 10px;
+    color: var(--color);
+  }
+  
+  .contact-section {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: var(--secondary-color);
+    border-radius: 12px;
+  }
+  
+  .contact-section h2 {
+    font-size: 1.75rem;
+    color: var(--color);
+    margin-bottom: 15px;
+    font-weight: 600;
+  }
+  
+  .contact-section p {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 15px;
+    color: var(--color);
+  }
+  
+  .contact-section ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  .contact-section li {
+    margin-bottom: 10px;
+    color: var(--color);
+  }
+  
+  .contact-section button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color4);
+    background-color: var(--color2);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .contact-section button:hover {
+    background-color: #002aa8;
+  }
+  
+  @media (max-width: 768px) {
+    .help-container {
+      padding: 20px;
+    }
+  
+    .support-title h1 {
+      font-size: 2rem;
+    }
+  
+    .faq-section h2,
+    .contact-section h2 {
+      font-size: 1.5rem;
+    }
+  
+    .faq-section p,
+    .contact-section p {
+      font-size: 0.9rem;
+    }
+  
+    .contact-section button {
+      width: 100%;
+    }
+  }
