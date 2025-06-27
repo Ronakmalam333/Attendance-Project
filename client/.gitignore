@@ -11,6 +11,8 @@ node_modules
 dist
 dist-ssr
 *.local
+
+# For different package managers like bun
 bun.lockb 
 
 # Editor directories and files

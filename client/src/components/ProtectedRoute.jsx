@@ -4,7 +4,6 @@ import { AuthContext } from '../context/AuthContext';
 
 const ProtectedRoute = ({ role, children }) => {
   const { user, isLoading } = useContext(AuthContext);
-  console.log("ProtectedRoute user:", user, isLoading, role);
   if (isLoading) {
     return null; // Or your loading spinner here
   }

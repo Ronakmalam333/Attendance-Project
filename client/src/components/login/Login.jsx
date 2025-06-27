@@ -2,7 +2,6 @@ import React, { useState, useContext } from "react";
 import "./login.css";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import loginImg from "./loginImg.jpg";
 import { AuthContext } from "../../context/AuthContext";
 
 function Login() {
@@ -32,7 +31,6 @@ function Login() {
       role: data.role,
     };
 
-    console.log("Sending login request with:", loginData);
 
     try {
       const response = await fetch("http://localhost:5000/login", {
@@ -45,15 +43,12 @@ function Login() {
 
       const result = await response.json();
 
-      console.log("Login Response:", result);
-      console.log("Response OK:", response.ok);
+      /* Only for debugging purposes...!!! */
+      // console.log("Login Response:", result);
+      // console.log("Response OK:", response.ok);
 
       if (response.ok) {
         login({ ...result.user, role: result.role }, result.token);
-        console.log(
-          "Navigating to:",
-          data.role === "student" ? "/student" : "/staff"
-        );
         navigate(data.role === "student" ? "/student" : "/staff");
       } else {
         alert("Login failed: " + result.message);
@@ -190,7 +185,6 @@ function Login() {
 
       <div
         className='signin-banner'
-        style={{ backgroundImage: `url(${loginImg})` }}
       ></div>
     </div>
   );

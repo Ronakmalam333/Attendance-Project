@@ -2,7 +2,6 @@ import React, { useContext, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./navbar.css";
 import { AuthContext } from "../../context/AuthContext";
-import TeamLogo from "../../assets/Team-Logo.png";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -29,36 +28,73 @@ function Navbar() {
     displayIndex !== -1 ? `calc(${displayIndex * 33.33 + 16}% - 5px)` : "0";
 
   const mobileMenu = (
-    <div className="mobile-menu-overlay" onClick={() => setMobileMenuOpen(false)}>
-      <div className="mobile-menu" onClick={e => e.stopPropagation()}>
-        <div className="mobile-menu-header">
-          <img src={TeamLogo} alt="logo" className="mobile-menu-logo" />
-          <button className="mobile-menu-close" onClick={() => setMobileMenuOpen(false)}>&times;</button>
+    <div
+      className='mobile-menu-overlay'
+      onClick={() => setMobileMenuOpen(false)}
+    >
+      <div className='mobile-menu' onClick={(e) => e.stopPropagation()}>
+        <div className='mobile-menu-header'>
+          <img src="https://avatars.githubusercontent.com/u/201213121?s=200&v=4" alt="Team-Logo" />
+          <button
+            className='mobile-menu-close'
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            &times;
+          </button>
         </div>
-        <div className="mobile-menu-section">
-          <div className="mobile-menu-item" onClick={() => {navigate(basePath); setMobileMenuOpen(false);}}>
+        <div className='mobile-menu-section'>
+          <div
+            className='mobile-menu-item'
+            onClick={() => {
+              navigate(basePath);
+              setMobileMenuOpen(false);
+            }}
+          >
             Home
           </div>
-          <div className="mobile-menu-item" onClick={() => {navigate(`${basePath}/attendence`); setMobileMenuOpen(false);}}>
+          <div
+            className='mobile-menu-item'
+            onClick={() => {
+              navigate(`${basePath}/attendence`);
+              setMobileMenuOpen(false);
+            }}
+          >
             Attendance
           </div>
-          <div className="mobile-menu-item" onClick={() => {navigate(`${basePath}/${user?.role === "staff" ? "students" : "classes"}`); setMobileMenuOpen(false);}}>
+          <div
+            className='mobile-menu-item'
+            onClick={() => {
+              navigate(
+                `${basePath}/${user?.role === "staff" ? "students" : "classes"}`
+              );
+              setMobileMenuOpen(false);
+            }}
+          >
             {user?.role === "staff" ? "Students" : "Classes"}
           </div>
         </div>
-        <div className="mobile-menu-section">
+        <div className='mobile-menu-section'>
           {otherDetailsItems.map((item) => (
             <div
               key={item.path}
-              className="mobile-menu-item"
-              onClick={() => {navigate(item.path); setMobileMenuOpen(false);}}
+              className='mobile-menu-item'
+              onClick={() => {
+                navigate(item.path);
+                setMobileMenuOpen(false);
+              }}
             >
               {item.label}
             </div>
           ))}
         </div>
-        <div className="mobile-menu-section">
-          <div className="mobile-menu-item" onClick={() => {navigate(`${basePath}/profile`); setMobileMenuOpen(false);}}>
+        <div className='mobile-menu-section'>
+          <div
+            className='mobile-menu-item'
+            onClick={() => {
+              navigate(`${basePath}/profile`);
+              setMobileMenuOpen(false);
+            }}
+          >
             Profile
           </div>
         </div>
@@ -71,29 +107,39 @@ function Navbar() {
       <div className='nav-contain'>
         <button
           className={`hamburger${mobileMenuOpen ? " active" : ""}`}
-          aria-label="Open menu"
+          aria-label='Open menu'
           aria-expanded={mobileMenuOpen}
-          aria-controls="mobile-nav"
+          aria-controls='mobile-nav'
           onClick={() => setMobileMenuOpen(true)}
-          type="button"
+          type='button'
         >
-          <span className="hamburger-lines">
-            <span className="hamburger-line"></span>
-            <span className="hamburger-line"></span>
-            <span className="hamburger-line"></span>
+          <span className='hamburger-lines'>
+            <span className='hamburger-line'></span>
+            <span className='hamburger-line'></span>
+            <span className='hamburger-line'></span>
           </span>
         </button>
-        <div className="logo">
-          <img src={TeamLogo} alt="logo" />
+        <div className='logo-container'>
+          <img src="https://avatars.githubusercontent.com/u/201213121?s=200&v=4" alt="Team-Logo" />
         </div>
         <div className='menus'>
           <div className='menu-item' onClick={() => navigate(basePath)}>
             Home
           </div>
-          <div className='menu-item' onClick={() => navigate(`${basePath}/attendence`)}>
+          <div
+            className='menu-item'
+            onClick={() => navigate(`${basePath}/attendence`)}
+          >
             Attendance
           </div>
-          <div className='menu-item' onClick={() => navigate(`${basePath}/${user?.role === "staff" ? "students" : "classes"}`)}>
+          <div
+            className='menu-item'
+            onClick={() =>
+              navigate(
+                `${basePath}/${user?.role === "staff" ? "students" : "classes"}`
+              )
+            }
+          >
             {user?.role === "staff" ? "Students" : "Classes"}
           </div>
         </div>
@@ -117,7 +163,10 @@ function Navbar() {
             }}
           ></span>
         </div>
-        <div className='account' onClick={() => navigate(`${basePath}/profile`)}>
+        <div
+          className='account'
+          onClick={() => navigate(`${basePath}/profile`)}
+        >
           <svg
             xmlns='http://www.w3.org/2000/svg'
             height='45px'

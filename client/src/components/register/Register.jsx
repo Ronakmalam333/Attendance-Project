@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import "./register.css";
@@ -76,13 +76,19 @@ const Register = () => {
       const contentType = response.headers.get("content-type");
       if (!contentType || !contentType.includes("application/json")) {
         const text = await response.text();
-        throw new Error(`Expected JSON, but received: ${text.slice(0, 100)}...`);
+        throw new Error(
+          `Expected JSON, but received: ${text.slice(0, 100)}...`
+        );
       }
 
       const result = await response.json();
 
       if (response.ok) {
-        alert(`${data.role === "student" ? "Student" : "Admin"} registered successfully!`);
+        alert(
+          `${
+            data.role === "student" ? "Student" : "Admin"
+          } registered successfully!`
+        );
         navigate("/signin");
       } else {
         throw new Error(result.message || "Registration failed");
@@ -97,18 +103,24 @@ const Register = () => {
   const role = watch("role");
 
   return (
-    <div className="register-container">
-      <div className="signup-img-contain"></div>
+    <div className='register-container'>
+      <div className='signup-img-contain'>
+        {/* <img
+          src='https://th.bing.com/th/id/OIP.4Jmh9M
+3SoTkPtk1COE2mhwHaHa?pid=ImgDet&w=206&h=206&c=7&dpr=1.7&cb=idpwebp2&o=7&rm=3'
+          alt='Signup'
+        ></img> */}
+      </div>
 
-      <div className="signup">
+      <div className='signup'>
         <h1>Create Account</h1>
-        <form className="register-form" onSubmit={handleSubmit(onSubmit)}>
-          <div className="role-input">
+        <form className='register-form' onSubmit={handleSubmit(onSubmit)}>
+          <div className='role-input'>
             <label>
               <input
                 {...register("role", { required: "Please select a role" })}
-                type="radio"
-                value="student"
+                type='radio'
+                value='student'
                 defaultChecked
               />{" "}
               Student
@@ -116,32 +128,44 @@ const Register = () => {
             <label>
               <input
                 {...register("role", { required: "Please select a role" })}
-                type="radio"
-                value="staff"
+                type='radio'
+                value='staff'
               />{" "}
               Staff
             </label>
-            {errors.role && <p className="error">{errors.role.message}</p>}
+            {errors.role && <p className='error'>{errors.role.message}</p>}
           </div>
 
-          <div className="input-group">
+          <div className='input-group'>
             <input
               {...register("firstname", { required: "First name is required" })}
-              type="text"
-              placeholder="First Name"
-              style={{ border: `${errors.firstname ? "2px solid red" : "2px solid #ddd"}` }}
+              type='text'
+              placeholder='First Name'
+              style={{
+                border: `${
+                  errors.firstname ? "2px solid red" : "2px solid #ddd"
+                }`,
+              }}
             />
             <input
               {...register("lastname", { required: "Last name is required" })}
-              type="text"
-              placeholder="Last Name"
-              style={{ border: `${errors.lastname ? "2px solid red" : "2px solid #ddd"}` }}
+              type='text'
+              placeholder='Last Name'
+              style={{
+                border: `${
+                  errors.lastname ? "2px solid red" : "2px solid #ddd"
+                }`,
+              }}
             />
-            {errors.firstname && <p className="error">{errors.firstname.message}</p>}
-            {errors.lastname && <p className="error">{errors.lastname.message}</p>}
+            {errors.firstname && (
+              <p className='error'>{errors.firstname.message}</p>
+            )}
+            {errors.lastname && (
+              <p className='error'>{errors.lastname.message}</p>
+            )}
           </div>
 
-          <div className="input-group">
+          <div className='input-group'>
             <input
               {...register("email", {
                 required: "Email is required",
@@ -150,14 +174,16 @@ const Register = () => {
                   message: "Invalid email address",
                 },
               })}
-              type="email"
-              placeholder="Email"
-              style={{ border: `${errors.email ? "2px solid red" : "2px solid #ddd"}` }}
+              type='email'
+              placeholder='Email'
+              style={{
+                border: `${errors.email ? "2px solid red" : "2px solid #ddd"}`,
+              }}
             />
-            {errors.email && <p className="error">{errors.email.message}</p>}
+            {errors.email && <p className='error'>{errors.email.message}</p>}
           </div>
 
-          <div className="input-group">
+          <div className='input-group'>
             <input
               {...register("uid", {
                 required: "UID is required",
@@ -166,75 +192,115 @@ const Register = () => {
                   message: "UID must be at least 6 characters",
                 },
               })}
-              type="text"
-              placeholder="UID"
-              style={{ border: `${errors.uid ? "2px solid red" : "2px solid #ddd"}` }}
+              type='text'
+              placeholder='UID'
+              style={{
+                border: `${errors.uid ? "2px solid red" : "2px solid #ddd"}`,
+              }}
             />
-            {errors.uid && <p className="error">{errors.uid.message}</p>}
+            {errors.uid && <p className='error'>{errors.uid.message}</p>}
           </div>
 
           {role === "student" && (
-            <div className="input-group">
+            <div className='input-group'>
               <button
-                className="course-btn"
+                className='course-btn'
                 onClick={courseBox}
-                style={{ border: `${errors.course || errors.semester ? "2px solid red" : "2px solid #ddd"}` }}
+                style={{
+                  border: `${
+                    errors.course || errors.semester
+                      ? "2px solid red"
+                      : "2px solid #ddd"
+                  }`,
+                }}
               >
                 {selectedCourse || "Select Course"}
                 {selectedSemester && ` - Sem ${selectedSemester}`}
                 <span>
-                  <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000">
-                    <path d="M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z" />
+                  <svg
+                    xmlns='http://www.w3.org/2000/svg'
+                    height='24px'
+                    viewBox='0 -960 960 960'
+                    width='24px'
+                    fill='#000000'
+                  >
+                    <path d='M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z' />
                   </svg>
                 </span>
               </button>
               {(errors.course || errors.semester) && (
-                <p className="error">{errors.course?.message || errors.semester?.message}</p>
+                <p className='error'>
+                  {errors.course?.message || errors.semester?.message}
+                </p>
               )}
 
               <div
-                className="course"
+                className='course'
                 onClick={hideCourseBox}
                 style={{ display: `${isCourseBox ? "flex" : "none"}` }}
               >
-                <div className="course-input-contain">
+                <div className='course-input-contain'>
                   <span
-                    className="backToRegister"
-                    style={{ position: "absolute", top: "15px", left: "15px", cursor: "pointer" }}
+                    className='backToRegister'
+                    style={{
+                      position: "absolute",
+                      top: "15px",
+                      left: "15px",
+                      cursor: "pointer",
+                    }}
                     onClick={handleBackButton}
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px" fill="#000000">
-                      <path d="M372.31-267.69 160-480l212.31-212.31L400.62-664l-164 164H800v40H236.62l164 164-28.31 28.31Z"/>
+                    <svg
+                      xmlns='http://www.w3.org/2000/svg'
+                      height='30px'
+                      viewBox='0 -960 960 960'
+                      width='30px'
+                      fill='#000000'
+                    >
+                      <path d='M372.31-267.69 160-480l212.31-212.31L400.62-664l-164 164H800v40H236.62l164 164-28.31 28.31Z' />
                     </svg>
                   </span>
 
                   <input
                     {...register("course", {
-                      required: role === "student" ? "Course is required" : false,
-                      validate: (value) => role !== "student" || !!value || "Course is required",
+                      required:
+                        role === "student" ? "Course is required" : false,
+                      validate: (value) =>
+                        role !== "student" || !!value || "Course is required",
                     })}
-                    type="hidden"
+                    type='hidden'
                     value={selectedCourse}
                   />
                   <input
                     {...register("semester", {
-                      required: role === "student" ? "Semester is required" : false,
-                      validate: (value) => role !== "student" || !!value || "Semester is required",
+                      required:
+                        role === "student" ? "Semester is required" : false,
+                      validate: (value) =>
+                        role !== "student" || !!value || "Semester is required",
                     })}
-                    type="hidden"
+                    type='hidden'
                     value={selectedSemester}
                   />
 
-                  <div className="courses">
+                  <div className='courses'>
                     <div>
-                      {["B-tech CSE", "B-tech ME", "B-tech ECE", "B-tech Civil", "MCA", "MBA"].map((course) => (
+                      {[
+                        "B-tech CSE",
+                        "B-tech ME",
+                        "B-tech ECE",
+                        "B-tech Civil",
+                        "MCA",
+                        "MBA",
+                      ].map((course) => (
                         <span
                           key={course}
                           onClick={(e) => {
                             e.preventDefault();
                             handleCourseSelect(course);
                           }}
-                          className={selectedCourse === course ? "selected" : ""}
+                          className={
+                            selectedCourse === course ? "selected" : ""
+                          }
                         >
                           {course}
                         </span>
@@ -242,7 +308,7 @@ const Register = () => {
                     </div>
                   </div>
 
-                  <div className="sem">
+                  <div className='sem'>
                     {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
                       <span
                         key={sem}
@@ -250,7 +316,9 @@ const Register = () => {
                           e.preventDefault();
                           handleSemesterSelect(sem.toString());
                         }}
-                        className={selectedSemester === sem.toString() ? "selected" : ""}
+                        className={
+                          selectedSemester === sem.toString() ? "selected" : ""
+                        }
                       >
                         {sem}
                       </span>
@@ -261,7 +329,7 @@ const Register = () => {
             </div>
           )}
 
-          <div className="input-group">
+          <div className='input-group'>
             <input
               {...register("password", {
                 required: "Password is required",
@@ -270,32 +338,45 @@ const Register = () => {
                   message: "Password must be at least 4 characters",
                 },
               })}
-              type="password"
-              placeholder="Password"
-              style={{ border: `${errors.password ? "2px solid red" : "2px solid #ddd"}` }}
+              type='password'
+              placeholder='Password'
+              style={{
+                border: `${
+                  errors.password ? "2px solid red" : "2px solid #ddd"
+                }`,
+              }}
             />
-            {errors.password && <p className="error">{errors.password.message}</p>}
+            {errors.password && (
+              <p className='error'>{errors.password.message}</p>
+            )}
           </div>
 
-          <div className="input-group">
+          <div className='input-group'>
             <input
               {...register("confirmpassword", {
                 required: "Confirm your password",
                 validate: (value) =>
                   value === password || "Passwords do not match",
               })}
-              type="password"
-              placeholder="Confirm Password"
-              style={{ border: `${errors.confirmpassword ? "2px solid red" : "2px solid #ddd"}` }}
+              type='password'
+              placeholder='Confirm Password'
+              style={{
+                border: `${
+                  errors.confirmpassword ? "2px solid red" : "2px solid #ddd"
+                }`,
+              }}
             />
-            {errors.confirmpassword && <p className="error">{errors.confirmpassword.message}</p>}
+            {errors.confirmpassword && (
+              <p className='error'>{errors.confirmpassword.message}</p>
+            )}
           </div>
 
-          <button type="submit">Register</button>
+          <button type='submit'>Register</button>
         </form>
 
-        <div className="signin-btn">
-          Already Have An Account <span onClick={() => navigate('/signin')}>Sign In</span>
+        <div className='signin-btn'>
+          Already Have An Account{" "}
+          <span onClick={() => navigate("/signin")}>Sign In</span>
         </div>
       </div>
     </div>
