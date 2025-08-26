@@ -6,8 +6,31 @@ import { scheduleContext } from "../../../../context/Schedule";
 function Token() {
   const { register, handleSubmit, formState: { errors } } = useForm();
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = async (data) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/attendance/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          token: data.subToken,
+          subject: onTimeSub
+        })
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        alert('Attendance submitted successfully!');
+      } else {
+        alert('Failed to submit attendance: ' + result.message);
+      }
+    } catch (error) {
+      console.error('Error submitting attendance:', error);
+      alert('Error submitting attendance');
+    }
   };
 
   const { mon, tue, wed, thu, fri, leave } = useContext(scheduleContext);

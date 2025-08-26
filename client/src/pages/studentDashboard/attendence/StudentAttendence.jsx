@@ -10,22 +10,42 @@ const StudentAttendance = () => {
   const [error, setError] = useState(null);
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
 
-  const sampleData = useMemo(
-    () => [
-      { Name: 'Alice', RollNo: 101, Status: 'Present', Date: '2025-05-01' },
-      { Name: 'Alice', RollNo: 101, Status: 'Absent', Date: '2025-05-02' },
-      { Name: 'Alice', RollNo: 101, Status: 'Present', Date: '2025-05-03' },
-      { Name: 'Alice', RollNo: 101, Status: 'Late', Date: '2025-05-04' },
-      { Name: 'Alice', RollNo: 101, Status: 'Present', Date: '2025-05-05' },
-    ],
-    []
-  );
-
   useEffect(() => {
-    setLoading(true);
-    setData(sampleData);
-    setLoading(false);
-  }, [sampleData]);
+    const fetchAttendanceData = async () => {
+      setLoading(true);
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:5000/attendance/student', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (response.ok) {
+          const attendanceData = await response.json();
+          // Transform data to match component expectations
+          const transformedData = attendanceData.map(record => ({
+            Name: record.studentName,
+            RollNo: record.studentUid,
+            Status: record.status,
+            Date: new Date(record.date).toISOString().split('T')[0],
+            Subject: record.subject,
+            Faculty: record.faculty,
+            Time: record.time
+          }));
+          setData(transformedData);
+        } else {
+          setError('Failed to fetch attendance data');
+        }
+      } catch (err) {
+        setError('Error fetching attendance data');
+        console.error('Attendance fetch error:', err);
+      }
+      setLoading(false);
+    };
+
+    fetchAttendanceData();
+  }, []);
 
   const filteredData = useMemo(() => {
     if (!dateRange.start || !dateRange.end) return data;
@@ -63,11 +83,12 @@ const StudentAttendance = () => {
     const doc = new jsPDF();
     doc.text('My Attendance Report', 14, 15);
     autoTable(doc, {
-      head: [['Date', 'Name', 'RollNo', 'Status']],
+      head: [['Date', 'Subject', 'Faculty', 'Time', 'Status']],
       body: filteredData.map((row) => [
         row.Date,
-        row.Name,
-        row.RollNo,
+        row.Subject || 'N/A',
+        row.Faculty || 'N/A',
+        row.Time || 'N/A',
         row.Status,
       ]),
       startY: 25,
@@ -125,8 +146,9 @@ const StudentAttendance = () => {
               <thead>
                 <tr>
                   <th>Date</th>
-                  <th>Name</th>
-                  <th>RollNo</th>
+                  <th>Subject</th>
+                  <th>Faculty</th>
+                  <th>Time</th>
                   <th>Status</th>
                 </tr>
               </thead>
@@ -134,9 +156,10 @@ const StudentAttendance = () => {
                 {filteredData.map((row, index) => (
                   <tr key={`${row.RollNo}-${row.Date}-${index}`}>
                     <td>{row.Date}</td>
-                    <td>{row.Name}</td>
-                    <td>{row.RollNo}</td>
-                    <td>{row.Status}</td>
+                    <td>{row.Subject}</td>
+                    <td>{row.Faculty}</td>
+                    <td>{row.Time}</td>
+                    <td className={`status ${row.Status.toLowerCase()}`}>{row.Status}</td>
                   </tr>
                 ))}
               </tbody>

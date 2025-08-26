@@ -1,139 +1,191 @@
 .student-attendance-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 20px;
-  font-family: "Arial", sans-serif;
-  background: #f4f7fa;
-  min-height: 100vh;
-  box-sizing: border-box;
+  padding: 2rem;
+  background: var(--bg-primary);
+  min-height: calc(100vh - 70px);
+  animation: fadeIn 0.6s ease-out;
 }
 
 .attendance-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 2rem;
+  padding: 2rem;
+  background: var(--gradient-card);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--bg-tertiary);
+  box-shadow: var(--shadow-lg);
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 1rem;
 }
 
 .attendance-header h1 {
   font-size: 2rem;
-  color: #2c3e50;
-  margin: 0 0 8px 0;
+  font-weight: 700;
+  margin: 0;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .controls {
   display: flex;
-  gap: 15px;
+  gap: 1rem;
   align-items: center;
   flex-wrap: wrap;
 }
 
 .date-filter {
   display: flex;
-  gap: 10px;
+  gap: 1rem;
 }
 
 .date-filter label {
   display: flex;
   flex-direction: column;
-  font-size: 0.9rem;
-  color: #34495e;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  gap: 0.5rem;
 }
 
 .date-filter input {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  min-width: 90px;
+  padding: 0.75rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--bg-hover);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  min-width: 120px;
+  transition: var(--transition-fast);
+}
+
+.date-filter input:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 .export-btn {
-  padding: 10px 20px;
-  background: #3498db;
-  color: white;
+  padding: 0.75rem 1.5rem;
+  background: var(--gradient-primary);
+  color: var(--text-primary);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-lg);
   cursor: pointer;
-  font-size: 1rem;
-  transition: background 0.3s;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: var(--transition-fast);
+  box-shadow: var(--shadow-md);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .export-btn:hover {
-  background: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
 }
 
 .export-btn:disabled {
-  background: #ccc;
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .error-message {
-  color: #e74c3c;
-  font-size: 0.9rem;
-  margin-top: 10px;
+  color: var(--accent-error);
+  font-size: 0.875rem;
+  margin-top: 1rem;
+  background: rgba(239, 68, 68, 0.1);
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--accent-error);
+  font-weight: 500;
 }
 
 .data-section {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 1024px) {
+  .data-section {
+    grid-template-columns: 1fr;
+  }
 }
 
 .attendance-table, .attendance-chart {
-  flex: 1 1 360px;
-  min-width: 240px;
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 18px;
+  background: var(--gradient-card);
+  border: 1px solid var(--bg-tertiary);
+  padding: 2rem;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  transition: var(--transition-normal);
   overflow-x: auto;
 }
 
-.attendance-table h2, .attendance-chart h2 {
-  font-size: 1.35rem;
-  color: #2c3e50;
-  margin-bottom: 12px;
+.attendance-table:hover, .attendance-chart:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--accent-primary);
 }
 
-/* Responsive table */
+.attendance-table h2, .attendance-chart h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--accent-primary);
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 1rem;
-  min-width: 350px;
-  background: #fff;
+  font-size: 0.875rem;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
 }
 
 th, td {
-  padding: 10px;
+  padding: 1rem;
   text-align: left;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--bg-hover);
 }
 
 th {
-  background: #3498db;
-  color: white;
-  font-size: 1.04rem;
+  background: var(--gradient-primary);
+  color: var(--text-primary);
+  font-size: 0.875rem;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 tr:nth-child(even) {
-  background: #f9f9f9;
+  background: var(--bg-secondary);
 }
 
 tr:hover {
-  background: #f1f1f1;
+  background: var(--bg-hover);
 }
 
 .no-data {
-  color: #7f8c8d;
+  color: var(--text-muted);
   font-size: 1rem;
   text-align: center;
-  padding: 20px;
+  padding: 2rem;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--bg-hover);
 }
 
 @media (max-width: 900px) {

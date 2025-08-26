@@ -20,16 +20,32 @@ function Details() {
         });
         const data = await response.json();
         if (response.ok) {
+          // Handle both name formats: single name field or separate first/last names
+          const fullName = data.name || `${data.firstname || ''} ${data.lastname || ''}`.trim();
+          const [firstName, ...lastNameParts] = fullName.split(' ');
+          
           setStudentInfo({
-            firstname: data.firstname,
-            lastname: data.lastname,
-            uid: data.uid
+            firstname: firstName || 'Student',
+            lastname: lastNameParts.join(' ') || '',
+            uid: data.uid || 'N/A'
           });
         } else {
           console.error('Failed to fetch student info:', data.message);
+          // Set fallback data
+          setStudentInfo({
+            firstname: 'Student',
+            lastname: '',
+            uid: 'N/A'
+          });
         }
       } catch (error) {
         console.error('Error fetching student info:', error);
+        // Set fallback data
+        setStudentInfo({
+          firstname: 'Student',
+          lastname: '',
+          uid: 'N/A'
+        });
       }
     };
 
@@ -81,7 +97,7 @@ function Details() {
           </svg>
         </div>
         <div id='user_details'>
-          <h2>{`${studentInfo.firstname} ${studentInfo.lastname}`}</h2>
+          <h2>{`${studentInfo.firstname}${studentInfo.lastname ? ' ' + studentInfo.lastname : ''}`}</h2>
           <p>UID: {studentInfo.uid}</p>
         </div>
       </div>

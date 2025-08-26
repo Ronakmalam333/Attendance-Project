@@ -100,18 +100,42 @@ const AllAttendance = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Sample data for initial display
-  const sampleData = useMemo(() => [
-    { Name: "Alice", RollNo: 101, Status: "Present" },
-    { Name: "Bob", RollNo: 102, Status: "Absent" },
-    { Name: "Charlie", RollNo: 103, Status: "Present" },
-    { Name: "David", RollNo: 104, Status: "Late" },
-    { Name: "Eva", RollNo: 105, Status: "Present" },
-  ], []);
-
   useEffect(() => {
-    setData(sampleData);
-  }, [sampleData]);
+    const fetchAttendanceData = async () => {
+      setLoading(true);
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:5000/attendance/all', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (response.ok) {
+          const attendanceData = await response.json();
+          // Transform data to match component expectations
+          const transformedData = attendanceData.map(record => ({
+            Name: record.studentName,
+            RollNo: record.studentUid,
+            Status: record.status,
+            Date: new Date(record.date).toISOString().split('T')[0],
+            Subject: record.subject,
+            Faculty: record.faculty,
+            Time: record.time
+          }));
+          setData(transformedData);
+        } else {
+          setError('Failed to fetch attendance data');
+        }
+      } catch (err) {
+        setError('Error fetching attendance data');
+        console.error('Attendance fetch error:', err);
+      }
+      setLoading(false);
+    };
+
+    fetchAttendanceData();
+  }, []);
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];

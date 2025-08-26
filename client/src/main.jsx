@@ -6,13 +6,16 @@ import App from './App.jsx'
 
 import { Schedule } from './context/Schedule.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
+import { ThemeProvider } from './context/ThemeContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <AuthProvider>
-      <Schedule>
-        <App />
-      </Schedule>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <Schedule>
+          <App />
+        </Schedule>
+      </AuthProvider>
+    </ThemeProvider>
   </StrictMode>
 )

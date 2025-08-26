@@ -1,54 +1,98 @@
 .signin-contain {
     width: 100%;
-    height: 100%;
+    min-height: 100vh;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    column-gap: 20px;
-    padding: 30px;
-    background: var(--primary-color);
-    color: var(--color);
-    font-weight: 300;
+    gap: 2rem;
+    padding: 2rem;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-weight: 400;
 }
 
 .signin-contain form {
     position: relative;
-    height: 100%;
-    box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
-    background: white;
-    border-radius: 20px;
+    min-height: 600px;
+    background: var(--gradient-card);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-around;
-    overflow: hidden;
+    padding: 2rem;
+    transition: var(--transition-normal);
+}
+
+.signin-contain form:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--accent-primary);
 }
 
 .signin-contain form h1 {
-    font-weight: 100;
+    font-weight: 700;
+    font-size: 2rem;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.signin-contain p {
+    color: var(--text-secondary);
+    margin: 0;
 }
 
 .signin-contain p span {
-    color: var(--color2);
-    font-size: 1.2rem;
+    color: var(--accent-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
     text-transform: capitalize;
     cursor: pointer;
+    transition: var(--transition-fast);
 }
 
 .signin-contain p span:hover {
-    color: var(--color3);
+    color: var(--accent-secondary);
+    text-decoration: underline;
 }
 
 .signin-contain .signin-banner {
     position: relative;
-    height: 100%;
-    border-radius: 20px;
-    box-shadow: rgba(17, 17, 26, 0.05) 0px 1px 0px, rgba(17, 17, 26, 0.1) 0px 0px 8px;
+    min-height: 600px;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
     overflow: hidden;
+    background: var(--gradient-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.signin-contain .signin-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("https://edcollab.co/upload/image1668710561.jpeg");
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
-    background-image: url("https://edcollab.co/upload/image1668710561.jpeg");
+    opacity: 0.3;
+}
+
+.signin-contain .signin-banner::after {
+    content: 'Welcome Back';
+    position: relative;
+    z-index: 1;
+    color: white;
+    font-size: 3rem;
+    font-weight: 700;
+    text-align: center;
+    text-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
 
 form .back-btn {
@@ -84,38 +128,74 @@ form .back-btn svg {
     gap: 50px;
 }
 
-.role-input2{
-    width: 50%;
+.role-input2 {
+    width: 70%;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 50px;
+    gap: 2rem;
+    margin-bottom: 1rem;
+}
+
+.role-input2 label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-primary);
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    transition: var(--transition-fast);
+}
+
+.role-input2 label:hover {
+    background: var(--bg-hover);
+}
+
+.role-input2 input[type="radio"] {
+    accent-color: var(--accent-primary);
 }
 
 .input {
     position: relative;
-    width: 50%;
-    height: 100%;
+    width: 70%;
     display: flex;
     flex-direction: column;
+    margin-bottom: 1.5rem;
 }
 
 .input .label {
     position: absolute;
-    top: 20px;
-    left: 5px;
-    font-size: 16px;
-    transition: all 0.3s ease;
+    top: 1rem;
+    left: 1rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    transition: var(--transition-fast);
+    pointer-events: none;
+    background: var(--bg-card);
+    padding: 0 0.5rem;
 }
 
 .input input {
-    height: 60px;
-    background: transparent;
+    height: 3.5rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
     outline: none;
-    border: none;
-    font-size: 16px;
-    padding: 5px;
-    padding-right: 30px;
+    font-size: 1rem;
+    padding: 1rem;
+    color: var(--text-primary);
+    transition: var(--transition-fast);
+}
+
+.input input:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.input input::placeholder {
+    color: var(--text-muted);
 }
 
 .eye-container {
@@ -130,14 +210,7 @@ form .back-btn svg {
 }
 
 .input .bottom-border {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 1px;
-    background-color: var(--color);
-    transition: background-color 0.3s ease, transform 0.3s ease;
-    transform-origin: left;
-    transition: 1s;
+    display: none;
 }
 
 /* Hover effect on the input field */
@@ -147,115 +220,112 @@ form .back-btn svg {
     opacity: 0.5;
 } */
 
-.input:hover .bottom-border {
-    transition: 1s;
-    box-shadow: inset 400px 0px 0 0 blue;
-}
-
-/* Focus effect to keep the label at the top */
-.input input:focus+.bottom-border {
-    transition: 1s;
-    box-shadow: inset 400px 0px 0 0 blue;
-}
-
-.input input:focus~.label {
-    top: 0;
-    font-size: 14px;
-    opacity: 0.5;
-}
-
-/* Disable hover effect when input has value or is focused */
-.input.focused .label,
-.input.focused:hover .label {
-    top: 0;
-    font-size: 14px;
-    opacity: 0.5;
-}
-
-.input.focused .bottom-border,
-.input.focused:hover .bottom-border {
-    background-color: blue;
-    transform: scaleX(1);
+.input input:focus ~ .label,
+.input.focused .label {
+    top: -0.5rem;
+    font-size: 0.75rem;
+    color: var(--accent-primary);
+    font-weight: 600;
 }
 
 .forgot {
-    color: var(--color2);
+    color: var(--accent-primary);
     cursor: pointer;
-    align-self: flex-start;
-    margin-left: 25%;
+    align-self: flex-end;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: var(--transition-fast);
+    margin-top: -1rem;
+    margin-bottom: 1rem;
 }
 
 .forgot:hover {
-    color: var(--color3);
+    color: var(--accent-secondary);
+    text-decoration: underline;
 }
 
 .submit-container {
     width: 100%;
-    height: 120px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
+    gap: 1rem;
+}
+
+.submit-container p {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    margin: 0;
 }
 
 .submit-container .submit {
     position: relative;
-    width: 50%;
-    height: 40px;
+    width: 70%;
+    height: 3rem;
     border: none;
     outline: none;
-    border-radius: 10px;
+    border-radius: var(--radius-lg);
     cursor: pointer;
     overflow: hidden;
-    text-transform: capitalize;
-    background: #333;
-    color: var(--color4);
-    transition: 0.5s;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-size: 0.875rem;
+    letter-spacing: 0.5px;
+    background: var(--gradient-primary);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-lg);
+    transition: var(--transition-fast);
 }
 
 .submit:hover {
-    transition: 0.5s;
-    transform: scale(110%);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
 }
 
-.submit:after {
-    position: absolute;
-    background: rgba(255, 255, 255, 0.132);
-    content: " ";
-    height: 155px;
-    left: -75px;
-    opacity: 0.4;
-    position: absolute;
-    top: -50px;
-    transform: rotate(35deg);
-    transition: all 550ms cubic-bezier(0.19, 1, 0.22, 1);
-    width: 50px;
-    z-index: 10;
+.submit:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-md);
 }
 
-.submit:hover:after {
-    left: 120%;
-    transition: all 550ms cubic-bezier(0.19, 1, 0.22, 1);
+.submit::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: var(--transition-normal);
+}
+
+.submit:hover::before {
+    left: 100%;
 }
 
 .google {
-    width: 50%;
-    height: 40px;
-    border-radius: 10px;
-    background: #333;
+    width: 70%;
+    height: 3rem;
+    border-radius: var(--radius-lg);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--color4);
-    gap: 10px;
+    color: var(--text-primary);
+    gap: 0.75rem;
+    font-weight: 500;
+    font-size: 0.875rem;
     text-transform: capitalize;
-    transition: 0.5s;
+    transition: var(--transition-fast);
     cursor: pointer;
+    box-shadow: var(--shadow-md);
 }
 
 .google:hover {
-    transition: 0.5s;
-    transform: scale(110%);
+    background: var(--bg-hover);
+    border-color: var(--accent-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
 }
 
 

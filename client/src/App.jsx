@@ -9,6 +9,7 @@ import AboutUs from './components/about us/AboutUs';
 import AllAttendence from './pages/adminDashboard/attendence/AllAttendence';
 import Feedback from './components/feedback/Feedback';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import StudentDashboard from './pages/studentDashboard/StudentDashboard';
 import AdminDashboard from './pages/adminDashboard/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -20,8 +21,9 @@ import Chatbot from './components/chatbot/Chatbot';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <ThemeProvider>
+      <AuthProvider>
+        <Router>
         <div className="container">
           <Routes>
 
@@ -69,8 +71,9 @@ function App() {
           </Routes>
           <Chatbot/>
         </div>
-      </Router>
-    </AuthProvider>
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

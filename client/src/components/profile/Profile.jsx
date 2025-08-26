@@ -29,17 +29,13 @@ const Profile = () => {
         });
         const data = await response.json();
         if (response.ok) {
-          if (user?.role === "staff" && data.name) {
-            // Split name for staff (assume "First Last" format)
-            const [firstname, ...rest] = data.name.split(' ');
-            setProfileData({
-              ...data,
-              firstname: firstname || '',
-              lastname: rest.join(' ') || '',
-            });
-          } else {
-            setProfileData(data);
-          }
+          // Split name for both staff and students
+          const [firstname, ...rest] = (data.name || '').split(' ');
+          setProfileData({
+            ...data,
+            firstname: firstname || '',
+            lastname: rest.join(' ') || '',
+          });
         } else {
           console.error('Failed to fetch profile:', data.message);
         }
@@ -77,14 +73,10 @@ const Profile = () => {
   const handleSave = async () => {
     try {
       let dataToSend = { ...profileData };
-      // For staff, combine firstname and lastname into name
-      if (user?.role === "staff") {
-        dataToSend.name = `${profileData.firstname} ${profileData.lastname}`.trim();
-        delete dataToSend.firstname;
-        delete dataToSend.lastname;
-        // Optionally: prevent staff from changing email by removing it from update payload
-        // delete dataToSend.email;
-      }
+      // Combine firstname and lastname into name for both roles
+      dataToSend.name = `${profileData.firstname} ${profileData.lastname}`.trim();
+      delete dataToSend.firstname;
+      delete dataToSend.lastname;
       const response = await fetch('http://localhost:5000/profile', {
         method: 'PUT',
         headers: {
@@ -98,7 +90,7 @@ const Profile = () => {
         setIsEditing(false);
         alert('Profile updated successfully!');
         // Update profileData with any changes returned from backend
-        if (user?.role === "staff" && result.user?.name) {
+        if (result.user?.name) {
           const [firstname, ...rest] = result.user.name.split(' ');
           setProfileData({
             ...result.user,

@@ -1,11 +1,15 @@
 const mongoose = require('mongoose');
+require('dotenv').config();
 
-const URI = 'mongodb://localhost:27017/studentDb';
+const URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/studentDb';
 
 function connectDb() {
     mongoose.connect(URI)
     .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.log(err));
+    .catch(err => {
+        console.error('MongoDB connection error:', err);
+        process.exit(1);
+    });
 }
 
 module.exports = connectDb;

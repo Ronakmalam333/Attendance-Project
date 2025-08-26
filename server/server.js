@@ -12,10 +12,10 @@ const attendance = require("./models/attendance");
 const app = express();
 connectDb();
 
-// Load environment variables (recommended to store API keys)
+// Load environment variables
 require("dotenv").config();
 const SECRET_KEY = process.env.SECRET_KEY || "This is my security key";
-const GOOGLE_AI_KEY = process.env.GOOGLE_AI_KEY || "AIzaSyBMqGgZVmMYRxlQ0OX7LGLK8179KQk9uKc"; // Move to .env
+const GOOGLE_AI_KEY = process.env.GOOGLE_AI_KEY;
 const genAI = new GoogleGenerativeAI(GOOGLE_AI_KEY);
 
 app.use(express.json());
@@ -289,4 +289,155 @@ app.get("/students", async (req, res) => {
   }
 });
 
-app.listen(5000, () => console.log("listening on http://localhost:5000"));
+// Middleware for token verification
+const verifyToken = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  const token = authHeader.split(" ")[1];
+  try {
+    const decoded = jwt.verify(token, SECRET_KEY);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: "Invalid or expired token" });
+  }
+};
+
+// Submit attendance token
+app.post("/attendance/submit", verifyToken, async (req, res) => {
+  const { token: attendanceToken, subject } = req.body;
+  const { username, role } = req.user;
+
+  if (role !== "student") {
+    return res.status(403).json({ message: "Only students can submit attendance" });
+  }
+
+  try {
+    const studentData = await student.findOne({
+      $or: [{ uid: username }, { email: username }],
+    });
+
+    if (!studentData) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    const today = new Date();
+    const dateStr = today.toISOString().split('T')[0];
+    const timeStr = today.toLocaleTimeString('en-US', { hour12: false });
+
+    // Check if attendance already exists for today and subject
+    const existingAttendance = await attendance.findOne({
+      studentId: studentData._id,
+      subject,
+      date: {
+        $gte: new Date(dateStr),
+        $lt: new Date(new Date(dateStr).getTime() + 24 * 60 * 60 * 1000)
+      }
+    });
+
+    if (existingAttendance) {
+      return res.status(400).json({ message: "Attendance already submitted for this subject today" });
+    }
+
+    // Create new attendance record
+    const newAttendance = new attendance({
+      studentId: studentData._id,
+      studentUid: studentData.uid,
+      studentName: studentData.name,
+      subject,
+      faculty: "TBD", // This should come from schedule or be provided
+      date: today,
+      time: timeStr,
+      status: "Present",
+      token: attendanceToken,
+      duration: "1 hour" // This should be calculated or provided
+    });
+
+    await newAttendance.save();
+    return res.status(200).json({ message: "Attendance submitted successfully" });
+  } catch (error) {
+    console.error("Attendance submission error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+// Get student's attendance records
+app.get("/attendance/student", verifyToken, async (req, res) => {
+  const { username, role } = req.user;
+
+  if (role !== "student") {
+    return res.status(403).json({ message: "Access denied" });
+  }
+
+  try {
+    const studentData = await student.findOne({
+      $or: [{ uid: username }, { email: username }],
+    });
+
+    if (!studentData) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    const attendanceRecords = await attendance.find({ studentId: studentData._id })
+      .sort({ date: -1 });
+
+    return res.json(attendanceRecords);
+  } catch (error) {
+    console.error("Get student attendance error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+// Get all attendance records (admin only)
+app.get("/attendance/all", verifyToken, async (req, res) => {
+  const { role } = req.user;
+
+  if (role !== "staff") {
+    return res.status(403).json({ message: "Access denied" });
+  }
+
+  try {
+    const attendanceRecords = await attendance.find()
+      .populate('studentId', 'name uid email course semester')
+      .sort({ date: -1 });
+
+    return res.json(attendanceRecords);
+  } catch (error) {
+    console.error("Get all attendance error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+// Get attendance summary (admin dashboard)
+app.get("/api/attendance/summary", verifyToken, async (req, res) => {
+  const { role } = req.user;
+
+  if (role !== "staff") {
+    return res.status(403).json({ message: "Access denied" });
+  }
+
+  try {
+    const totalStudents = await student.countDocuments();
+    const totalRecords = await attendance.countDocuments();
+    
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
+    
+    const presentToday = await attendance.countDocuments({
+      date: { $gte: startOfDay, $lt: endOfDay },
+      status: "Present"
+    });
+
+    return res.json({ totalStudents, totalRecords, presentToday });
+  } catch (error) {
+    console.error("Get attendance summary error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server listening on http://localhost:${PORT}`));
