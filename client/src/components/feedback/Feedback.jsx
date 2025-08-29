@@ -51,7 +51,7 @@ function Feedback() {
         </div>
 
         <button type="submit" className="submit-btn">
-          Send Feedback 🚀
+          <h3 className="btn-text">Submit Feedback 🚀</h3>
         </button>
       </form>
     </div>

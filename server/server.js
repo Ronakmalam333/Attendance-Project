@@ -2,12 +2,16 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { generateTokens, setTokenCookies, clearTokenCookies } = require('./tokenUtils');
+const { authenticateToken, authorizeRoles } = require('./authMiddleware');
 
 const connectDb = require("./config/db");
 const student = require("./models/student");
 const staff = require("./models/staff");
 const attendance = require("./models/attendance");
+const AttendanceToken = require("./models/attendanceToken");
 
 const app = express();
 connectDb();
@@ -19,7 +23,11 @@ const GOOGLE_AI_KEY = process.env.GOOGLE_AI_KEY;
 const genAI = new GoogleGenerativeAI(GOOGLE_AI_KEY);
 
 app.use(express.json());
-app.use(cors());
+app.use(cookieParser());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
 
 app.get("/", (req, res) => {
   res.json({ message: "Hello, World!" });
@@ -139,14 +147,13 @@ app.post("/login", async (req, res) => {
       if (studentExist) {
         const studentMatch = await bcrypt.compare(password, studentExist.password);
         if (studentMatch) {
-          const token = jwt.sign({ username, role }, SECRET_KEY, {
-            expiresIn: "24h",
-          });
+          const { accessToken, refreshToken } = generateTokens({ username, role });
+          setTokenCookies(res, accessToken, refreshToken);
+          
           return res.status(200).json({
             message: "Login Successful",
-            token,
             role,
-            user: { ...studentExist.toObject(), role }, // <-- FIXED
+            user: { ...studentExist.toObject(), role },
           });
         }
       }
@@ -157,14 +164,13 @@ app.post("/login", async (req, res) => {
       if (staffExist) {
         const staffMatch = await bcrypt.compare(password, staffExist.password);
         if (staffMatch) {
-          const token = jwt.sign({ username, role }, SECRET_KEY, {
-            expiresIn: "24h",
-          });
+          const { accessToken, refreshToken } = generateTokens({ username, role });
+          setTokenCookies(res, accessToken, refreshToken);
+          
           return res.status(200).json({
             message: "Login Successful",
-            token,
             role,
-            user: { ...staffExist.toObject(), role }, // <-- FIXED
+            user: { ...staffExist.toObject(), role },
           });
         }
       }
@@ -177,16 +183,9 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.get("/profile", async (req, res) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-
-  const token = authHeader.split(" ")[1];
+app.get("/profile", authenticateToken, async (req, res) => {
   try {
-    const decoded = jwt.verify(token, SECRET_KEY);
-    const { username, role } = decoded;
+    const { username, role } = req.user;
 
     let user;
     if (role === "student") {
@@ -206,20 +205,13 @@ app.get("/profile", async (req, res) => {
     return res.json(user);
   } catch (error) {
     console.error("Profile error:", error);
-    return res.status(500).json({ message: "Invalid or expired token" });
+    return res.status(500).json({ message: "Server error" });
   }
 });
 
-app.put("/profile", async (req, res) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-
-  const token = authHeader.split(" ")[1];
+app.put("/profile", authenticateToken, async (req, res) => {
   try {
-    const decoded = jwt.verify(token, SECRET_KEY);
-    const { username, role } = decoded;
+    const { username, role } = req.user;
     const updates = req.body;
 
     let user;
@@ -256,8 +248,32 @@ app.post("/chatbot", async (req, res) => {
   }
 
   try {
+    const systemPrompt = `You are an AI assistant for an Attendance Management System (AMS). You help students and staff with attendance-related queries only. 
+
+System Features:
+- Students can submit attendance using tokens during class hours
+- Staff can view all attendance records and generate reports
+- Students can view their personal attendance history
+- System supports role-based access (student/staff)
+- Attendance tracking with date, time, subject, and status
+- Profile management for users
+- Dashboard with attendance statistics
+
+Only answer questions related to:
+- How to submit attendance
+- Viewing attendance records
+- Understanding attendance statistics
+- Profile management
+- System navigation
+- Troubleshooting attendance issues
+- Academic attendance policies
+
+If asked about topics unrelated to attendance management, politely redirect to attendance-related topics.
+
+User Question: ${prompt}`;
+
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const result = await model.generateContent(prompt);
+    const result = await model.generateContent(systemPrompt);
     const response = result.response;
     const text = response.text();
     return res.status(200).json({ response: text });
@@ -279,7 +295,7 @@ app.post("/data", async (req, res) => {
   }
 });
 
-app.get("/students", async (req, res) => {
+app.get("/students", authenticateToken, authorizeRoles('staff'), async (req, res) => {
   try {
     const data = await student.find();
     return res.json(data);
@@ -289,33 +305,65 @@ app.get("/students", async (req, res) => {
   }
 });
 
-// Middleware for token verification
-const verifyToken = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Unauthorized" });
+// Token refresh endpoint
+app.post("/auth/refresh", (req, res) => {
+  const refreshToken = req.cookies?.refreshToken;
+  
+  if (!refreshToken) {
+    return res.status(401).json({ message: "Refresh token required" });
   }
 
-  const token = authHeader.split(" ")[1];
   try {
-    const decoded = jwt.verify(token, SECRET_KEY);
-    req.user = decoded;
-    next();
+    const { verifyRefreshToken } = require('./tokenUtils');
+    const decoded = verifyRefreshToken(refreshToken);
+    const { accessToken, refreshToken: newRefreshToken } = generateTokens({
+      username: decoded.username,
+      role: decoded.role
+    });
+
+    setTokenCookies(res, accessToken, newRefreshToken);
+    return res.status(200).json({ message: "Token refreshed successfully" });
   } catch (error) {
-    return res.status(401).json({ message: "Invalid or expired token" });
+    return res.status(401).json({ message: "Invalid refresh token" });
   }
-};
+});
+
+// Logout endpoint
+app.post("/auth/logout", (req, res) => {
+  clearTokenCookies(res);
+  return res.status(200).json({ message: "Logged out successfully" });
+});
+
+// Check authentication status
+app.get("/auth/status", (req, res) => {
+  try {
+    const accessToken = req.cookies?.accessToken;
+    
+    if (!accessToken) {
+      return res.status(401).json({ authenticated: false });
+    }
+
+    const { verifyAccessToken } = require('./tokenUtils');
+    const decoded = verifyAccessToken(accessToken);
+    return res.status(200).json({ 
+      authenticated: true, 
+      user: decoded 
+    });
+  } catch (error) {
+    return res.status(401).json({ authenticated: false });
+  }
+});
 
 // Submit attendance token
-app.post("/attendance/submit", verifyToken, async (req, res) => {
+app.post("/attendance/submit", authenticateToken, authorizeRoles('student'), async (req, res) => {
   const { token: attendanceToken, subject } = req.body;
   const { username, role } = req.user;
 
-  if (role !== "student") {
-    return res.status(403).json({ message: "Only students can submit attendance" });
-  }
-
   try {
+    if (!attendanceToken || attendanceToken.length !== 4) {
+      return res.status(400).json({ message: "Please enter a valid 4-character token" });
+    }
+
     const studentData = await student.findOne({
       $or: [{ uid: username }, { email: username }],
     });
@@ -324,22 +372,42 @@ app.post("/attendance/submit", verifyToken, async (req, res) => {
       return res.status(404).json({ message: "Student not found" });
     }
 
+    // Find valid token
+    const now = new Date();
+    const tokenData = await AttendanceToken.findOne({
+      token: attendanceToken.toUpperCase(),
+      isActive: true,
+      validFrom: { $lte: now },
+      validUntil: { $gte: now }
+    });
+
+    if (!tokenData) {
+      return res.status(400).json({ 
+        message: "Invalid or expired token" 
+      });
+    }
+
+    if (tokenData.currentUsage >= tokenData.maxUsage) {
+      return res.status(400).json({ 
+        message: "Token usage limit reached" 
+      });
+    }
+
     const today = new Date();
-    const dateStr = today.toISOString().split('T')[0];
-    const timeStr = today.toLocaleTimeString('en-US', { hour12: false });
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000);
 
     // Check if attendance already exists for today and subject
     const existingAttendance = await attendance.findOne({
       studentId: studentData._id,
-      subject,
-      date: {
-        $gte: new Date(dateStr),
-        $lt: new Date(new Date(dateStr).getTime() + 24 * 60 * 60 * 1000)
-      }
+      subject: tokenData.subject,
+      date: { $gte: startOfDay, $lt: endOfDay }
     });
 
     if (existingAttendance) {
-      return res.status(400).json({ message: "Attendance already submitted for this subject today" });
+      return res.status(400).json({ 
+        message: `Attendance already marked for ${tokenData.subject} today` 
+      });
     }
 
     // Create new attendance record
@@ -347,17 +415,25 @@ app.post("/attendance/submit", verifyToken, async (req, res) => {
       studentId: studentData._id,
       studentUid: studentData.uid,
       studentName: studentData.name,
-      subject,
-      faculty: "TBD", // This should come from schedule or be provided
+      subject: tokenData.subject,
+      faculty: tokenData.faculty,
       date: today,
-      time: timeStr,
+      time: today.toLocaleTimeString('en-US', { hour12: false }),
       status: "Present",
-      token: attendanceToken,
-      duration: "1 hour" // This should be calculated or provided
+      token: attendanceToken.toUpperCase(),
+      duration: "1 hour"
     });
 
     await newAttendance.save();
-    return res.status(200).json({ message: "Attendance submitted successfully" });
+    
+    // Update token usage
+    await AttendanceToken.findByIdAndUpdate(tokenData._id, {
+      $inc: { currentUsage: 1 }
+    });
+
+    return res.status(200).json({ 
+      message: `Attendance marked successfully for ${tokenData.subject}` 
+    });
   } catch (error) {
     console.error("Attendance submission error:", error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -365,12 +441,8 @@ app.post("/attendance/submit", verifyToken, async (req, res) => {
 });
 
 // Get student's attendance records
-app.get("/attendance/student", verifyToken, async (req, res) => {
+app.get("/attendance/student", authenticateToken, authorizeRoles('student'), async (req, res) => {
   const { username, role } = req.user;
-
-  if (role !== "student") {
-    return res.status(403).json({ message: "Access denied" });
-  }
 
   try {
     const studentData = await student.findOne({
@@ -392,12 +464,8 @@ app.get("/attendance/student", verifyToken, async (req, res) => {
 });
 
 // Get all attendance records (admin only)
-app.get("/attendance/all", verifyToken, async (req, res) => {
+app.get("/attendance/all", authenticateToken, authorizeRoles('staff'), async (req, res) => {
   const { role } = req.user;
-
-  if (role !== "staff") {
-    return res.status(403).json({ message: "Access denied" });
-  }
 
   try {
     const attendanceRecords = await attendance.find()
@@ -412,12 +480,8 @@ app.get("/attendance/all", verifyToken, async (req, res) => {
 });
 
 // Get attendance summary (admin dashboard)
-app.get("/api/attendance/summary", verifyToken, async (req, res) => {
+app.get("/api/attendance/summary", authenticateToken, authorizeRoles('staff'), async (req, res) => {
   const { role } = req.user;
-
-  if (role !== "staff") {
-    return res.status(403).json({ message: "Access denied" });
-  }
 
   try {
     const totalStudents = await student.countDocuments();
@@ -439,5 +503,115 @@ app.get("/api/attendance/summary", verifyToken, async (req, res) => {
   }
 });
 
+// Token Management Routes
+
+// Get all tokens (staff only)
+app.get("/tokens", authenticateToken, authorizeRoles('staff'), async (req, res) => {
+  try {
+    const tokens = await AttendanceToken.find().sort({ createdAt: -1 });
+    return res.json(tokens);
+  } catch (error) {
+    console.error("Get tokens error:", error);
+    return res.status(500).json({ message: "Failed to fetch tokens" });
+  }
+});
+
+// Get active tokens (students can see current sessions)
+app.get("/tokens/active", authenticateToken, async (req, res) => {
+  try {
+    const activeTokens = await AttendanceToken.find({
+      isActive: true,
+      validFrom: { $lte: new Date() },
+      validUntil: { $gte: new Date() },
+      $expr: { $lt: ['$currentUsage', '$maxUsage'] }
+    }).select('subject faculty validUntil currentUsage maxUsage').sort({ validUntil: 1 });
+    
+    return res.json(activeTokens);
+  } catch (error) {
+    console.error("Get active tokens error:", error);
+    return res.status(500).json({ message: "Failed to fetch active tokens" });
+  }
+});
+
+// Create new token (staff only)
+app.post("/tokens", authenticateToken, authorizeRoles('staff'), async (req, res) => {
+  const { subject, token, faculty, validFrom, validUntil, maxUsage } = req.body;
+  const { username } = req.user;
+
+  try {
+    const newToken = new AttendanceToken({
+      subject,
+      token,
+      faculty,
+      validFrom: new Date(validFrom),
+      validUntil: new Date(validUntil),
+      maxUsage: maxUsage || 100,
+      createdBy: username
+    });
+
+    await newToken.save();
+    return res.status(201).json({ message: "Token created successfully", token: newToken });
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(400).json({ message: "Token already exists" });
+    }
+    console.error("Create token error:", error);
+    return res.status(500).json({ message: "Failed to create token" });
+  }
+});
+
+// Update token (staff only)
+app.put("/tokens/:id", authenticateToken, authorizeRoles('staff'), async (req, res) => {
+  const { id } = req.params;
+  const updates = req.body;
+
+  try {
+    const updatedToken = await AttendanceToken.findByIdAndUpdate(id, updates, { new: true });
+    if (!updatedToken) {
+      return res.status(404).json({ message: "Token not found" });
+    }
+    return res.json({ message: "Token updated successfully", token: updatedToken });
+  } catch (error) {
+    console.error("Update token error:", error);
+    return res.status(500).json({ message: "Failed to update token" });
+  }
+});
+
+// Delete token (staff only)
+app.delete("/tokens/:id", authenticateToken, authorizeRoles('staff'), async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const deletedToken = await AttendanceToken.findByIdAndDelete(id);
+    if (!deletedToken) {
+      return res.status(404).json({ message: "Token not found" });
+    }
+    return res.json({ message: "Token deleted successfully" });
+  } catch (error) {
+    console.error("Delete token error:", error);
+    return res.status(500).json({ message: "Failed to delete token" });
+  }
+});
+
+
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('Global error:', err);
+  res.status(500).json({ 
+    message: process.env.NODE_ENV === 'production' 
+      ? 'Internal server error' 
+      : err.message 
+  });
+});
+
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({ message: 'Route not found' });
+});
+
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server listening on http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+});

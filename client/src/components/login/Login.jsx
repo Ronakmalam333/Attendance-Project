@@ -3,6 +3,7 @@ import "./login.css";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../context/AuthContext";
+import { tokenManager } from "../../tokenManager";
 
 function Login() {
   const navigate = useNavigate();
@@ -31,31 +32,16 @@ function Login() {
       role: data.role,
     };
 
-
     try {
-      const response = await fetch("http://localhost:5000/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(loginData),
-      });
-
-      const result = await response.json();
-
-      /* Only for debugging purposes...!!! */
-      // console.log("Login Response:", result);
-      // console.log("Response OK:", response.ok);
-
-      if (response.ok) {
-        login({ ...result.user, role: result.role }, result.token);
-        navigate(data.role === "student" ? "/student" : "/staff");
-      } else {
-        alert("Login failed: " + result.message);
-      }
+      const result = await tokenManager.login(loginData);
+      
+      // Login successful - cookies are automatically set by the server
+      login({ ...result.user, role: result.role });
+      navigate(data.role === "student" ? "/student" : "/staff");
     } catch (error) {
       console.error("Error during login:", error);
-      alert("Login failed: Network error");
+      const errorMessage = error.response?.data?.message || "Network error";
+      alert("Login failed: " + errorMessage);
     }
   };
 

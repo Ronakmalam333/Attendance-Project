@@ -2,10 +2,27 @@ import React, { useContext, useState, useEffect } from 'react';
 import './Profile.css';
 import { AuthContext } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import axios from '../../tokenManager';
+
+// ✅ Utility to normalize profile data safely
+const normalizeProfile = (data = {}) => {
+  const fullName = (data.name || '').trim();
+  const parts = fullName.split(/\s+/).filter(Boolean);
+
+  const firstname = data.firstname || parts[0] || '';
+  const lastname = data.lastname || (parts.length > 1 ? parts.slice(1).join(' ') : '');
+
+  return {
+    ...data,
+    firstname,
+    lastname,
+  };
+};
 
 const Profile = () => {
   const [profilePic, setProfilePic] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [statusMessage, setStatusMessage] = useState(null);
   const [profileData, setProfileData] = useState({
     firstname: '',
     lastname: '',
@@ -15,39 +32,23 @@ const Profile = () => {
     course: '',
     semester: ''
   });
-  const { user, token, logout } = useContext(AuthContext);
+
+  const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
   // Fetch profile data on mount
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await fetch('http://localhost:5000/profile', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        const data = await response.json();
-        if (response.ok) {
-          // Split name for both staff and students
-          const [firstname, ...rest] = (data.name || '').split(' ');
-          setProfileData({
-            ...data,
-            firstname: firstname || '',
-            lastname: rest.join(' ') || '',
-          });
-        } else {
-          console.error('Failed to fetch profile:', data.message);
-        }
+        const response = await axios.get('/profile');
+        setProfileData(normalizeProfile(response.data));
       } catch (error) {
-        console.error('Error fetching profile:', error);
+        console.error('Failed to fetch profile:', error.response?.data?.message || error.message);
       }
     };
 
-    if (user && token) {
-      fetchProfile();
-    }
-  }, [user, token]);
+    fetchProfile();
+  }, []);
 
   const handleProfilePicChange = (event) => {
     const file = event.target.files[0];
@@ -62,6 +63,16 @@ const Profile = () => {
 
   const handleLogout = () => {
     logout();
+    setProfileData({
+      firstname: '',
+      lastname: '',
+      name: '',
+      email: '',
+      uid: '',
+      course: '',
+      semester: ''
+    });
+    setProfilePic(null);
     navigate('/'); // Redirect to login page after logout
   };
 
@@ -72,40 +83,26 @@ const Profile = () => {
 
   const handleSave = async () => {
     try {
-      let dataToSend = { ...profileData };
-      // Combine firstname and lastname into name for both roles
-      dataToSend.name = `${profileData.firstname} ${profileData.lastname}`.trim();
+      let dataToSend = {
+        ...profileData,
+        name: `${profileData.firstname} ${profileData.lastname}`.trim()
+      };
       delete dataToSend.firstname;
       delete dataToSend.lastname;
-      const response = await fetch('http://localhost:5000/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(dataToSend)
-      });
-      const result = await response.json();
-      if (response.ok) {
-        setIsEditing(false);
-        alert('Profile updated successfully!');
-        // Update profileData with any changes returned from backend
-        if (result.user?.name) {
-          const [firstname, ...rest] = result.user.name.split(' ');
-          setProfileData({
-            ...result.user,
-            firstname: firstname || '',
-            lastname: rest.join(' ') || '',
-          });
-        } else {
-          setProfileData(result.user);
-        }
-      } else {
-        alert('Failed to update profile: ' + result.message);
+
+      const response = await axios.put('/profile', dataToSend);
+      const result = response.data;
+
+      setIsEditing(false);
+      setStatusMessage('Profile updated successfully!');
+
+      if (result.user) {
+        setProfileData(normalizeProfile(result.user));
       }
     } catch (error) {
       console.error('Error updating profile:', error);
-      alert('Error updating profile');
+      const errorMessage = error.response?.data?.message || 'Error updating profile';
+      setStatusMessage('Failed to update profile: ' + errorMessage);
     }
   };
 
@@ -133,9 +130,7 @@ const Profile = () => {
           </label>
           <div className='profile-info'>
             <h2>
-              {user?.role === "staff"
-                ? `${profileData.firstname} ${profileData.lastname}`.trim()
-                : `${profileData.firstname} ${profileData.lastname}`.trim()}
+              {`${profileData.firstname} ${profileData.lastname}`.trim() || profileData.name || 'User Name'}
             </h2>
             <p>{profileData.email}</p>
           </div>
@@ -147,39 +142,38 @@ const Profile = () => {
         <div className='profile-details'>
           <div className='profile-field'>
             <label>Full Name</label>
-            <input type='text'
-              value={
-                user?.role === "staff"
-                  ? `${profileData.firstname} ${profileData.lastname}`.trim()
-                  : `${profileData.firstname} ${profileData.lastname}`.trim()
-              }
+            <input
+              type='text'
+              value={`${profileData.firstname || ''} ${profileData.lastname || ''}`.trim() || 'No name available'}
               readOnly
             />
           </div>
 
           <div className='profile-field'>
             <label>UID</label>
-            <input type='text' value={profileData.uid} readOnly />
+            <input type='text' value={profileData.uid || ''} readOnly />
           </div>
 
           <div className='profile-field'>
             <label>Email</label>
-            <input type='text' value={profileData.email} readOnly />
+            <input type='text' value={profileData.email || ''} readOnly />
           </div>
 
           {user?.role === 'student' && (
             <>
               <div className='profile-field'>
                 <label>Course</label>
-                <input type='text' value={profileData.course} readOnly />
+                <input type='text' value={profileData.course || ''} readOnly />
               </div>
               <div className='profile-field'>
                 <label>Semester</label>
-                <input type='text' value={profileData.semester} readOnly />
+                <input type='text' value={profileData.semester || ''} readOnly />
               </div>
             </>
           )}
         </div>
+
+        {statusMessage && <p className="status">{statusMessage}</p>}
 
         <button className='logout-button' onClick={handleLogout}>
           Logout
@@ -194,7 +188,7 @@ const Profile = () => {
                 <input
                   type='text'
                   name='firstname'
-                  value={profileData.firstname}
+                  value={profileData.firstname || ''}
                   onChange={handleInputChange}
                 />
               </div>
@@ -203,7 +197,7 @@ const Profile = () => {
                 <input
                   type='text'
                   name='lastname'
-                  value={profileData.lastname}
+                  value={profileData.lastname || ''}
                   onChange={handleInputChange}
                 />
               </div>
@@ -212,9 +206,9 @@ const Profile = () => {
                 <input
                   type='text'
                   name='email'
-                  value={profileData.email}
+                  value={profileData.email || ''}
                   onChange={handleInputChange}
-                  readOnly={user?.role === 'staff'} // Staff cannot edit email
+                  disabled={user?.role === 'staff'} // Staff cannot edit email
                 />
               </div>
               {user?.role === 'student' && (
@@ -224,7 +218,7 @@ const Profile = () => {
                     <input
                       type='text'
                       name='course'
-                      value={profileData.course}
+                      value={profileData.course || ''}
                       onChange={handleInputChange}
                     />
                   </div>
@@ -233,7 +227,7 @@ const Profile = () => {
                     <input
                       type='text'
                       name='semester'
-                      value={profileData.semester}
+                      value={profileData.semester || ''}
                       onChange={handleInputChange}
                     />
                   </div>

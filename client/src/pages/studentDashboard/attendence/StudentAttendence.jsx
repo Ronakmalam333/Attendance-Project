@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import axios from '../../../tokenManager';
 import './studentattendence.css';
 
 const StudentAttendance = () => {
@@ -14,31 +15,34 @@ const StudentAttendance = () => {
     const fetchAttendanceData = async () => {
       setLoading(true);
       try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/attendance/student', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        
-        if (response.ok) {
-          const attendanceData = await response.json();
-          // Transform data to match component expectations
-          const transformedData = attendanceData.map(record => ({
-            Name: record.studentName,
-            RollNo: record.studentUid,
-            Status: record.status,
-            Date: new Date(record.date).toISOString().split('T')[0],
-            Subject: record.subject,
-            Faculty: record.faculty,
-            Time: record.time
-          }));
-          setData(transformedData);
-        } else {
-          setError('Failed to fetch attendance data');
+        // Check auth status first
+        const authStatus = await axios.get('/auth/status');
+        if (!authStatus.data.authenticated) {
+          setError('Please log in to view attendance data');
+          setLoading(false);
+          return;
         }
+
+        const response = await axios.get('/attendance/student');
+        const attendanceData = response.data;
+        
+        // Transform data to match component expectations
+        const transformedData = attendanceData.map(record => ({
+          Name: record.studentName,
+          RollNo: record.studentUid,
+          Status: record.status,
+          Date: new Date(record.date).toISOString().split('T')[0],
+          Subject: record.subject,
+          Faculty: record.faculty,
+          Time: record.time
+        }));
+        setData(transformedData);
       } catch (err) {
-        setError('Error fetching attendance data');
+        if (err.response?.status === 403) {
+          setError('Access denied. Please ensure you are logged in as a student.');
+        } else {
+          setError('Error fetching attendance data');
+        }
         console.error('Attendance fetch error:', err);
       }
       setLoading(false);

@@ -1,65 +1,78 @@
 import React, { createContext, useEffect, useState } from 'react';
+import { tokenManager } from '../tokenManager';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const login = (userData, token) => {
+  const login = (userData) => {
     setUser(userData);
-    setToken(token);
-    localStorage.setItem('token', token);
+    setIsAuthenticated(true);
+    // Store user data in localStorage for persistence
     localStorage.setItem('user', JSON.stringify(userData));
-    localStorage.setItem('loginTime', Date.now());
+    localStorage.setItem('role', userData.role);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await tokenManager.logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
     setUser(null);
-    setToken(null);
-    localStorage.removeItem('token');
+    setIsAuthenticated(false);
     localStorage.removeItem('user');
-    localStorage.removeItem('loginTime');
+    localStorage.removeItem('role');
   };
 
+  // Check authentication status on app load
   useEffect(() => {
-  const storedToken = localStorage.getItem('token');
-  const storedUserRaw = localStorage.getItem('user');
-  const loginTime = localStorage.getItem('loginTime');
-
-  if (storedToken && storedUserRaw && loginTime) {
-    const timeElapsed = Date.now() - parseInt(loginTime, 10);
-    const twentyFourHours = 24 * 60 * 60 * 1000;
-
-    if (timeElapsed < twentyFourHours) {
+    const checkAuthStatus = async () => {
       try {
-        const parsedUser = storedUserRaw !== "undefined" ? JSON.parse(storedUserRaw) : null;
-
-        if (parsedUser) {
-          setUser(parsedUser);
-          setToken(storedToken);
+        const authStatus = await tokenManager.checkAuth();
+        if (authStatus.authenticated) {
+          setIsAuthenticated(true);
+          // Try to get user data from localStorage first
+          const storedUser = localStorage.getItem('user');
+          if (storedUser) {
+            try {
+              setUser(JSON.parse(storedUser));
+            } catch (error) {
+              console.error('Error parsing stored user data:', error);
+              localStorage.removeItem('user');
+            }
+          }
         } else {
-          logout();
+          setIsAuthenticated(false);
+          setUser(null);
+          localStorage.removeItem('user');
+          localStorage.removeItem('role');
         }
       } catch (error) {
-        console.error('Failed to parse user data from localStorage:', error);
-        logout();
+        console.error('Auth check failed:', error);
+        setIsAuthenticated(false);
+        setUser(null);
+      } finally {
+        setIsLoading(false);
       }
-    } else {
-      logout(); 
-    }
-  } else {
-    logout();
-  }
+    };
 
-  setIsLoading(false);
-}, []);
-
-
+    checkAuthStatus();
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      isAuthenticated, 
+      login, 
+      logout, 
+      isLoading,
+      // Keep token for backward compatibility
+      token: isAuthenticated ? 'authenticated' : null
+    }}>
       {children}
     </AuthContext.Provider>
   );

@@ -14,8 +14,10 @@ import StudentDashboard from './pages/studentDashboard/StudentDashboard';
 import AdminDashboard from './pages/adminDashboard/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import StudentAttendence from './pages/studentDashboard/attendence/StudentAttendence';
+import AttendanceMarking from './pages/studentDashboard/attendence/AttendanceMarking';
 import Classes from './pages/studentDashboard/classes/Classes';
 import Students from './pages/adminDashboard/students/Students';
+import TokenManagement from './pages/adminDashboard/tokens/TokenManagement';
 import Profile from './components/profile/Profile';
 import Chatbot from './components/chatbot/Chatbot';
 
@@ -41,6 +43,7 @@ function App() {
             >
               <Route index element={<StudentDashboard />} />
               <Route path='attendence' element={<StudentAttendence/>}/>
+              <Route path='mark-attendance' element={<AttendanceMarking/>}/>
               <Route path='classes' element={<Classes/>}/>
               <Route path="privacypolicy" element={<PrivacyPolicy />} />
               <Route path="aboutus" element={<AboutUs />} />
@@ -58,7 +61,9 @@ function App() {
               }
             >
               <Route index element={<AdminDashboard />} />
+              <Route path='manage-tokens' element={<TokenManagement/>}/>
               <Route path='students' element={<Students/>}/>
+              <Route path='tokens' element={<TokenManagement/>}/>
               <Route path="privacypolicy" element={<PrivacyPolicy />} />
               <Route path="aboutus" element={<AboutUs />} />
               <Route path="attendence" element={<AllAttendence />} />

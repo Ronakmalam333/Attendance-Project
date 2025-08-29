@@ -3,12 +3,13 @@ import { Navigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
 const ProtectedRoute = ({ role, children }) => {
-  const { user, isLoading } = useContext(AuthContext);
+  const { user, isAuthenticated, isLoading } = useContext(AuthContext);
+  
   if (isLoading) {
-    return null; // Or your loading spinner here
+    return <div>Loading...</div>; // Loading spinner
   }
 
-  if (!user || user.role !== role) {
+  if (!isAuthenticated || !user || user.role !== role) {
     return <Navigate to="/" />;
   }
 

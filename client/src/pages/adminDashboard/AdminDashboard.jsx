@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { AuthContext } from "../../context/AuthContext";
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../../tokenManager';
 import './adminDashboard.css';
 
 function AdminDashboard() {
@@ -9,37 +9,28 @@ function AdminDashboard() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
   
-
   const basePath = user?.role === "staff" ? "/staff" : "/student";
-
 
   useEffect(() => {
     const fetchSummary = async () => {
       setLoading(true);
       try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get('/api/attendance/summary', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await axios.get('/api/attendance/summary');
         setSummary(response.data);
         setLoading(false);
       } catch (err) {
         setError('Failed to fetch dashboard data');
-        if (err.response?.status === 401) {
-          localStorage.removeItem('token');
-          navigate('/login');
-        }
         setLoading(false);
       }
     };
     fetchSummary();
   }, [navigate]);
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
+  
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
   };
 
   const handleGenerateReport = () => {
@@ -76,10 +67,7 @@ Attendance Rate: ${reportData.attendanceRate}%
 
   const handleExportData = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('/attendance/all', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get('/attendance/all');
       
       const csvContent = "data:text/csv;charset=utf-8," 
         + "Date,Student Name,UID,Subject,Faculty,Status\n"
@@ -101,16 +89,7 @@ Attendance Rate: ${reportData.attendanceRate}%
   };
 
   const handleManageTokens = () => {
-    // Simple token management - could be expanded
-    const tokens = [
-      { subject: 'Mathematics', token: 'MATH', active: true },
-      { subject: 'Physics', token: 'PHYS', active: true },
-      { subject: 'Chemistry', token: 'CHEM', active: false },
-      { subject: 'Computer Science', token: 'COMP', active: true }
-    ];
-    
-    const tokenList = tokens.map(t => `${t.subject}: ${t.token} (${t.active ? 'Active' : 'Inactive'})`).join('\n');
-    alert(`Current Tokens:\n\n${tokenList}\n\nNote: Token management feature can be expanded with a dedicated interface.`);
+    navigate(`${basePath}/manage-tokens`);
   };
 
   return (

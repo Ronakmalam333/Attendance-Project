@@ -62,6 +62,17 @@ function Navbar() {
           >
             Attendance
           </div>
+          {user?.role === "student" && (
+            <div
+              className='mobile-menu-item'
+              onClick={() => {
+                navigate(`${basePath}/mark-attendance`);
+                setMobileMenuOpen(false);
+              }}
+            >
+              Mark Attendance
+            </div>
+          )}
           <div
             className='mobile-menu-item'
             onClick={() => {
@@ -73,6 +84,17 @@ function Navbar() {
           >
             {user?.role === "staff" ? "Students" : "Classes"}
           </div>
+          {user?.role === "staff" && (
+            <div
+              className='mobile-menu-item'
+              onClick={() => {
+                navigate(`${basePath}/tokens`);
+                setMobileMenuOpen(false);
+              }}
+            >
+              Tokens
+            </div>
+          )}
         </div>
         <div className='mobile-menu-section'>
           {otherDetailsItems.map((item) => (
@@ -122,7 +144,7 @@ function Navbar() {
         </button>
         <div className='logo-container'>
           <img src="https://avatars.githubusercontent.com/u/201213121?s=200&v=4" alt="Team-Logo" />
-          <span className='logo-text'>AttendanceMS</span>
+          <span className='logo-text'>AMS</span>
         </div>
         <div className='menus'>
           <div className='menu-item' onClick={() => navigate(basePath)}>
@@ -134,6 +156,14 @@ function Navbar() {
           >
             Attendance
           </div>
+          {user?.role === "student" && (
+            <div
+              className='menu-item'
+              onClick={() => navigate(`${basePath}/mark-attendance`)}
+            >
+              Mark Attendance
+            </div>
+          )}
           <div
             className='menu-item'
             onClick={() =>
@@ -144,6 +174,14 @@ function Navbar() {
           >
             {user?.role === "staff" ? "Students" : "Classes"}
           </div>
+          {user?.role === "staff" && (
+            <div
+              className='menu-item'
+              onClick={() => navigate(`${basePath}/tokens`)}
+            >
+              Tokens
+            </div>
+          )}
         </div>
         <div className='other-details'>
           {otherDetailsItems.map((item, index) => (

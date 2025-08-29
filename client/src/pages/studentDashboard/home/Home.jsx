@@ -1,20 +1,17 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import './home.css'
 import Details from './details/Details';
 import Token from './token/Token';
-// import StuToken from './token/StuToken';
-// import StaffToken from './token/StaffToken';
+import { AuthContext } from '../../../context/AuthContext';
 
 function Home() {
-  const role = localStorage.getItem("role");
+  const { user } = useContext(AuthContext);
   return (
     <div className="home-contain">
-
       <div className='home'>
         <Details />
         <Token />
       </div>
-
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import ExcelJS from "exceljs";
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
+import axios from '../../../tokenManager';
 import './allattendence.css';
 
 const EditableTable = ({ data, onDataUpdate }) => {
@@ -104,29 +105,20 @@ const AllAttendance = () => {
     const fetchAttendanceData = async () => {
       setLoading(true);
       try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/attendance/all', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
+        const response = await axios.get('/attendance/all');
+        const attendanceData = response.data;
         
-        if (response.ok) {
-          const attendanceData = await response.json();
-          // Transform data to match component expectations
-          const transformedData = attendanceData.map(record => ({
-            Name: record.studentName,
-            RollNo: record.studentUid,
-            Status: record.status,
-            Date: new Date(record.date).toISOString().split('T')[0],
-            Subject: record.subject,
-            Faculty: record.faculty,
-            Time: record.time
-          }));
-          setData(transformedData);
-        } else {
-          setError('Failed to fetch attendance data');
-        }
+        // Transform data to match component expectations
+        const transformedData = attendanceData.map(record => ({
+          Name: record.studentName,
+          RollNo: record.studentUid,
+          Status: record.status,
+          Date: new Date(record.date).toISOString().split('T')[0],
+          Subject: record.subject,
+          Faculty: record.faculty,
+          Time: record.time
+        }));
+        setData(transformedData);
       } catch (err) {
         setError('Error fetching attendance data');
         console.error('Attendance fetch error:', err);
@@ -158,12 +150,11 @@ const AllAttendance = () => {
       const parsedData = [];
 
       worksheet.eachRow((row, rowIndex) => {
-        if (rowIndex === 1) return; // Skip header
-        const [Name, RollNo, Status] = row.values.slice(1); // Ignore first null
+        if (rowIndex === 1) return;
+        const [Name, RollNo, Status] = row.values.slice(1);
         parsedData.push({ Name, RollNo, Status });
       });
 
-      // Validate at least one good row
       if (!parsedData.length || !parsedData[0].Name || !parsedData[0].RollNo || !parsedData[0].Status) {
         throw new Error("File must contain Name, RollNo, and Status columns");
       }
@@ -181,17 +172,14 @@ const AllAttendance = () => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Attendance");
 
-    // Header
     worksheet.columns = [
       { header: "Name", key: "Name", width: 20 },
       { header: "RollNo", key: "RollNo", width: 10 },
       { header: "Status", key: "Status", width: 15 }
     ];
 
-    // Add data
     data.forEach(row => worksheet.addRow(row));
 
-    // Style header row
     worksheet.getRow(1).font = { bold: true };
     worksheet.getRow(1).alignment = { horizontal: 'center' };
 

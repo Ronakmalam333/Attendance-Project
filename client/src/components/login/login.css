@@ -231,7 +231,7 @@ form .back-btn svg {
 .forgot {
     color: var(--accent-primary);
     cursor: pointer;
-    align-self: flex-end;
+    align-self: center;
     font-size: 0.875rem;
     font-weight: 500;
     transition: var(--transition-fast);

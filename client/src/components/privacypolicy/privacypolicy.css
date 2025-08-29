@@ -34,7 +34,7 @@
 
 .privacy-policy-container h2 {
   font-size: 1.75rem;
-  color: #34495e;
+  color: var(--color2);
   margin-top: 30px;
   margin-bottom: 15px;
   font-weight: 600;
@@ -46,7 +46,7 @@
   font-size: 1rem;
   line-height: 1.6;
   margin-bottom: 15px;
-  color: #555;
+  color: var(--color4);
 }
 
 .privacy-policy-container ul {
@@ -56,14 +56,13 @@
 
 .privacy-policy-container li {
   margin-bottom: 10px;
-  color: #555;
+  color: var(--color4);
   position: relative;
   padding-left: 20px;
 }
 
 .privacy-policy-container li::before {
-  content: "•";
-  color: #3498db;
+  color: var(--color4);
   font-size: 1.5rem;
   position: absolute;
   left: 0;
@@ -71,7 +70,7 @@
 }
 
 strong {
-  color: #2c3e50;
+  color: var(--color4);
   font-weight: 600;
 }
 

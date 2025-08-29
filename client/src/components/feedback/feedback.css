@@ -13,7 +13,7 @@
 
 .feedback-title {
     text-align: center;
-    color: #2c3e50;
+    color: var(--color4);
     font-size: 2rem;
     margin-bottom: 1rem;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
@@ -39,7 +39,7 @@
 .form-group label {
     display: block;
     margin-bottom: 0.5rem;
-    color: #2c3e50;
+    color: var(--color4);
     font-weight: 600;
 }
 
@@ -112,6 +112,14 @@ textarea:focus {
 
 .submit-btn:hover {
     opacity: 0.8;
+}
+
+.submit-btn h3.btn-text {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+    color: var(--text-primary);
 }
 
 @media (max-width: 768px) {

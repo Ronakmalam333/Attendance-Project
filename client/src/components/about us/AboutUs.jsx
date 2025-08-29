@@ -108,10 +108,10 @@ const AboutUs = () => {
         </div>
         <div className="contact-info">
           <p>
-            📧 <a href="mailto:anmolsinha4321@gmail.com">anmolsinha4321@gmail.com</a>
+            📧 <a href="mailto:itzronakmalam94@gmail.com">itzronakmalam94@gmail.com</a>
           </p>
           <p>
-            📞 <a href="tel:+918733942557">+91 8733942557</a>
+            📞 <a href="tel:+918264983605">+91 8264983605</a>
           </p>
           <p>
             📍 Boy's Hostel, 

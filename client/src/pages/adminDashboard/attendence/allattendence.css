@@ -29,6 +29,7 @@
 
 .upload-btn,
 .export-btn {
+  cursor: pointer;
   padding: 0.8rem 1.6rem;
   font-weight: 500;
   border-radius: 6px;

@@ -41,12 +41,12 @@ const ThemeToggle = () => {
       >
         {theme === 'light' ? (
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="5" stroke="currentColor" strokeWidth="2"/>
-            <path d="m12 1-1 6m1-6 1 6m-1-6v6m8 5-6-1m6 1-6 1m6-1h-6m5 8-6-1m6 1-6 1m6-1h-6m-5 8 1-6m-1 6-1-6m1 6v-6m-8-5 6 1m-6-1 6-1m-6 1h6m-5-8 6 1m-6-1 6-1m-6 1h6" stroke="currentColor" strokeWidth="2"/>
+            <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2"/>
+            <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" stroke="currentColor" strokeWidth="2"/>
           </svg>
         ) : (
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" stroke="currentColor" strokeWidth="2"/>
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor"/>
           </svg>
         )}
       </div>

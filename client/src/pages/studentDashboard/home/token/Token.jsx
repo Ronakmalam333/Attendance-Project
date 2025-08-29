@@ -2,34 +2,24 @@ import React, { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import "./token.css";
 import { scheduleContext } from "../../../../context/Schedule";
+import axios from '../../../../tokenManager';
 
 function Token() {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm();
 
   const onSubmit = async (data) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/attendance/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          token: data.subToken,
-          subject: onTimeSub
-        })
+      const response = await axios.post('/attendance/submit', {
+        token: data.subToken.toUpperCase(),
+        subject: onTimeSub !== "No Classes Found" ? onTimeSub : 'AUTO_DETECT'
       });
 
-      const result = await response.json();
-      if (response.ok) {
-        alert('Attendance submitted successfully!');
-      } else {
-        alert('Failed to submit attendance: ' + result.message);
-      }
+      alert(response.data.message || 'Attendance submitted successfully!');
+      reset();
     } catch (error) {
       console.error('Error submitting attendance:', error);
-      alert('Error submitting attendance');
+      const errorMessage = error.response?.data?.message || 'Error submitting attendance';
+      alert('Failed to submit attendance: ' + errorMessage);
     }
   };
 
@@ -67,7 +57,7 @@ function Token() {
       currentSub = leave;
   }
 
-  const sub = currentSub ? currentSub.map(element => element.sub) : [];
+  const sub = currentSub && Array.isArray(currentSub) ? currentSub.map(element => element?.sub || 'N/A') : [];
   
 
   const hours = date.getHours();
@@ -79,12 +69,12 @@ function Token() {
   
   let onTimeSub = "No Classes Found";
 
-  if (time >= 9.15 && time < 10.15) onTimeSub = sub[0];
-  else if (time >= 10.15 && time < 11.15) onTimeSub = sub[1];
-  else if (time >= 11.15 && time < 12.15) onTimeSub = sub[2];
-  else if (time >= 12.15 && time < 14) onTimeSub = sub[3];
-  else if (time >= 14 && time < 15) onTimeSub = sub[4];
-  else if (time >= 15 && time < 16) onTimeSub = sub[5];
+  if (time >= 9.15 && time < 10.15) onTimeSub = sub[0] || "No Classes Found";
+  else if (time >= 10.15 && time < 11.15) onTimeSub = sub[1] || "No Classes Found";
+  else if (time >= 11.15 && time < 12.15) onTimeSub = sub[2] || "No Classes Found";
+  else if (time >= 12.15 && time < 14) onTimeSub = sub[3] || "No Classes Found";
+  else if (time >= 14 && time < 15) onTimeSub = sub[4] || "No Classes Found";
+  else if (time >= 15 && time < 16) onTimeSub = sub[5] || "No Classes Found";
 
   return (
     <div className="token_contain">
@@ -93,19 +83,21 @@ function Token() {
         <h1 className="sub_name">{onTimeSub}</h1>
         <input
           {...register("subToken", {
-            required: "Subject code required",
-            minLength: { value: 4, message: "Enter 4-digit code only" },
-            maxLength: { value: 4, message: "Enter 4-digit code only" },
+            required: "Subject token required",
+            minLength: { value: 4, message: "Enter 4-character token only" },
+            maxLength: { value: 4, message: "Enter 4-character token only" },
+            pattern: { value: /^[A-Z0-9]{4}$/, message: "Token must be 4 uppercase letters/numbers" }
           })}
           className="token_input"
           type="text"
-          placeholder="Enter Subject Token"
+          placeholder="Enter Subject Token (e.g., EX7G)"
+          style={{ textTransform: 'uppercase' }}
           onInput={(e) => {
-            let value = e.target.value;
-
+            let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
             if(value.length > 4){
-              e.target.value = value.substring(0,4);
+              value = value.substring(0,4);
             }
+            e.target.value = value;
           }}
         />
         {errors.subToken && <span className="error">{errors.subToken.message}</span>}
