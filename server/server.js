@@ -355,9 +355,14 @@ app.get("/auth/status", (req, res) => {
 });
 
 // Submit attendance token
-app.post("/attendance/submit", authenticateToken, authorizeRoles('student'), async (req, res) => {
+app.post("/attendance/submit", authenticateToken, async (req, res) => {
   const { token: attendanceToken, subject } = req.body;
   const { username, role } = req.user;
+
+  // Check if user is a student
+  if (role !== 'student') {
+    return res.status(403).json({ message: "Only students can submit attendance" });
+  }
 
   try {
     if (!attendanceToken || attendanceToken.length !== 4) {

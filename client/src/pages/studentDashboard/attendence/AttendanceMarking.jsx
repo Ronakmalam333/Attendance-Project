@@ -19,6 +19,7 @@ function AttendanceMarking() {
       setActiveTokens(response.data);
     } catch (error) {
       console.error('Error fetching active tokens:', error);
+      setActiveTokens([]);
     }
   };
 
@@ -31,6 +32,20 @@ function AttendanceMarking() {
 
     setLoading(true);
     try {
+      // Check authentication first
+      const authCheck = await axios.get('/auth/status');
+      if (!authCheck.data.authenticated) {
+        showMessage('Please log in to submit attendance', 'error');
+        setLoading(false);
+        return;
+      }
+
+      if (authCheck.data.user.role !== 'student') {
+        showMessage('Only students can submit attendance', 'error');
+        setLoading(false);
+        return;
+      }
+
       const response = await axios.post('/attendance/submit', {
         token: token.toUpperCase(),
         subject: 'AUTO_DETECT'
