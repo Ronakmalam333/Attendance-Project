@@ -56,7 +56,7 @@ function Students() {
             ) : (
               students.map((stu) => (
                 <tr key={stu._id} tabIndex={0}>
-                  <td data-label="Name">{stu.firstname + " " + stu.lastname}</td>
+                  <td data-label="Name">{stu.name}</td>
                   <td data-label="UID">{stu.uid}</td>
                   <td data-label="Email">{stu.email}</td>
                   <td data-label="Course">{stu.course}</td>

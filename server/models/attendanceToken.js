@@ -12,8 +12,20 @@ const attendanceTokenSchema = new mongoose.Schema({
     createdBy: { type: String, required: true }
 }, { timestamps: true });
 
-attendanceTokenSchema.index({ token: 1 });
+// Prevent duplicate tokens for same subject in overlapping time periods
 attendanceTokenSchema.index({ subject: 1, validFrom: 1, validUntil: 1 });
+attendanceTokenSchema.index({ token: 1 }, { unique: true });
+
+// Add validation
+attendanceTokenSchema.pre('save', function(next) {
+  if (this.validFrom >= this.validUntil) {
+    next(new Error('Valid from date must be before valid until date'));
+  }
+  if (this.maxUsage < 1) {
+    next(new Error('Max usage must be at least 1'));
+  }
+  next();
+});
 
 const AttendanceToken = mongoose.model('AttendanceToken', attendanceTokenSchema);
 

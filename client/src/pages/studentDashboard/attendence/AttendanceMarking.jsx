@@ -65,10 +65,11 @@ function AttendanceMarking() {
   const showMessage = (msg, type) => {
     setMessage(msg);
     setMessageType(type);
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       setMessage('');
       setMessageType('');
     }, 5000);
+    return () => clearTimeout(timeoutId);
   };
 
   const handleTokenInput = (e) => {

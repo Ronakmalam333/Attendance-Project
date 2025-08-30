@@ -365,8 +365,10 @@ app.post("/attendance/submit", authenticateToken, async (req, res) => {
   }
 
   try {
-    if (!attendanceToken || attendanceToken.length !== 4) {
-      return res.status(400).json({ message: "Please enter a valid 4-character token" });
+    // Sanitize and validate input
+    const sanitizedToken = attendanceToken?.toString().trim().toUpperCase();
+    if (!sanitizedToken || !/^[A-Z0-9]{4}$/.test(sanitizedToken)) {
+      return res.status(400).json({ message: "Please enter a valid 4-character alphanumeric token" });
     }
 
     const studentData = await student.findOne({
@@ -380,7 +382,7 @@ app.post("/attendance/submit", authenticateToken, async (req, res) => {
     // Find valid token
     const now = new Date();
     const tokenData = await AttendanceToken.findOne({
-      token: attendanceToken.toUpperCase(),
+      token: sanitizedToken,
       isActive: true,
       validFrom: { $lte: now },
       validUntil: { $gte: now }
@@ -425,7 +427,7 @@ app.post("/attendance/submit", authenticateToken, async (req, res) => {
       date: today,
       time: today.toLocaleTimeString('en-US', { hour12: false }),
       status: "Present",
-      token: attendanceToken.toUpperCase(),
+      token: sanitizedToken,
       duration: "1 hour"
     });
 

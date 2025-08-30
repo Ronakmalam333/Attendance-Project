@@ -41,7 +41,16 @@ const Profile = () => {
     const fetchProfile = async () => {
       try {
         const response = await axios.get('/profile');
-        setProfileData(normalizeProfile(response.data));
+        const normalized = normalizeProfile(response.data);
+        setProfileData({
+          firstname: normalized.firstname || '',
+          lastname: normalized.lastname || '',
+          name: normalized.name || '',
+          email: normalized.email || '',
+          uid: normalized.uid || '',
+          course: normalized.course || '',
+          semester: normalized.semester || ''
+        });
       } catch (error) {
         console.error('Failed to fetch profile:', error.response?.data?.message || error.message);
       }
@@ -53,9 +62,27 @@ const Profile = () => {
   const handleProfilePicChange = (event) => {
     const file = event.target.files[0];
     if (file) {
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setStatusMessage('File size must be less than 5MB');
+        setTimeout(() => setStatusMessage(null), 3000);
+        return;
+      }
+      
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setStatusMessage('Please select a valid image file');
+        setTimeout(() => setStatusMessage(null), 3000);
+        return;
+      }
+      
       const reader = new FileReader();
       reader.onloadend = () => {
         setProfilePic(reader.result);
+      };
+      reader.onerror = () => {
+        setStatusMessage('Error reading file');
+        setTimeout(() => setStatusMessage(null), 3000);
       };
       reader.readAsDataURL(file);
     }
@@ -95,14 +122,25 @@ const Profile = () => {
 
       setIsEditing(false);
       setStatusMessage('Profile updated successfully!');
+      setTimeout(() => setStatusMessage(null), 3000);
 
       if (result.user) {
-        setProfileData(normalizeProfile(result.user));
+        const normalized = normalizeProfile(result.user);
+        setProfileData({
+          firstname: normalized.firstname || '',
+          lastname: normalized.lastname || '',
+          name: normalized.name || '',
+          email: normalized.email || '',
+          uid: normalized.uid || '',
+          course: normalized.course || '',
+          semester: normalized.semester || ''
+        });
       }
     } catch (error) {
       console.error('Error updating profile:', error);
       const errorMessage = error.response?.data?.message || 'Error updating profile';
       setStatusMessage('Failed to update profile: ' + errorMessage);
+      setTimeout(() => setStatusMessage(null), 3000);
     }
   };
 
