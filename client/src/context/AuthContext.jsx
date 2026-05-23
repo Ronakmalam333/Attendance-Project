@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
   const login = (userData) => {
     setUser(userData);
     setIsAuthenticated(true);
+    setIsLoading(false);
     // Store user data in localStorage for persistence
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('role', userData.role);
