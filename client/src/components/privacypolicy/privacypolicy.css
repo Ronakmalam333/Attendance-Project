@@ -70,7 +70,7 @@
 }
 
 strong {
-  color: var(--color4);
+  color: var(--color);
   font-weight: 600;
 }
 
@@ -98,6 +98,17 @@ strong {
   border-radius: 8px;
 }
 
+.privacy-policy-container section p a {
+  color: var(--color4);
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.privacy-policy-container section p a:hover {
+  color: var(--color2);
+  text-decoration: none;
+}
+
 .privacy-policy-container section:last-child {
   background: var(--secondary-color);
   color: var(--color);
@@ -116,5 +127,5 @@ strong {
 }
 
 .privacy-policy-container section:last-child strong {
-  color: var(--color);
+  color: var(--color4);
 }

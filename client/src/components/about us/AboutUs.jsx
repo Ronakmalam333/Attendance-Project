@@ -25,20 +25,20 @@ const features = [
 const teamMembers = [
   {
     name: "Anmol Sinha",
-    role: "CO-Founder",
-    photo: "/images/team/anmol.jpg", // Replace with actual path or URL
+    role: "Contributing Developer",
+    photo: "/images/team/anmol-sinha.png", // Replace with actual image URL
     alt: "Anmol Sinha photo"
   },
   {
     name: "Ronak Malam",
-    role: "CO-Founder",
-    photo: "/images/team/ronak.jpg",
+    role: "Founder & Lead Developer",
+    photo: "/images/team/ronak-malam.png",
     alt: "Ronak Malam photo"
   },
   {
     name: "Jugendra Kashyap",
-    role: "CO-Founder",
-    photo: "/images/team/jugendra.jpg",
+    role: "Project Participant",
+    photo: "/images/team/jugendra-kashyap.jpg", // Replace with actual image URL
     alt: "Jugendra Kashyap photo"
   }
 ];
@@ -87,13 +87,16 @@ const AboutUs = () => {
         <div className="team-grid">
           {teamMembers.map((member) => (
             <div className="team-card" key={member.name}>
-              <div
-                className="team-photo"
-                style={{ backgroundImage: `url(${member.photo})` }}
-                role="img"
-                aria-label={member.alt}
-                title={member.name}
-              ></div>
+              <div className="team-photo">
+                <img 
+                  src={member.photo} 
+                  alt={member.alt}
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.parentElement.style.backgroundColor = '#cbd5e0';
+                  }}
+                />
+              </div>
               <h3>{member.name}</h3>
               <p>{member.role}</p>
             </div>
@@ -114,8 +117,7 @@ const AboutUs = () => {
             📞 <a href="tel:+918264983605">+91 8264983605</a>
           </p>
           <p>
-            📍 Boy's Hostel, 
-            [Rai University, Ahmedabad, Gujarat, India]
+            📍 Ahmedabad, Gujarat, India
           </p>
         </div>
       </section>
