@@ -110,7 +110,9 @@ PORT=5000
 
 ## License
 
-This project is licensed under the ISC License.
+Copyright (c) 2024 Ronak Malam. All Rights Reserved.
+
+This software is proprietary and confidential. Viewing the source code is permitted for educational purposes only. Any use, reproduction, or distribution requires explicit written permission from the copyright holder. See the [LICENSE](LICENSE) file for details.
 
 ## Support
 
