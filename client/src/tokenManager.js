@@ -11,10 +11,7 @@ const api = axios.create({
 // Attach Authorization header for every request
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("authToken"); // store this after login
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    // Cookies are automatically sent with withCredentials: true
     return config;
   },
   (error) => Promise.reject(error)
@@ -25,14 +22,10 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      const token = localStorage.getItem("authToken");
-      if (token) {
-        localStorage.removeItem("authToken");
-        localStorage.removeItem("user");
-        localStorage.removeItem("role");
-        if (window.location.pathname !== "/" && window.location.pathname !== "/signin") {
-          window.location.href = "/";
-        }
+      localStorage.removeItem("user");
+      localStorage.removeItem("role");
+      if (window.location.pathname !== "/" && window.location.pathname !== "/signin") {
+        window.location.href = "/";
       }
     }
     return Promise.reject(error);
@@ -42,10 +35,6 @@ api.interceptors.response.use(
 // Token manager helper functions
 export const tokenManager = {
   async checkAuth() {
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-      return { authenticated: false };
-    }
     try {
       const response = await api.get("/auth/status");
       return response.data;
@@ -54,12 +43,9 @@ export const tokenManager = {
     }
   },
 
-
-
   async logout() {
     try {
       await api.post("/auth/logout");
-      localStorage.removeItem("authToken");
       return true;
     } catch {
       return false;
@@ -69,9 +55,6 @@ export const tokenManager = {
   async login(credentials) {
     try {
       const response = await api.post("/login", credentials);
-      if (response.data.token) {
-        localStorage.setItem("authToken", response.data.token);
-      }
       return response.data;
     } catch (error) {
       throw error;
