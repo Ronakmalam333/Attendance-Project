@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import api from '../../../tokenManager';
 import './students.css';
 
 function Students() {
@@ -9,17 +10,10 @@ function Students() {
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const response = await fetch('http://localhost:5000/students', {
-          credentials: 'include',
-        });
-        const data = await response.json();
-        if (response.ok) {
-          setStudents(data);
-        } else {
-          setError(data.message || 'Failed to fetch students');
-        }
+        const response = await api.get('/students');
+        setStudents(response.data);
       } catch (err) {
-        setError('Failed to fetch students');
+        setError(err.response?.data?.message || 'Failed to fetch students');
       }
       setLoading(false);
     };

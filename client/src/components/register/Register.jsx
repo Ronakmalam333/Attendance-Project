@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import api from "../../tokenManager";
 import "./register.css";
 
 const Register = () => {
@@ -46,7 +47,6 @@ const Register = () => {
   const onSubmit = async (data) => {
     try {
       const endpoint = data.role === "student" ? "/student" : "/staff";
-      const url = `http://localhost:5000${endpoint}`;
 
       const payload = {
         firstname: data.firstname,
@@ -63,39 +63,17 @@ const Register = () => {
 
       console.log("Sending payload:", payload);
 
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      const response = await api.post(endpoint, payload);
 
-      console.log("Response status:", response.status);
-
-      const contentType = response.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/json")) {
-        const text = await response.text();
-        throw new Error(
-          `Expected JSON, but received: ${text.slice(0, 100)}...`
-        );
-      }
-
-      const result = await response.json();
-
-      if (response.ok) {
-        alert(
-          `${
-            data.role === "student" ? "Student" : "Admin"
-          } registered successfully!`
-        );
-        navigate("/signin");
-      } else {
-        throw new Error(result.message || "Registration failed");
-      }
+      alert(
+        `${
+          data.role === "student" ? "Student" : "Admin"
+        } registered successfully!`
+      );
+      navigate("/signin");
     } catch (error) {
       console.error("Error during registration:", error);
-      alert(`Registration failed: ${error.message}`);
+      alert(`Registration failed: ${error.response?.data?.message || error.message}`);
     }
   };
 

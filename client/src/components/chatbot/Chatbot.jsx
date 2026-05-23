@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import api from '../../tokenManager';
 import './Chatbot.css';
 
 const Chatbot = () => {
@@ -18,14 +19,8 @@ const Chatbot = () => {
     setInput('');
 
     try {
-      const res = await fetch('http://localhost:5000/chatbot', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: input })
-      });
-
-      const data = await res.json();
-      const botResponse = data.response || "Sorry, I couldn't understand that.";
+      const res = await api.post('/chatbot', { prompt: input });
+      const botResponse = res.data.response || "Sorry, I couldn't understand that.";
       setMessages(prev => [...prev, { text: botResponse, sender: 'bot' }]);
     } catch (error) {
       console.error('Chatbot Error:', error);
