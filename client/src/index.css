@@ -27,6 +27,7 @@ html, body {
   
   --text-primary: #1e293b;
   --text-secondary: #64748b;
+  --text-tertiary: rgb(60, 60, 149);
   --text-muted: #94a3b8;
   
   --accent-primary: #6366f1;

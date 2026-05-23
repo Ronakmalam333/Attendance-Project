@@ -3,8 +3,8 @@ import './privacypolicy.css';
 
 const LAST_UPDATED = "25/06/2025";
 const CONTACT = {
-  email: "anmolsinha4321@gmail.com",
-  phone: "+918733942557",
+  organizationEmail: "mayamatrix@gmail.com",
+  personalEmail: "itzronakmalam94@gmail.com"
 };
 
 const PrivacyPolicy = () => (
@@ -112,10 +112,10 @@ const PrivacyPolicy = () => (
         If you have any questions or concerns about this Privacy Policy, please contact us at:
       </p>
       <p>
-        <strong>Email: </strong>
-        <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a><br />
-        <strong>Phone: </strong>
-        <a href={`tel:${CONTACT.phone}`}>{CONTACT.phone}</a>
+        <strong>Organization Email: </strong>
+        <a href={`mailto:${CONTACT.organizationEmail}`}>{CONTACT.organizationEmail}</a><br />
+        <strong>Personal Email: </strong>
+        <a href={`mailto:${CONTACT.personalEmail}`}>{CONTACT.personalEmail}</a><br />
       </p>
     </section>
   </main>
