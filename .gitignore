@@ -1,6 +1,5 @@
 # Dependencies
 node_modules/
-package-lock.json
 
 # Environment variables
 .env
@@ -24,8 +23,3 @@ build/
 # OS
 .DS_Store
 Thumbs.db
-
-# Documentation (keep only main README)
-ADD_LOGO_LOCALLY.md
-LOGO_FIX_GUIDE.md
-UI_IMPROVEMENTS.md
