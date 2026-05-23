@@ -1,9 +1,45 @@
 .students-contain {
     width: 100%;
-    height: auto;
-    padding: 20px;
-    animation: fadeIn 1s ease-in-out;
-    overflow-x: auto; /* Allow horizontal scroll on small screens */
+    min-height: calc(100vh - 70px);
+    padding: 2rem;
+    animation: fadeIn 0.6s ease-out;
+    overflow-x: auto;
+    background: var(--bg-primary);
+}
+
+.students-header {
+    background: var(--gradient-card);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-xl);
+    padding: 2rem;
+    box-shadow: var(--shadow-lg);
+    margin-bottom: 2rem;
+}
+
+.students-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.students-table-wrapper {
+    background: var(--gradient-card);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-xl);
+    padding: 2rem;
+    box-shadow: var(--shadow-lg);
+    overflow-x: auto;
+    transition: var(--transition-normal);
+}
+
+.students-table-wrapper:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--accent-primary);
 }
 
 /* Table Styling */
@@ -11,55 +47,104 @@
     width: 100%;
     border-collapse: collapse;
     text-align: left;
-    min-width: 600px; /* Prevents table from shrinking too much */
+    min-width: 600px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
 }
 
 .students-table th,
 .students-table td {
-    padding: 12px 15px;
-    border: 1px solid #ddd;
-    white-space: nowrap; /* Prevent text wrapping inside cells */
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-primary);
+    white-space: nowrap;
+    color: var(--text-primary);
 }
 
 .students-table th {
-    background-color: #f4f4f4;
+    background: var(--gradient-primary);
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.875rem;
 }
 
 .students-table tr:nth-child(even) {
-    background-color: var(--bg-primary);
+    background: var(--bg-secondary);
 }
 
 .students-table tr:hover {
-    background-color: var(--bg-hover);
+    background: var(--bg-hover);
 }
 
 /* Tablet View */
 @media (max-width: 1024px) {
+    .students-contain {
+        padding: 1.5rem;
+    }
+    
+    .students-header {
+        padding: 1.5rem;
+    }
+    
+    .students-header h1 {
+        font-size: 1.75rem;
+    }
+    
     .students-table th, 
     .students-table td {
-        padding: 10px 12px;
-        font-size: 15px;
+        padding: 0.875rem 1rem;
+        font-size: 0.9rem;
     }
 }
 
 /* Mobile View */
 @media (max-width: 768px) {
     .students-contain {
-        padding: 10px;
+        padding: 1rem;
+    }
+    
+    .students-header {
+        padding: 1.25rem;
+    }
+    
+    .students-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .students-table-wrapper {
+        padding: 1rem;
     }
 
     .students-table th,
     .students-table td {
-        padding: 8px 10px;
-        font-size: 14px;
+        padding: 0.75rem 0.875rem;
+        font-size: 0.85rem;
     }
 }
 
 /* Extra Small Devices */
 @media (max-width: 480px) {
+    .students-contain {
+        padding: 0.75rem;
+    }
+    
+    .students-header {
+        padding: 1rem;
+    }
+    
+    .students-header h1 {
+        font-size: 1.25rem;
+    }
+    
+    .students-table-wrapper {
+        padding: 0.75rem;
+    }
+    
     .students-table th,
     .students-table td {
-        padding: 6px 8px;
-        font-size: 12px;
+        padding: 0.625rem 0.75rem;
+        font-size: 0.8rem;
     }
 }

@@ -44,6 +44,23 @@
   box-shadow: var(--shadow-lg);
 }
 
+.univ-logo-fallback {
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-fast);
+  overflow: hidden;
+}
+
+.univ-logo-fallback:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-lg);
+}
+
 .timetable-wrapper {
   margin: 2rem 0 1rem 0;
   background: var(--gradient-card);
@@ -219,7 +236,8 @@
     gap: 10px;
     align-items: flex-start;
   }
-  .univ-logo {
+  .univ-logo,
+  .univ-logo-fallback {
     width: 60px;
     height: 60px;
   }
@@ -246,7 +264,8 @@
     padding: 2px;
     font-size: 0.96rem;
   }
-  .univ-logo {
+  .univ-logo,
+  .univ-logo-fallback {
     width: 44px;
     height: 44px;
   }
@@ -294,7 +313,8 @@
     font-size: 0.75rem;
     min-width: 220px;
   }
-  .univ-logo {
+  .univ-logo,
+  .univ-logo-fallback {
     width: 30px;
     height: 30px;
   }

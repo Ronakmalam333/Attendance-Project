@@ -36,6 +36,11 @@ const subjects = [
 
 function Classes() {
   const [timetable, setTimetable] = useState(initialTable);
+  const [logoError, setLogoError] = useState(false);
+
+  const handleLogoError = () => {
+    setLogoError(true);
+  };
 
   // !!!Optional !!! Handler for editing a cell in the future
   // const handleCellEdit = (rowIdx, colIdx, value) => {
@@ -48,7 +53,27 @@ function Classes() {
   return (
     <div className="classes-contain">
       <header className="classes-header">
-        <img src="https://www.raiuniversity.edu/wp-content/uploads//Rai-School-of-Engineering.png" alt="Rai University Logo" className="univ-logo" />
+        {!logoError ? (
+          <img 
+            src="/university-logo.png" 
+            alt="Rai University Logo" 
+            className="univ-logo"
+            onError={handleLogoError}
+          />
+        ) : (
+          <div className="univ-logo-fallback">
+            <svg viewBox="0 0 100 100" width="90" height="90">
+              <defs>
+                <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style={{stopColor: '#6366f1', stopOpacity: 1}} />
+                  <stop offset="100%" style={{stopColor: '#8b5cf6', stopOpacity: 1}} />
+                </linearGradient>
+              </defs>
+              <rect width="100" height="100" fill="url(#logoGradient)" rx="10"/>
+              <text x="50" y="60" fontSize="36" fill="white" textAnchor="middle" fontWeight="bold" fontFamily="Arial, sans-serif">RSE</text>
+            </svg>
+          </div>
+        )}
         <div>
           <h2>RAI SCHOOL OF ENGINEERING</h2>
           <div>Academic Year: 2024-25</div>
