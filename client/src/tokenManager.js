@@ -20,34 +20,21 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor to refresh token if expired
+// Response interceptor to handle 401 errors
 api.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      try {
-        const refreshResponse = await api.post("/auth/refresh");
-        if (refreshResponse.status === 200) {
-          // Save new token (if your backend sends it)
-          if (refreshResponse.data.token) {
-            localStorage.setItem("authToken", refreshResponse.data.token);
-          }
-          // Retry original request with new token
-          return api(originalRequest);
-        }
-      } catch (refreshError) {
-        console.error("Token refresh failed:", refreshError);
+  (error) => {
+    if (error.response?.status === 401) {
+      const token = localStorage.getItem("authToken");
+      if (token) {
         localStorage.removeItem("authToken");
         localStorage.removeItem("user");
         localStorage.removeItem("role");
-        window.location.href = "/";
-        return Promise.reject(refreshError);
+        if (window.location.pathname !== "/" && window.location.pathname !== "/signin") {
+          window.location.href = "/";
+        }
       }
     }
-
     return Promise.reject(error);
   }
 );
@@ -55,26 +42,19 @@ api.interceptors.response.use(
 // Token manager helper functions
 export const tokenManager = {
   async checkAuth() {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      return { authenticated: false };
+    }
     try {
       const response = await api.get("/auth/status");
       return response.data;
     } catch (error) {
-      console.error("Auth check failed:", error);
       return { authenticated: false };
     }
   },
 
-  async refreshToken() {
-    try {
-      const response = await api.post("/auth/refresh");
-      if (response.data.token) {
-        localStorage.setItem("authToken", response.data.token);
-      }
-      return true;
-    } catch {
-      return false;
-    }
-  },
+
 
   async logout() {
     try {
