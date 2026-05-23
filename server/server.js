@@ -24,8 +24,19 @@ const hf = HUGGINGFACE_API_KEY ? new HfInference(HUGGINGFACE_API_KEY) : null;
 
 app.use(express.json());
 app.use(cookieParser());
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'http://localhost:5173',
+  'http://localhost:5174',
+].filter(Boolean).flatMap(url => [url, url.replace(/\/$/, ''), url + '/']);
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.some(allowed => allowed.replace(/\/$/, '') === origin?.replace(/\/$/, ''))) {
+      return callback(null, true);
+    }
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
 }));
 
