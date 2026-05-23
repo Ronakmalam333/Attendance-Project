@@ -14,7 +14,6 @@ const attendanceTokenSchema = new mongoose.Schema({
 
 // Prevent duplicate tokens for same subject in overlapping time periods
 attendanceTokenSchema.index({ subject: 1, validFrom: 1, validUntil: 1 });
-attendanceTokenSchema.index({ token: 1 }, { unique: true });
 
 // Add validation
 attendanceTokenSchema.pre('save', function(next) {
