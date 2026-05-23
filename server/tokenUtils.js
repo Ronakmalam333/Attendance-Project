@@ -27,10 +27,12 @@ const verifyRefreshToken = (token) => {
 };
 
 const setTokenCookies = (res, accessToken, refreshToken) => {
+  const isProduction = process.env.NODE_ENV === 'production';
+  
   const cookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
   };
 
   res.cookie('accessToken', accessToken, {
