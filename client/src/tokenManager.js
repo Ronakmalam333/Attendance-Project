@@ -14,7 +14,7 @@ api.interceptors.request.use(
     // Cookies are automatically sent with withCredentials: true
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 // Response interceptor to handle 401 errors
@@ -24,12 +24,20 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem("user");
       localStorage.removeItem("role");
-      if (window.location.pathname !== "/" && window.location.pathname !== "/signin") {
+      // Only redirect if user is on a protected route
+      if (
+        window.location.pathname !== "/" &&
+        window.location.pathname !== "/signin"
+      ) {
         window.location.href = "/";
+      }
+      // Suppress console error for auth status checks (expected when not logged in)
+      if (error.config?.url?.includes("/auth/status")) {
+        return Promise.reject({ ...error, silent: true });
       }
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 // Token manager helper functions

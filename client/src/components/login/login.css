@@ -1,216 +1,216 @@
 .signin-contain {
-    width: 100%;
-    min-height: 100vh;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    padding: 2rem;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    font-weight: 400;
+  width: 100%;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  padding: 2rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-weight: 400;
 }
 
 .signin-contain form {
-    position: relative;
-    min-height: 600px;
-    background: var(--gradient-card);
-    border: 1px solid var(--border-primary);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-xl);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-around;
-    padding: 2rem;
-    transition: var(--transition-normal);
+  position: relative;
+  min-height: 600px;
+  background: var(--gradient-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  padding: 2rem;
+  transition: var(--transition-normal);
 }
 
 .signin-contain form:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-xl);
-    border-color: var(--accent-primary);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--accent-primary);
 }
 
 .signin-contain form h1 {
-    font-weight: 700;
-    font-size: 2rem;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+  font-weight: 700;
+  font-size: 2rem;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .signin-contain p {
-    color: var(--text-secondary);
-    margin: 0;
+  color: var(--text-secondary);
+  margin: 0;
 }
 
 .signin-contain p span {
-    color: var(--accent-primary);
-    font-size: 1.1rem;
-    font-weight: 600;
-    text-transform: capitalize;
-    cursor: pointer;
-    transition: var(--transition-fast);
+  color: var(--accent-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  cursor: pointer;
+  transition: var(--transition-fast);
 }
 
 .signin-contain p span:hover {
-    color: var(--accent-secondary);
-    text-decoration: underline;
+  color: var(--accent-secondary);
+  text-decoration: underline;
 }
 
 .signin-contain .signin-banner {
-    position: relative;
-    min-height: 600px;
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-lg);
-    overflow: hidden;
-    background: var(--gradient-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  position: relative;
+  min-height: 600px;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  background: var(--gradient-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .signin-contain .signin-banner::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: url("https://edcollab.co/upload/image1668710561.jpeg");
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    opacity: 0.3;
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("https://images.pexels.com/photos/31367502/pexels-photo-31367502.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: 0.3;
 }
 
 .signin-contain .signin-banner::after {
-    content: 'Welcome Back';
-    position: relative;
-    z-index: 1;
-    color: white;
-    font-size: 3rem;
-    font-weight: 700;
-    text-align: center;
-    text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  content: "Welcome Back";
+  position: relative;
+  z-index: 1;
+  color: white;
+  font-size: 3rem;
+  font-weight: 700;
+  text-align: center;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 form .back-btn {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 60px;
-    height: 60px;
-    border: none;
-    outline: none;
-    border-radius: 0 0 20px 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    cursor: pointer;
-    transition: 0.2s;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60px;
+  height: 60px;
+  border: none;
+  outline: none;
+  border-radius: 0 0 20px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
 form .back-btn svg {
-    fill: var(--color);
+  fill: var(--color);
 }
 
 /*! input area  */
 
 .input-area {
-    width: 100%;
-    height: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 50px;
+  width: 100%;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 50px;
 }
 
 .role-input2 {
-    width: 70%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 2rem;
-    margin-bottom: 1rem;
+  width: 70%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 1rem;
 }
 
 .role-input2 label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--text-primary);
-    font-weight: 500;
-    cursor: pointer;
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius-md);
-    transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  transition: var(--transition-fast);
 }
 
 .role-input2 label:hover {
-    background: var(--bg-hover);
+  background: var(--bg-hover);
 }
 
 .role-input2 input[type="radio"] {
-    accent-color: var(--accent-primary);
+  accent-color: var(--accent-primary);
 }
 
 .input {
-    position: relative;
-    width: 70%;
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 1.5rem;
+  position: relative;
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.5rem;
 }
 
 .input .label {
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
-    font-size: 0.875rem;
-    color: var(--text-muted);
-    transition: var(--transition-fast);
-    pointer-events: none;
-    background: var(--bg-card);
-    padding: 0 0.5rem;
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  transition: var(--transition-fast);
+  pointer-events: none;
+  background: var(--bg-card);
+  padding: 0 0.5rem;
 }
 
 .input input {
-    height: 3.5rem;
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-primary);
-    border-radius: var(--radius-md);
-    outline: none;
-    font-size: 1rem;
-    padding: 1rem;
-    color: var(--text-primary);
-    transition: var(--transition-fast);
+  height: 3.5rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  outline: none;
+  font-size: 1rem;
+  padding: 1rem;
+  color: var(--text-primary);
+  transition: var(--transition-fast);
 }
 
 .input input:focus {
-    border-color: var(--accent-primary);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 .input input::placeholder {
-    color: var(--text-muted);
+  color: var(--text-muted);
 }
 
 .eye-container {
-    position: absolute;
-    right: 0;
-    top: 20px;
+  position: absolute;
+  right: 0;
+  top: 20px;
 }
 
 .eye-container svg {
-    fill: var(--color);
-    cursor: pointer;
+  fill: var(--color);
+  cursor: pointer;
 }
 
 .input .bottom-border {
-    display: none;
+  display: none;
 }
 
 /* Hover effect on the input field */
@@ -222,234 +222,230 @@ form .back-btn svg {
 
 .input input:focus ~ .label,
 .input.focused .label {
-    top: -0.5rem;
-    font-size: 0.75rem;
-    color: var(--accent-primary);
-    font-weight: 600;
+  top: -0.5rem;
+  font-size: 0.75rem;
+  color: var(--accent-primary);
+  font-weight: 600;
 }
 
 .forgot {
-    color: var(--accent-primary);
-    cursor: pointer;
-    align-self: center;
-    font-size: 0.875rem;
-    font-weight: 500;
-    transition: var(--transition-fast);
-    margin-top: -1rem;
-    margin-bottom: 1rem;
+  color: var(--accent-primary);
+  cursor: pointer;
+  align-self: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: var(--transition-fast);
+  margin-top: -1rem;
+  margin-bottom: 1rem;
 }
 
 .forgot:hover {
-    color: var(--accent-secondary);
-    text-decoration: underline;
+  color: var(--accent-secondary);
+  text-decoration: underline;
 }
 
 .submit-container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
 }
 
 .submit-container p {
-    color: var(--text-muted);
-    font-size: 0.875rem;
-    margin: 0;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin: 0;
 }
 
 .submit-container .submit {
-    position: relative;
-    width: 70%;
-    height: 3rem;
-    border: none;
-    outline: none;
-    border-radius: var(--radius-lg);
-    cursor: pointer;
-    overflow: hidden;
-    text-transform: uppercase;
-    font-weight: 600;
-    font-size: 0.875rem;
-    letter-spacing: 0.5px;
-    background: var(--gradient-primary);
-    color: var(--text-primary);
-    box-shadow: var(--shadow-lg);
-    transition: var(--transition-fast);
+  position: relative;
+  width: 70%;
+  height: 3rem;
+  border: none;
+  outline: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  overflow: hidden;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.5px;
+  background: var(--gradient-primary);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-lg);
+  transition: var(--transition-fast);
 }
 
 .submit:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-xl);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
 }
 
 .submit:active {
-    transform: translateY(0);
-    box-shadow: var(--shadow-md);
+  transform: translateY(0);
+  box-shadow: var(--shadow-md);
 }
 
 .submit::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transition: var(--transition-normal);
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: var(--transition-normal);
 }
 
 .submit:hover::before {
-    left: 100%;
+  left: 100%;
 }
 
 .google {
-    width: 70%;
-    height: 3rem;
-    border-radius: var(--radius-lg);
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-primary);
-    gap: 0.75rem;
-    font-weight: 500;
-    font-size: 0.875rem;
-    text-transform: capitalize;
-    transition: var(--transition-fast);
-    cursor: pointer;
-    box-shadow: var(--shadow-md);
+  width: 70%;
+  height: 3rem;
+  border-radius: var(--radius-lg);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  gap: 0.75rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  text-transform: capitalize;
+  transition: var(--transition-fast);
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
 }
 
 .google:hover {
-    background: var(--bg-hover);
-    border-color: var(--accent-primary);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+  background: var(--bg-hover);
+  border-color: var(--accent-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
 }
-
 
 /*! Extra Small Devices (Portrait Phones) */
 @media only screen and (max-width: 575px) {
+  .signin-contain {
+    grid-template-columns: 1fr;
+    padding: 0px;
+  }
 
-    .signin-contain {
-        grid-template-columns: 1fr;
-        padding: 0px;
-    }
+  .signin-banner {
+    display: none;
+  }
 
-    .signin-banner {
-        display: none;
-    }
+  .signin-contain form {
+    justify-content: center;
+    border-radius: 0;
+    background: transparent;
+    gap: 50px;
+  }
 
-    .signin-contain form {
-        justify-content: center;
-        border-radius: 0;
-        background: transparent;
-        gap: 50px;
-    }
+  .input {
+    width: 80%;
+  }
 
-    .input {
-        width: 80%;
-    }
+  .forgot {
+    margin-left: 10%;
+  }
 
-    .forgot {
-        margin-left: 10%;
-    }
+  .submit {
+    width: 80%;
+  }
 
-    .submit {
-        width: 80%;
-    }
-
-    .google {
-        width: 60%;
-    }
-
+  .google {
+    width: 60%;
+  }
 }
 
 /*! Small devices (phones, 576px and up) */
 @media (min-width: 575px) and (max-width: 768px) {
+  .signin-contain {
+    grid-template-columns: 1fr;
+    padding: 10px;
+  }
 
-    .signin-contain {
-        grid-template-columns: 1fr;
-        padding: 10px;
-    }
+  .signin-banner {
+    display: none;
+  }
 
-    .signin-banner {
-        display: none;
-    }
+  .signin-contain form {
+    justify-content: center;
+    gap: 50px;
+  }
 
-    .signin-contain form {
-        justify-content: center;
-        gap: 50px;
-    }
+  .input {
+    width: 80%;
+  }
 
-    .input {
-        width: 80%;
-    }
+  .forgot {
+    margin-left: 10%;
+  }
 
-    .forgot {
-        margin-left: 10%;
-    }
+  .submit {
+    width: 80%;
+  }
 
-    .submit {
-        width: 80%;
-    }
-
-    .google {
-        width: 50%;
-    }
-
+  .google {
+    width: 50%;
+  }
 }
 
 /*! Medium devices (tablets, 768px and up) */
 @media (min-width: 768px) and (max-width: 992px) {
+  .signin-contain {
+    grid-template-columns: 1fr;
+    padding: 10px;
+  }
 
-    .signin-contain {
-        grid-template-columns: 1fr;
-        padding: 10px;
-    }
+  .signin-banner {
+    display: none;
+  }
 
-    .signin-banner {
-        display: none;
-    }
+  .signin-contain form {
+    justify-content: center;
+    gap: 50px;
+  }
 
-    .signin-contain form {
-        justify-content: center;
-        gap: 50px;
-    }
+  .input {
+    width: 50%;
+  }
 
-    .input {
-        width: 50%;
-    }
+  .submit {
+    width: 50%;
+  }
 
-    .submit {
-        width: 50%;
-    }
-
-    .google {
-        width: 50%;
-    }
-
+  .google {
+    width: 50%;
+  }
 }
 
 /*! Large devices (desktops, 992px and up) */
 @media (min-width: 992px) and (max-width: 1200px) {
+  .signin-contain form {
+    justify-content: center;
+    gap: 50px;
+  }
 
-    .signin-contain form {
-        justify-content: center;
-        gap: 50px;
-    }
+  .input {
+    width: 60%;
+  }
 
-    .input {
-        width: 60%;
-    }
+  .submit {
+    width: 60%;
+  }
 
-    .submit {
-        width: 60%;
-    }
-
-    .google {
-        width: 60%;
-    }
-
+  .google {
+    width: 60%;
+  }
 }
