@@ -18,8 +18,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   padding: 2rem;
+  padding-bottom: 4rem;
   animation: fadeIn 0.6s ease-out;
   background: var(--bg-primary);
 }
@@ -173,28 +173,71 @@
 
 /* Logout Button */
 .logout-button {
-  background: var(--accent-error);
-  color: var(--text-primary);
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
+  padding: 1rem 2rem;
   border-radius: var(--radius-lg);
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 600;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lg);
   transition: var(--transition-fast);
-  position: fixed;
-  bottom: 20px;
-  right: 100px;
+  margin-top: 3rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  z-index: 1000;
+  width: 100%;
+  max-width: 800px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.logout-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: var(--transition-normal);
+}
+
+.logout-button:hover::before {
+  left: 100%;
 }
 
 .logout-button:hover {
-  background: #dc2626;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 8px 16px rgba(239, 68, 68, 0.4);
+}
+
+.logout-button:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-md);
+}
+
+/* Status Message */
+.status {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
+  color: var(--text-primary);
+  width: 100%;
+  max-width: 800px;
+  box-shadow: var(--shadow-md);
 }
 
 /* Edit Overlay */
@@ -256,55 +299,241 @@
 }
 
 /* Media Queries for Responsiveness */
-@media (min-width: 600px) {
+
+/* Extra Small Devices - Mobile Portrait (up to 480px) */
+@media (max-width: 480px) {
+  .profile {
+    padding: 1rem;
+    padding-bottom: 2rem;
+  }
+
+  .profile-header {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .profile-pic-label {
+    width: 100px;
+    height: 100px;
+    border-width: 3px;
+  }
+
+  .profile-info h2 {
+    font-size: 1.25rem;
+  }
+
+  .profile-info p {
+    font-size: 0.8rem;
+  }
+
+  .edit-button {
+    position: static;
+    margin-top: 1rem;
+    width: 100%;
+    padding: 0.625rem 1rem;
+    font-size: 0.8rem;
+  }
+
+  .profile-details {
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    gap: 1rem;
+  }
+
+  .profile-field input {
+    padding: 0.625rem;
+    font-size: 0.8rem;
+  }
+
+  .logout-button {
+    padding: 0.875rem 1.5rem;
+    font-size: 0.875rem;
+    margin-top: 2rem;
+  }
+
+  .edit-popup {
+    width: 95%;
+    padding: 1.5rem;
+  }
+
+  .edit-popup h2 {
+    font-size: 1.25rem;
+  }
+}
+
+/* Small Devices - Mobile Landscape (481px to 576px) */
+@media (min-width: 481px) and (max-width: 576px) {
+  .profile {
+    padding: 1.5rem;
+    padding-bottom: 3rem;
+  }
+
+  .profile-header {
+    padding: 1.75rem;
+  }
+
+  .profile-pic-label {
+    width: 110px;
+    height: 110px;
+  }
+
+  .profile-info h2 {
+    font-size: 1.35rem;
+  }
+
+  .edit-button {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.825rem;
+  }
+
+  .profile-details {
+    padding: 1.75rem;
+    gap: 1.25rem;
+  }
+
+  .logout-button {
+    padding: 0.9rem 1.75rem;
+    font-size: 0.9rem;
+    margin-top: 2.5rem;
+  }
+}
+
+/* Medium Devices - Tablets Portrait (577px to 768px) */
+@media (min-width: 577px) and (max-width: 768px) {
+  .profile {
+    padding: 1.75rem;
+  }
+
   .profile-header {
     flex-direction: row;
     text-align: left;
   }
 
   .profile-info {
-    margin-left: 20px;
+    margin-left: 1.5rem;
     margin-top: 0;
   }
 
+  .profile-pic-label {
+    width: 130px;
+    height: 130px;
+  }
+
+  .profile-info h2 {
+    font-size: 1.5rem;
+  }
+
+  .profile-info p {
+    font-size: 0.9rem;
+  }
+
   .profile-details {
-    grid-template-columns: repeat(
-      2,
-      1fr
-    ); /* Two columns for tablets and desktops */
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .logout-button {
+    padding: 0.95rem 1.85rem;
+    font-size: 0.95rem;
   }
 }
 
-@media (min-width: 768px) {
+/* Large Tablets - Tablets Landscape (769px to 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .profile-header {
+    flex-direction: row;
+    text-align: left;
+  }
+
+  .profile-info {
+    margin-left: 1.75rem;
+    margin-top: 0;
+  }
+
+  .profile-pic-label {
+    width: 140px;
+    height: 140px;
+  }
+
+  .profile-info h2 {
+    font-size: 1.625rem;
+  }
+
+  .profile-info p {
+    font-size: 0.95rem;
+  }
+
+  .profile-details {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* Desktop - Standard (1025px to 1440px) */
+@media (min-width: 1025px) and (max-width: 1440px) {
+  .profile-header {
+    flex-direction: row;
+    text-align: left;
+  }
+
+  .profile-info {
+    margin-left: 2rem;
+    margin-top: 0;
+  }
+
   .profile-pic-label {
     width: 150px;
     height: 150px;
   }
 
   .profile-info h2 {
-    font-size: 26px;
+    font-size: 1.75rem;
   }
 
   .profile-info p {
-    font-size: 16px;
+    font-size: 1rem;
+  }
+
+  .profile-details {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-/* Logout Button Responsive Positioning */
-@media (max-width: 768px) {
-  .logout-button {
-    right: 20px;
-    bottom: 90px;
-    padding: 0.625rem 1.25rem;
-    font-size: 0.8rem;
+/* Large Desktop - Wide Screens (1441px and above) */
+@media (min-width: 1441px) {
+  .profile {
+    padding: 3rem;
   }
-}
 
-@media (max-width: 480px) {
+  .profile-header {
+    flex-direction: row;
+    text-align: left;
+    padding: 2.5rem;
+  }
+
+  .profile-info {
+    margin-left: 2.5rem;
+    margin-top: 0;
+  }
+
+  .profile-pic-label {
+    width: 160px;
+    height: 160px;
+  }
+
+  .profile-info h2 {
+    font-size: 2rem;
+  }
+
+  .profile-info p {
+    font-size: 1.1rem;
+  }
+
+  .profile-details {
+    grid-template-columns: repeat(2, 1fr);
+    padding: 2.5rem;
+  }
+
   .logout-button {
-    right: 16px;
-    bottom: 80px;
-    padding: 0.5rem 1rem;
-    font-size: 0.75rem;
+    font-size: 1.1rem;
   }
 }

@@ -1,6 +1,57 @@
-
+/* General Styles */
 .studentDashboard {
-    width: 100%;
-    min-height: calc(100vh - 70px);
-    overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
+  min-height: calc(100vh - 70px);
+  overflow-x: hidden;
+  padding: 1rem;
+  background: var(--bg-primary);
+  transition: var(--transition-normal);
+  box-sizing: border-box;
+}
+
+/* Extra Small Mobile - Portrait (≤480px) */
+@media (max-width: 480px) {
+  .studentDashboard {
+    padding: 0.5rem;
+    min-height: calc(100vh - 60px);
+  }
+}
+
+/* Small Mobile - Landscape (481px to 576px) */
+@media (min-width: 481px) and (max-width: 576px) {
+  .studentDashboard {
+    padding: 0.875rem;
+    min-height: calc(100vh - 65px);
+  }
+}
+
+/* Medium Tablets - Portrait (577px to 768px) */
+@media (min-width: 577px) and (max-width: 768px) {
+  .studentDashboard {
+    padding: 1.25rem;
+  }
+}
+
+/* Large Tablets - Landscape (769px to 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .studentDashboard {
+    padding: 1.5rem;
+  }
+}
+
+/* Desktop - Standard (1025px to 1440px) */
+@media (min-width: 1025px) and (max-width: 1440px) {
+  .studentDashboard {
+    padding: 2rem;
+  }
+}
+
+/* Large Desktop - Wide Screens (≥1441px) */
+@media (min-width: 1441px) {
+  .studentDashboard {
+    padding: 2.5rem;
+    max-width: 1920px;
+    margin: 0 auto;
+  }
 }
