@@ -1,10 +1,22 @@
 .chatbot-widget {
   position: fixed;
-  bottom: 2.5vw;
-  right: 8rem;
-  z-index: 10000;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
   font-family: "Segoe UI", "Arial", sans-serif;
   filter: drop-shadow(0 8px 24px rgba(0, 48, 120, 0.08));
+  animation: slideInFromRight 0.4s ease-out;
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .chatbot-toggle {
@@ -26,7 +38,31 @@
   align-items: center;
   justify-content: center;
   outline: none;
+  position: relative;
 }
+
+.chatbot-toggle::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px solid rgba(59, 130, 246, 0.4);
+  animation: chatbot-pulse 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes chatbot-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0;
+  }
+}
+
 .chatbot-toggle:hover,
 .chatbot-toggle:focus {
   background: linear-gradient(135deg, #225ca3 60%, #289ddb 100%);
@@ -34,6 +70,12 @@
     0 12px 32px rgba(40, 120, 255, 0.13),
     0 2px 9px rgba(40, 120, 255, 0.14);
   transform: scale(1.07);
+}
+
+.chatbot-toggle:hover::after,
+.chatbot-toggle:focus::after {
+  animation: none;
+  opacity: 0;
 }
 
 .chatbot-window {
@@ -201,8 +243,15 @@
 
 @media (max-width: 768px) {
   .chatbot-widget {
-    right: 2.5vw;
-    bottom: 6rem;
+    right: 20px;
+    bottom: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chatbot-widget {
+    right: 16px;
+    bottom: 16px;
   }
 }
 

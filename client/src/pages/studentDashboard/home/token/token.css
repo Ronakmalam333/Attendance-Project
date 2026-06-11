@@ -38,7 +38,7 @@
 
 .token_box {
   width: 100%;
-  max-width: 350px;
+  max-width: 390px;
   padding: 2rem;
   background: var(--bg-tertiary);
   border: 1px solid var(--border-primary);

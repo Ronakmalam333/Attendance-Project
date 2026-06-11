@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import "./login.css";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -12,6 +12,8 @@ function Login() {
   const [emailValue, setEmailValue] = useState("");
   const [passwordValue, setPasswordValue] = useState("");
   const [eye, setEye] = useState(false);
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
   const {
     register,
     handleSubmit,
@@ -25,6 +27,68 @@ function Login() {
   const handlePasswordBlur = () => setPasswordFocused(false);
   const handleEye = () => setEye(!eye);
 
+  // Check for autofilled values
+  useEffect(() => {
+    const checkAutofill = () => {
+      if (emailRef.current) {
+        const isAutofilled =
+          emailRef.current.matches(":-webkit-autofill") ||
+          emailRef.current.value !== "";
+        if (isAutofilled) {
+          setEmailValue(emailRef.current.value || "autofilled");
+        }
+      }
+      if (passwordRef.current) {
+        const isAutofilled =
+          passwordRef.current.matches(":-webkit-autofill") ||
+          passwordRef.current.value !== "";
+        if (isAutofilled) {
+          setPasswordValue(passwordRef.current.value || "autofilled");
+        }
+      }
+    };
+
+    // Check immediately and after multiple delays (browsers autofill at different times)
+    checkAutofill();
+    const timer1 = setTimeout(checkAutofill, 100);
+    const timer2 = setTimeout(checkAutofill, 300);
+    const timer3 = setTimeout(checkAutofill, 500);
+
+    // Listen for animationstart event (Chrome triggers this on autofill)
+    const emailInput = emailRef.current;
+    const passwordInput = passwordRef.current;
+
+    const handleAnimationStart = () => {
+      setTimeout(checkAutofill, 50);
+    };
+
+    if (emailInput) {
+      emailInput.addEventListener("animationstart", handleAnimationStart);
+    }
+    if (passwordInput) {
+      passwordInput.addEventListener("animationstart", handleAnimationStart);
+    }
+
+    // Also check when the page gains focus or input event occurs
+    window.addEventListener("focus", checkAutofill);
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+      window.removeEventListener("focus", checkAutofill);
+      if (emailInput) {
+        emailInput.removeEventListener("animationstart", handleAnimationStart);
+      }
+      if (passwordInput) {
+        passwordInput.removeEventListener(
+          "animationstart",
+          handleAnimationStart,
+        );
+      }
+    };
+  }, []);
+
   const onSubmit = async (data) => {
     const loginData = {
       username: data.username,
@@ -34,7 +98,7 @@ function Login() {
 
     try {
       const result = await tokenManager.login(loginData);
-      
+
       // Login successful - cookies are automatically set by the server
       login({ ...result.user, role: result.role });
       navigate(data.role === "student" ? "/student" : "/staff");
@@ -86,9 +150,11 @@ function Login() {
               type='text'
               className='email'
               id='username'
+              ref={emailRef}
               onFocus={handleEmailFocus}
               onBlur={handleEmailBlur}
               onChange={(e) => setEmailValue(e.target.value)}
+              onInput={(e) => setEmailValue(e.target.value)}
               {...register("username", {
                 required: "Email / UID is required",
               })}
@@ -111,9 +177,11 @@ function Login() {
               type={eye ? "text" : "password"}
               className='pass'
               id='password'
+              ref={passwordRef}
               onFocus={handlePasswordFocus}
               onBlur={handlePasswordBlur}
               onChange={(e) => setPasswordValue(e.target.value)}
+              onInput={(e) => setPasswordValue(e.target.value)}
               {...register("password", {
                 required: "Password is required",
                 minLength: {
@@ -169,9 +237,7 @@ function Login() {
         </div>
       </form>
 
-      <div
-        className='signin-banner'
-      ></div>
+      <div className='signin-banner'></div>
     </div>
   );
 }
