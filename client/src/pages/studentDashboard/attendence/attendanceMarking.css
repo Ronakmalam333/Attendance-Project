@@ -7,21 +7,16 @@
   animation: fadeIn 0.6s ease-out;
 }
 
-.header {
+.attendance-marking .page-header {
   background: var(--gradient-card);
   border: 1px solid var(--border-primary);
   border-radius: var(--radius-xl);
   padding: 2rem;
   box-shadow: var(--shadow-lg);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
 }
 
-.header h1 {
+.attendance-marking .header-content h1 {
   font-size: 2rem;
   font-weight: 700;
   margin: 0;
@@ -29,22 +24,7 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-}
-
-.current-time {
-  font-size: 1rem;
-  font-weight: 600;
-  color: white;
-  background: var(--gradient-primary);
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-md);
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+  text-align: center;
 }
 
 .attendance-form-container {
@@ -145,7 +125,7 @@
 }
 
 .submit-btn.loading::after {
-  content: '';
+  content: "";
   position: absolute;
   width: 20px;
   height: 20px;
@@ -262,32 +242,49 @@
   gap: 0.5rem;
 }
 
-.time-info, .usage-info {
+.time-info,
+.usage-info {
   font-size: 0.875rem;
   color: var(--text-secondary);
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 1024px) {
   .attendance-marking {
     padding: 1.5rem;
   }
-  
-  .header h1 {
+
+  .attendance-marking .header-content h1 {
     font-size: 1.75rem;
   }
 }
@@ -296,32 +293,21 @@
   .attendance-marking {
     padding: 1rem;
   }
-  
-  .header {
-    flex-direction: column;
-    padding: 1.5rem;
-    text-align: center;
-  }
-  
-  .header h1 {
+
+  .attendance-marking .header-content h1 {
     font-size: 1.5rem;
   }
-  
-  .current-time {
-    font-size: 0.875rem;
-    padding: 0.625rem 1.25rem;
-  }
-  
+
   .attendance-form-container {
     padding: 1.5rem;
   }
-  
+
   .token-input {
     font-size: 1.25rem;
     letter-spacing: 2px;
     padding: 1rem;
   }
-  
+
   .sessions-grid {
     grid-template-columns: 1fr;
   }
@@ -331,25 +317,25 @@
   .attendance-marking {
     padding: 0.75rem;
   }
-  
-  .header {
-    padding: 1rem;
+
+  .attendance-marking .page-header {
+    padding: 1.5rem;
   }
-  
-  .header h1 {
+
+  .attendance-marking .header-content h1 {
     font-size: 1.25rem;
   }
-  
+
   .attendance-form-container,
   .active-sessions {
     padding: 1rem;
   }
-  
+
   .token-input {
     font-size: 1.125rem;
     padding: 0.875rem;
   }
-  
+
   .submit-btn {
     padding: 0.875rem 1.5rem;
     font-size: 0.875rem;
