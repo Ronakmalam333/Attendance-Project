@@ -68,6 +68,14 @@ export const tokenManager = {
       throw error;
     }
   },
+  async googleLogin(data) {
+    try {
+      const response = await api.post("/auth/google", data);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
 };
 
 export default api;

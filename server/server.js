@@ -1,7 +1,11 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
+const axios = require("axios");
 const jwt = require("jsonwebtoken");
+
+const { OAuth2Client } = require("google-auth-library");
+
 const cookieParser = require("cookie-parser");
 const { HfInference } = require("@huggingface/inference");
 const {
@@ -11,6 +15,7 @@ const {
 } = require("./tokenUtils");
 const { authenticateToken, authorizeRoles } = require("./authMiddleware");
 
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const connectDb = require("./config/db");
 const student = require("./models/student");
 const staff = require("./models/staff");
@@ -155,6 +160,7 @@ app.post("/signup", async (req, res) => {
         password: hashedPassword,
         course,
         semester,
+        profileCompleted: true,
       });
       await newUser.save();
 
@@ -237,6 +243,113 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.post("/auth/google", async (req, res) => {
+  try {
+    const { accessToken, role } = req.body;
+
+    // Validate role
+    if (!role || (role !== "student" && role !== "staff")) {
+      return res.status(400).json({
+        success: false,
+        message: "Please select a valid role (student or staff)",
+      });
+    }
+
+    // Get user info from Google
+    const googleResponse = await axios.get(
+      "https://www.googleapis.com/oauth2/v3/userinfo",
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    );
+
+    const { email, name, sub, picture } = googleResponse.data;
+
+    const hashedPassword = await bcrypt.hash("GOOGLE_ACCOUNT", 10);
+
+    if (role === "student") {
+      let studentData = await student.findOne({ email });
+
+      // Create account if first login (without UID - will be added during profile completion)
+      if (!studentData) {
+        studentData = await student.create({
+          name,
+          email,
+          uid: `TEMP_${email.split("@")[0]}_${Date.now()}`, // Temporary UID until user completes profile
+          password: hashedPassword,
+          course: "Pending",
+          semester: "Pending",
+          profileCompleted: false,
+        });
+      }
+
+      // Use your existing JWT system
+      const { accessToken: jwtAccessToken, refreshToken } = generateTokens({
+        username: email,
+        role: "student",
+      });
+
+      setTokenCookies(res, jwtAccessToken, refreshToken);
+
+      res.json({
+        success: true,
+        role: "student",
+        user: {
+          id: studentData._id,
+          name: studentData.name,
+          email: studentData.email,
+          uid: studentData.uid,
+          course: studentData.course,
+          semester: studentData.semester,
+          profileCompleted: studentData.profileCompleted,
+        },
+      });
+    } else if (role === "staff") {
+      let staffData = await staff.findOne({ email });
+
+      // Create account if first login
+      if (!staffData) {
+        // For staff, use email-based UID temporarily (they can update it later in profile)
+        const tempUID = `STAFF_${email.split("@")[0]}_${Date.now()}`;
+        staffData = await staff.create({
+          name,
+          email,
+          uid: tempUID,
+          password: hashedPassword,
+        });
+      }
+
+      // Use your existing JWT system
+      const { accessToken: jwtAccessToken, refreshToken } = generateTokens({
+        username: email,
+        role: "staff",
+      });
+
+      setTokenCookies(res, jwtAccessToken, refreshToken);
+
+      res.json({
+        success: true,
+        role: "staff",
+        user: {
+          id: staffData._id,
+          name: staffData.name,
+          email: staffData.email,
+          uid: staffData.uid,
+        },
+      });
+    }
+  } catch (error) {
+    console.error("Google auth error:", error);
+
+    res.status(401).json({
+      success: false,
+      message: "Google authentication failed",
+    });
+  }
+});
+
 app.get("/profile", authenticateToken, async (req, res) => {
   try {
     const { username, role } = req.user;
@@ -268,18 +381,58 @@ app.put("/profile", authenticateToken, async (req, res) => {
     const { username, role } = req.user;
     const updates = req.body;
 
+    // If UID is being updated, check if it's already taken
+    if (updates.uid) {
+      const existingStudent = await student.findOne({ uid: updates.uid });
+      const existingStaff = await staff.findOne({ uid: updates.uid });
+
+      // Get current user to check if this is their own UID
+      let currentUser;
+      if (role === "student") {
+        currentUser = await student.findOne({
+          $or: [{ uid: username }, { email: username }],
+        });
+      } else {
+        currentUser = await staff.findOne({
+          $or: [{ uid: username }, { email: username }],
+        });
+      }
+
+      // If UID exists and belongs to someone else, reject the update
+      if (
+        (existingStudent && existingStudent.email !== currentUser.email) ||
+        (existingStaff && existingStaff.email !== currentUser.email)
+      ) {
+        return res.status(400).json({
+          message:
+            "This University ID is already taken. Please use a different UID.",
+        });
+      }
+    }
+
+    // If completing profile for the first time, mark it as completed
+    if (
+      updates.uid &&
+      updates.course &&
+      updates.semester &&
+      updates.course !== "Pending" &&
+      updates.semester !== "Pending"
+    ) {
+      updates.profileCompleted = true;
+    }
+
     let user;
     if (role === "student") {
       user = await student.findOneAndUpdate(
         { $or: [{ uid: username }, { email: username }] },
         updates,
-        { new: true },
+        { new: true, runValidators: true },
       );
     } else {
       user = await staff.findOneAndUpdate(
         { $or: [{ uid: username }, { email: username }] },
         updates,
-        { new: true },
+        { new: true, runValidators: true },
       );
     }
 
@@ -290,6 +443,15 @@ app.put("/profile", authenticateToken, async (req, res) => {
     return res.json({ message: "Profile updated", user });
   } catch (error) {
     console.error("Profile update error:", error);
+
+    // Handle MongoDB duplicate key error
+    if (error.code === 11000) {
+      return res.status(400).json({
+        message:
+          "This University ID is already taken. Please use a different UID.",
+      });
+    }
+
     return res.status(500).json({ message: "Something went wrong" });
   }
 });

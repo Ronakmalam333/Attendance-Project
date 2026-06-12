@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../context/AuthContext";
 import { tokenManager } from "../../tokenManager";
+import { useGoogleLogin } from "@react-oauth/google";
 
 function Login() {
   const navigate = useNavigate();
@@ -12,14 +13,65 @@ function Login() {
   const [emailValue, setEmailValue] = useState("");
   const [passwordValue, setPasswordValue] = useState("");
   const [eye, setEye] = useState(false);
+  const [googleRole, setGoogleRole] = useState(""); // For Google Sign-In role selection
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
   const {
     register,
     handleSubmit,
     formState: { errors },
+    watch,
   } = useForm();
   const { login } = useContext(AuthContext);
+
+  // Watch the selected role from the form
+  const selectedRole = watch("role");
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        // Use the selected role from the form
+        const roleToUse = selectedRole || googleRole;
+
+        if (!roleToUse) {
+          alert(
+            "Please select a role (Student or Staff) before signing in with Google",
+          );
+          return;
+        }
+
+        const result = await tokenManager.googleLogin({
+          accessToken: tokenResponse.access_token,
+          role: roleToUse, // Send role to backend
+        });
+
+        login({
+          ...result.user,
+          role: result.role,
+        });
+
+        // Check if profile needs to be completed (only for students)
+        if (
+          result.role === "student" &&
+          result.user.profileCompleted === false
+        ) {
+          navigate("/complete-profile");
+        } else {
+          navigate(result.role === "student" ? "/student" : "/staff");
+        }
+      } catch (error) {
+        console.error(error);
+        alert(
+          "Google login failed: " +
+            (error.response?.data?.message || "Unknown error"),
+        );
+      }
+    },
+
+    onError: () => {
+      alert("Google login failed");
+    },
+  });
 
   const handleEmailFocus = () => setEmailFocused(true);
   const handleEmailBlur = () => setEmailFocused(false);
@@ -204,7 +256,12 @@ function Login() {
             Login
           </button>
           <p>or</p>
-          <div className='google'>
+          <div
+            className='google'
+            onClick={() => googleLogin()}
+            style={{ cursor: "pointer" }}
+          >
+            {" "}
             <svg
               width='35px'
               height='35px'

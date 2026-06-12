@@ -89,7 +89,8 @@
   box-shadow: var(--shadow-md);
 }
 
-.timetable th, .timetable td {
+.timetable th,
+.timetable td {
   padding: 1rem;
   text-align: center;
   border-bottom: 1px solid var(--border-primary);
@@ -109,8 +110,9 @@
   background: var(--bg-secondary);
 }
 
-.timetable td.lunch-cell, .timetable .lunch-cell {
-  background: rgba(245, 158, 11, 0.2) !important;
+.timetable tr td.lunch-cell,
+.timetable tr .lunch-cell {
+  background: rgba(245, 158, 11, 0.2);
   color: var(--accent-warning);
   font-weight: 700;
   font-size: 1rem;
@@ -286,7 +288,8 @@
     min-width: 420px;
     font-size: 0.87rem;
   }
-  .timetable th, .timetable td {
+  .timetable th,
+  .timetable td {
     padding: 6px 3px;
     font-size: 0.87rem;
   }
@@ -296,18 +299,19 @@
     min-width: 290px;
     font-size: 0.72rem;
   }
-  .timetable th, .timetable td {
+  .timetable th,
+  .timetable td {
     padding: 4px 2px;
     font-size: 0.72rem;
   }
 }
 @media (max-width: 430px) {
-  .classes-header,
-  .timetable-wrapper,
-  .subjects-section,
-  .classes-footer {
-    padding-left: 2px !important;
-    padding-right: 2px !important;
+  .classes-contain .classes-header,
+  .classes-contain .timetable-wrapper,
+  .classes-contain .subjects-section,
+  .classes-contain .classes-footer {
+    padding-left: 2px;
+    padding-right: 2px;
   }
   .timetable {
     font-size: 0.75rem;

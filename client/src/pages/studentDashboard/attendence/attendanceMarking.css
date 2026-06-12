@@ -55,10 +55,19 @@
   gap: 0.75rem;
 }
 
-.form-group label {
-  font-weight: 600;
-  font-size: 1rem;
-  color: var(--text-primary);
+.attendance-form-container .form-group label {
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+[data-theme="light"] .attendance-form-container .form-group label {
+  color: #1e293b;
+  text-shadow: none;
 }
 
 .token-input {

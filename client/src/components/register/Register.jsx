@@ -60,9 +60,6 @@ const Register = () => {
           semester: data.semester,
         }),
       };
-
-      console.log("Sending payload:", payload);
-
       const response = await api.post(endpoint, payload);
 
       alert(
