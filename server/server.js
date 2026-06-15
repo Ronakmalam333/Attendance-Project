@@ -322,15 +322,14 @@ app.post("/auth/google", async (req, res) => {
     } else if (role === "staff") {
       let staffData = await staff.findOne({ email });
 
-      // Create account if first login
+      // Create account if first login (without UID and name - will be added during profile completion)
       if (!staffData) {
-        // For staff, use email-based UID temporarily (they can update it later in profile)
-        const tempUID = `STAFF_${email.split("@")[0]}_${Date.now()}`;
         staffData = await staff.create({
-          name,
+          name: "Pending", // Temporary name until profile completion
           email,
-          uid: tempUID,
+          uid: `TEMP_${sub}`, // Temporary UID until user provides their actual UID
           password: hashedPassword,
+          profileCompleted: false, // Mark profile as incomplete
         });
       }
 
@@ -350,6 +349,7 @@ app.post("/auth/google", async (req, res) => {
           name: staffData.name,
           email: staffData.email,
           uid: staffData.uid,
+          profileCompleted: staffData.profileCompleted !== false, // Default to true for existing users
         },
       });
     }
@@ -423,15 +423,24 @@ app.put("/profile", authenticateToken, async (req, res) => {
       }
     }
 
-    // If completing profile for the first time, mark it as completed
-    if (
-      updates.uid &&
-      updates.course &&
-      updates.semester &&
-      updates.course !== "Pending" &&
-      updates.semester !== "Pending"
-    ) {
-      updates.profileCompleted = true;
+    // For students: Mark profile as completed if all required fields are present
+    if (role === "student") {
+      if (
+        updates.uid &&
+        updates.course &&
+        updates.semester &&
+        updates.course !== "Pending" &&
+        updates.semester !== "Pending"
+      ) {
+        updates.profileCompleted = true;
+      }
+    }
+
+    // For staff: Mark profile as completed if name and uid are present
+    if (role === "staff") {
+      if (updates.name && updates.uid && updates.name !== "Pending") {
+        updates.profileCompleted = true;
+      }
     }
 
     let user;

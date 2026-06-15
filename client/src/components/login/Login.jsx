@@ -50,11 +50,8 @@ function Login() {
           role: result.role,
         });
 
-        // Check if profile needs to be completed (only for students)
-        if (
-          result.role === "student" &&
-          result.user.profileCompleted === false
-        ) {
+        // Check if profile needs to be completed (for both students and staff)
+        if (result.user.profileCompleted === false) {
           navigate("/complete-profile");
         } else {
           navigate(result.role === "student" ? "/student" : "/staff");
