@@ -47,7 +47,7 @@ const AboutUs = () => {
   return (
     <div className="about-us-container">
       <header className="about-header">
-        <h1>About CampusTrack</h1>
+        <h1>About AMS</h1>
         <p className="tagline">Revolutionizing College Attendance Management</p>
       </header>
 
@@ -57,7 +57,7 @@ const AboutUs = () => {
           <div className="decorative-line"></div>
         </div>
         <p className="mission-statement">
-          At CampusTrack, we're committed to transforming traditional attendance management 
+          At AMS, we're committed to transforming traditional attendance management 
           through innovative technology. Our goal is to streamline academic processes, 
           enhance student engagement, and provide real-time insights for educational institutions.
         </p>

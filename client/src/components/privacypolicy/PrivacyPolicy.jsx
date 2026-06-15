@@ -17,7 +17,7 @@ const PrivacyPolicy = () => (
     <section>
       <h2>1. Introduction</h2>
       <p>
-        Welcome to CampusTrack. We are committed to protecting your privacy and ensuring that your personal information is handled in a safe and responsible manner. This Privacy Policy outlines how we collect, use, and protect your information when you use our college attendance app.
+        Welcome to AMS. We are committed to protecting your privacy and ensuring that your personal information is handled in a safe and responsible manner. This Privacy Policy outlines how we collect, use, and protect your information when you use our college attendance app.
       </p>
     </section>
 

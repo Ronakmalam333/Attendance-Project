@@ -31,7 +31,9 @@ const SECRET_KEY = process.env.SECRET_KEY || "This is my security key";
 const HUGGINGFACE_API_KEY = process.env.HUGGINGFACE_API_KEY;
 const hf = HUGGINGFACE_API_KEY ? new HfInference(HUGGINGFACE_API_KEY) : null;
 
-app.use(express.json());
+// Increase payload limit to handle base64 images (10MB limit)
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(cookieParser());
 
 // Allow connections from any local network IP for mobile development

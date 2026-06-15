@@ -9,6 +9,7 @@ const studentSchema = new mongoose.Schema(
     course: { type: String, required: true, default: "Pending" },
     semester: { type: String, required: true, default: "Pending" },
     profileCompleted: { type: Boolean, default: false },
+    profilePicture: { type: String }, // Base64 encoded image
   },
   { timestamps: true },
 );
