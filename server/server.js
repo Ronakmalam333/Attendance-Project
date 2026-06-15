@@ -62,6 +62,14 @@ app.use(
         return callback(null, true);
       }
 
+      // Allow Vercel deployments (both production and preview)
+      if (
+        origin.match(/^https:\/\/.*\.vercel\.app$/) ||
+        origin.match(/^https:\/\/.*\.vercel\.com$/)
+      ) {
+        return callback(null, true);
+      }
+
       // Check against allowed origins list
       if (
         allowedOrigins.some(
@@ -71,6 +79,9 @@ app.use(
       ) {
         return callback(null, true);
       }
+
+      // Log rejected origins for debugging
+      console.log(`CORS: Rejected origin: ${origin}`);
       callback(new Error("Not allowed by CORS"));
     },
     credentials: true,

@@ -1,18 +1,38 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./navbar.css";
 import { AuthContext } from "../../context/AuthContext";
-import ThemeToggle from '../ThemeToggle';
+import ThemeToggle from "../ThemeToggle";
+import axios from "../../tokenManager";
 
 function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [hoveredIndex, setHoveredIndex] = useState(-1);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profilePicture, setProfilePicture] = useState(null);
 
   const { user } = useContext(AuthContext);
 
   const basePath = user?.role === "staff" ? "/staff" : "/student";
+
+  // Fetch profile picture
+  useEffect(() => {
+    const fetchProfilePicture = async () => {
+      try {
+        const response = await axios.get("/profile");
+        if (response.data.profilePicture) {
+          setProfilePicture(response.data.profilePicture);
+        }
+      } catch (error) {
+        console.error("Error fetching profile picture:", error);
+      }
+    };
+
+    if (user) {
+      fetchProfilePicture();
+    }
+  }, [user]);
 
   const otherDetailsItems = [
     { path: `${basePath}/aboutus`, label: "About Us" },
@@ -21,7 +41,7 @@ function Navbar() {
   ];
 
   const activeIndex = otherDetailsItems.findIndex(
-    (item) => location.pathname === item.path
+    (item) => location.pathname === item.path,
   );
   const displayIndex = hoveredIndex !== -1 ? hoveredIndex : activeIndex;
 
@@ -35,7 +55,10 @@ function Navbar() {
     >
       <div className='mobile-menu' onClick={(e) => e.stopPropagation()}>
         <div className='mobile-menu-header'>
-          <img src="https://avatars.githubusercontent.com/u/201213121?s=200&v=4" alt="Team-Logo" />
+          <img
+            src='https://avatars.githubusercontent.com/u/201213121?s=200&v=4'
+            alt='Team-Logo'
+          />
           <button
             className='mobile-menu-close'
             onClick={() => setMobileMenuOpen(false)}
@@ -77,7 +100,7 @@ function Navbar() {
             className='mobile-menu-item'
             onClick={() => {
               navigate(
-                `${basePath}/${user?.role === "staff" ? "students" : "classes"}`
+                `${basePath}/${user?.role === "staff" ? "students" : "classes"}`,
               );
               setMobileMenuOpen(false);
             }}
@@ -143,7 +166,10 @@ function Navbar() {
           </span>
         </button>
         <div className='logo-container'>
-          <img src="https://avatars.githubusercontent.com/u/201213121?s=200&v=4" alt="Team-Logo" />
+          <img
+            src='https://avatars.githubusercontent.com/u/201213121?s=200&v=4'
+            alt='Team-Logo'
+          />
           <span className='logo-text'>AMS</span>
         </div>
         <div className='menus'>
@@ -168,7 +194,7 @@ function Navbar() {
             className='menu-item'
             onClick={() =>
               navigate(
-                `${basePath}/${user?.role === "staff" ? "students" : "classes"}`
+                `${basePath}/${user?.role === "staff" ? "students" : "classes"}`,
               )
             }
           >
@@ -203,21 +229,41 @@ function Navbar() {
             }}
           ></span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
           <ThemeToggle />
           <div
             className='account'
             onClick={() => navigate(`${basePath}/profile`)}
+            style={{
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              height='20px'
-              viewBox='0 -960 960 960'
-              width='20px'
-              fill='currentColor'
-            >
-              <path d='M234-276q51-39 114-61.5T480-360q69 0 132 22.5T726-276q35-41 54.5-93T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 59 19.5 111t54.5 93Zm246-164q-59 0-99.5-40.5T340-580q0-59 40.5-99.5T480-720q59 0 99.5 40.5T620-580q0 59-40.5 99.5T480-440Zm0 360q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q53 0 100-15.5t86-44.5q-39-29-86-44.5T480-280q-53 0-100 15.5T294-220q39 29 86 44.5T480-160Zm0-360q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17Zm0-60Zm0 360Z' />
-            </svg>
+            {profilePicture ? (
+              <img
+                src={profilePicture}
+                alt='Profile'
+                style={{
+                  width: "32px",
+                  height: "32px",
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  border: "2px solid currentColor",
+                }}
+              />
+            ) : (
+              <svg
+                xmlns='http://www.w3.org/2000/svg'
+                height='20px'
+                viewBox='0 -960 960 960'
+                width='20px'
+                fill='currentColor'
+              >
+                <path d='M234-276q51-39 114-61.5T480-360q69 0 132 22.5T726-276q35-41 54.5-93T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 59 19.5 111t54.5 93Zm246-164q-59 0-99.5-40.5T340-580q0-59 40.5-99.5T480-720q59 0 99.5 40.5T620-580q0 59-40.5 99.5T480-440Zm0 360q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q53 0 100-15.5t86-44.5q-39-29-86-44.5T480-280q-53 0-100 15.5T294-220q39 29 86 44.5T480-160Zm0-360q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17Zm0-60Zm0 360Z' />
+              </svg>
+            )}
           </div>
         </div>
       </div>
