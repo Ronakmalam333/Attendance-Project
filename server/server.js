@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
@@ -25,8 +27,6 @@ const AttendanceToken = require("./models/attendanceToken");
 const app = express();
 connectDb();
 
-// Load environment variables
-require("dotenv").config();
 const SECRET_KEY = process.env.SECRET_KEY || "This is my security key";
 const HUGGINGFACE_API_KEY = process.env.HUGGINGFACE_API_KEY;
 const hf = HUGGINGFACE_API_KEY ? new HfInference(HUGGINGFACE_API_KEY) : null;
@@ -36,57 +36,68 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(cookieParser());
 
-// Allow connections from any local network IP for mobile development
+// Allow connections from frontend and local network IPs for development
 const allowedOrigins = [
   process.env.CLIENT_URL,
+  "https://attendance-management-system-mayamatrix.vercel.app",
   "http://localhost:5173",
   "http://localhost:5174",
 ]
   .filter(Boolean)
   .flatMap((url) => [url, url.replace(/\/$/, ""), url + "/"]);
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (mobile apps, Postman, etc.)
-      if (!origin) {
-        return callback(null, true);
-      }
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, Postman, curl, etc.)
+    if (!origin) {
+      return callback(null, true);
+    }
 
-      // Allow any local network origin for development
-      if (
-        origin.match(
-          /^http:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.\d+\.\d+\.\d+)(:\d+)?$/,
-        )
-      ) {
-        return callback(null, true);
-      }
+    // Allow any local network origin for development
+    if (
+      origin.match(
+        /^http:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.\d+\.\d+\.\d+)(:\d+)?$/,
+      )
+    ) {
+      return callback(null, true);
+    }
 
-      // Allow Vercel deployments (both production and preview)
-      if (
-        origin.match(/^https:\/\/.*\.vercel\.app$/) ||
-        origin.match(/^https:\/\/.*\.vercel\.com$/)
-      ) {
-        return callback(null, true);
-      }
+    // Allow Vercel deployments (both production and preview)
+    if (
+      origin.match(/^https:\/\/.*\.vercel\.app$/) ||
+      origin.match(/^https:\/\/.*\.vercel\.com$/)
+    ) {
+      return callback(null, true);
+    }
 
-      // Check against allowed origins list
-      if (
-        allowedOrigins.some(
-          (allowed) =>
-            allowed.replace(/\/$/, "") === origin?.replace(/\/$/, ""),
-        )
-      ) {
-        return callback(null, true);
-      }
+    // Check against allowed origins list
+    if (
+      allowedOrigins.some(
+        (allowed) =>
+          allowed.replace(/\/$/, "") === origin?.replace(/\/$/, ""),
+      )
+    ) {
+      return callback(null, true);
+    }
 
-      // Log rejected origins for debugging
-      console.log(`CORS: Rejected origin: ${origin}`);
-      callback(new Error("Not allowed by CORS"));
-    },
-    credentials: true,
-  }),
-);
+    // Log rejected origins for debugging
+    console.log(`CORS: Rejected origin: ${origin}`);
+    callback(null, false);
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "Cookie",
+    "X-Requested-With",
+    "Accept",
+  ],
+  exposedHeaders: ["Set-Cookie"],
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.get("/", (req, res) => {
   res.json({ message: "Hello, World!" });
