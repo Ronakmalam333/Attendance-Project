@@ -1,0 +1,27 @@
+name: MongoDB Atlas Keep Alive
+
+on:
+  schedule:
+    - cron: "0 0 */7 * *"
+  workflow_dispatch:
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install MongoDB driver
+        run: npm install mongodb
+
+      - name: Ping MongoDB Atlas
+        run: node scripts/atlas-keepalive.js
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+
