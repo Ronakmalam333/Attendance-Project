@@ -1,273 +1,373 @@
-import React, { useContext, useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, { useContext, useState, useEffect, useRef } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import "./navbar.css";
 import { AuthContext } from "../../context/AuthContext";
+import { useToast } from "../../context/ToastContext";
 import ThemeToggle from "../ThemeToggle";
 import axios from "../../tokenManager";
+import Icons from "../ui/Icons";
+import Badge from "../ui/Badge";
+import ConfirmModal from "../ui/ConfirmModal";
 
 function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [hoveredIndex, setHoveredIndex] = useState(-1);
+  const toast = useToast();
+  const { user, logout } = useContext(AuthContext);
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profilePicture, setProfilePicture] = useState(null);
-
-  const { user } = useContext(AuthContext);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [logoutModalOpen, setLogoutModalOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const basePath = user?.role === "staff" ? "/staff" : "/student";
 
-  // Fetch profile picture
+  // Fetch profile picture if user logged in
   useEffect(() => {
+    let isMounted = true;
     const fetchProfilePicture = async () => {
       try {
         const response = await axios.get("/profile");
-        if (response.data.profilePicture) {
+        if (isMounted && response.data.profilePicture) {
           setProfilePicture(response.data.profilePicture);
         }
       } catch (error) {
-        console.error("Error fetching profile picture:", error);
+        // Silently ignore 401s or profile load error
       }
     };
 
     if (user) {
       fetchProfilePicture();
     }
+    return () => {
+      isMounted = false;
+    };
   }, [user]);
 
-  const otherDetailsItems = [
-    { path: `${basePath}/aboutus`, label: "About Us" },
-    { path: `${basePath}/privacypolicy`, label: "Privacy Policy" },
-    { path: `${basePath}/feedback`, label: "Feedback" },
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    setLogoutModalOpen(false);
+    try {
+      await logout();
+      toast.info("You have signed out securely.", "Logged Out");
+      navigate("/");
+    } catch (err) {
+      toast.error("Logout encounter an error.");
+    }
+  };
+
+  // Student navigation links
+  const studentLinks = [
+    { path: "/student", label: "Overview", icon: Icons.Home, exact: true },
+    { path: "/student/mark-attendance", label: "Check-in", icon: Icons.CheckSquare },
+    { path: "/student/attendence", label: "Attendance Log", icon: Icons.Calendar },
+    { path: "/student/classes", label: "Timetable", icon: Icons.Clock },
   ];
 
-  const activeIndex = otherDetailsItems.findIndex(
-    (item) => location.pathname === item.path,
-  );
-  const displayIndex = hoveredIndex !== -1 ? hoveredIndex : activeIndex;
+  // Staff navigation links
+  const staffLinks = [
+    { path: "/staff", label: "Executive Dashboard", icon: Icons.Home, exact: true },
+    { path: "/staff/tokens", label: "Token Generator", icon: Icons.Key },
+    { path: "/staff/students", label: "Student Directory", icon: Icons.Users },
+    { path: "/staff/attendence", label: "Attendance Master", icon: Icons.Calendar },
+  ];
 
-  const dotPosition =
-    displayIndex !== -1 ? `calc(${displayIndex * 33.33 + 16}% - 5px)` : "0";
+  const currentLinks = user?.role === "staff" ? staffLinks : studentLinks;
 
-  const mobileMenu = (
-    <div
-      className='mobile-menu-overlay'
-      onClick={() => setMobileMenuOpen(false)}
-    >
-      <div className='mobile-menu' onClick={(e) => e.stopPropagation()}>
-        <div className='mobile-menu-header'>
-          <img
-            src='https://avatars.githubusercontent.com/u/201213121?s=200&v=4'
-            alt='Team-Logo'
-          />
-          <button
-            className='mobile-menu-close'
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            &times;
-          </button>
-        </div>
-        <div className='mobile-menu-section'>
-          <div
-            className='mobile-menu-item'
-            onClick={() => {
-              navigate(basePath);
-              setMobileMenuOpen(false);
-            }}
-          >
-            Home
-          </div>
-          <div
-            className='mobile-menu-item'
-            onClick={() => {
-              navigate(`${basePath}/attendence`);
-              setMobileMenuOpen(false);
-            }}
-          >
-            Attendance
-          </div>
-          {user?.role === "student" && (
-            <div
-              className='mobile-menu-item'
-              onClick={() => {
-                navigate(`${basePath}/mark-attendance`);
-                setMobileMenuOpen(false);
-              }}
-            >
-              Mark Attendance
-            </div>
-          )}
-          <div
-            className='mobile-menu-item'
-            onClick={() => {
-              navigate(
-                `${basePath}/${user?.role === "staff" ? "students" : "classes"}`,
-              );
-              setMobileMenuOpen(false);
-            }}
-          >
-            {user?.role === "staff" ? "Students" : "Classes"}
-          </div>
-          {user?.role === "staff" && (
-            <div
-              className='mobile-menu-item'
-              onClick={() => {
-                navigate(`${basePath}/tokens`);
-                setMobileMenuOpen(false);
-              }}
-            >
-              Tokens
-            </div>
-          )}
-        </div>
-        <div className='mobile-menu-section'>
-          {otherDetailsItems.map((item) => (
-            <div
-              key={item.path}
-              className='mobile-menu-item'
-              onClick={() => {
-                navigate(item.path);
-                setMobileMenuOpen(false);
-              }}
-            >
-              {item.label}
-            </div>
-          ))}
-        </div>
-        <div className='mobile-menu-section'>
-          <div
-            className='mobile-menu-item'
-            onClick={() => {
-              navigate(`${basePath}/profile`);
-              setMobileMenuOpen(false);
-            }}
-          >
-            Profile
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  const isLinkActive = (item) => {
+    if (item.exact) {
+      return location.pathname === item.path;
+    }
+    return location.pathname.startsWith(item.path);
+  };
+
+  const getInitials = (name) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   return (
     <>
-      <div className='nav-contain'>
-        <button
-          className={`hamburger${mobileMenuOpen ? " active" : ""}`}
-          aria-label='Open menu'
-          aria-expanded={mobileMenuOpen}
-          aria-controls='mobile-nav'
-          onClick={() => setMobileMenuOpen(true)}
-          type='button'
-        >
-          <span className='hamburger-lines'>
-            <span className='hamburger-line'></span>
-            <span className='hamburger-line'></span>
-            <span className='hamburger-line'></span>
-          </span>
-        </button>
-        <div className='logo-container'>
-          <img
-            src='https://avatars.githubusercontent.com/u/201213121?s=200&v=4'
-            alt='Team-Logo'
-          />
-          <span className='logo-text'>AMS</span>
-        </div>
-        <div className='menus'>
-          <div className='menu-item' onClick={() => navigate(basePath)}>
-            Home
-          </div>
-          <div
-            className='menu-item'
-            onClick={() => navigate(`${basePath}/attendence`)}
+      <header className="erp-navbar" role="banner">
+        <div className="erp-navbar-inner">
+          {/* Mobile hamburger button */}
+          <button
+            type="button"
+            className="erp-hamburger-btn"
+            aria-label="Toggle navigation menu"
+            aria-expanded={mobileMenuOpen}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
-            Attendance
-          </div>
-          {user?.role === "student" && (
-            <div
-              className='menu-item'
-              onClick={() => navigate(`${basePath}/mark-attendance`)}
-            >
-              Mark Attendance
+            <Icons.Menu size={20} />
+          </button>
+
+          {/* Institutional Brand */}
+          <Link to={basePath} className="erp-brand-container">
+            <div className="erp-brand-logo-mark">
+              <Icons.Shield size={18} />
             </div>
-          )}
-          <div
-            className='menu-item'
-            onClick={() =>
-              navigate(
-                `${basePath}/${user?.role === "staff" ? "students" : "classes"}`,
-              )
-            }
-          >
-            {user?.role === "staff" ? "Students" : "Classes"}
-          </div>
-          {user?.role === "staff" && (
-            <div
-              className='menu-item'
-              onClick={() => navigate(`${basePath}/tokens`)}
-            >
-              Tokens
+            <div className="erp-brand-text-block">
+              <span className="erp-brand-name">AMS Enterprise</span>
+              <span className="erp-brand-status">
+                <span className="erp-status-dot" /> Live System
+              </span>
             </div>
-          )}
-        </div>
-        <div className='other-details'>
-          {otherDetailsItems.map((item, index) => (
-            <div
-              key={item.path}
-              className='other-details-item'
-              onClick={() => navigate(item.path)}
-              onMouseEnter={() => setHoveredIndex(index)}
-              onMouseLeave={() => setHoveredIndex(-1)}
-            >
-              {item.label}
-            </div>
-          ))}
-          <span
-            className='dot'
-            style={{
-              left: dotPosition,
-              opacity: displayIndex !== -1 ? 1 : 0,
-            }}
-          ></span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <ThemeToggle />
-          <div
-            className='account'
-            onClick={() => navigate(`${basePath}/profile`)}
-            style={{
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {profilePicture ? (
-              <img
-                src={profilePicture}
-                alt='Profile'
-                style={{
-                  width: "32px",
-                  height: "32px",
-                  borderRadius: "50%",
-                  objectFit: "cover",
-                  border: "2px solid currentColor",
-                }}
-              />
+          </Link>
+
+          {/* Role Pill */}
+          <div className="erp-role-pill-wrapper">
+            {user?.role === "staff" ? (
+              <Badge variant="brand" size="sm">
+                Faculty / Admin
+              </Badge>
             ) : (
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                height='20px'
-                viewBox='0 -960 960 960'
-                width='20px'
-                fill='currentColor'
-              >
-                <path d='M234-276q51-39 114-61.5T480-360q69 0 132 22.5T726-276q35-41 54.5-93T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 59 19.5 111t54.5 93Zm246-164q-59 0-99.5-40.5T340-580q0-59 40.5-99.5T480-720q59 0 99.5 40.5T620-580q0 59-40.5 99.5T480-440Zm0 360q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q53 0 100-15.5t86-44.5q-39-29-86-44.5T480-280q-53 0-100 15.5T294-220q39 29 86 44.5T480-160Zm0-360q26 0 43-17t17-43q0-26-17-43t-43-17q-26 0-43 17t-17 43q0 26 17 43t43 17Zm0-60Zm0 360Z' />
-              </svg>
+              <Badge variant="neutral" size="sm">
+                Student Portal
+              </Badge>
             )}
           </div>
+
+          {/* Desktop Navigation Tabs */}
+          <nav className="erp-nav-links" aria-label="Main Navigation">
+            {currentLinks.map((item) => {
+              const active = isLinkActive(item);
+              const IconComp = item.icon;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`erp-nav-item ${active ? "active" : ""}`}
+                >
+                  <IconComp size={16} />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Right Action Utilities */}
+          <div className="erp-nav-actions">
+            {/* Quick Links Menu */}
+            <div className="erp-nav-secondary-links">
+              <Link to={`${basePath}/aboutus`} className="erp-utility-link">
+                About
+              </Link>
+              <Link to={`${basePath}/privacypolicy`} className="erp-utility-link">
+                Policy
+              </Link>
+              <Link to={`${basePath}/feedback`} className="erp-utility-link">
+                Feedback
+              </Link>
+            </div>
+
+            {/* Theme Toggle */}
+            <div className="erp-theme-wrapper">
+              <ThemeToggle />
+            </div>
+
+            {/* User Profile Dropdown */}
+            <div className="erp-profile-dropdown-container" ref={dropdownRef}>
+              <button
+                type="button"
+                className="erp-profile-trigger"
+                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                aria-expanded={profileDropdownOpen}
+                aria-label="User account menu"
+              >
+                {profilePicture ? (
+                  <img
+                    src={profilePicture}
+                    alt={user?.name || "User Avatar"}
+                    className="erp-avatar-img"
+                  />
+                ) : (
+                  <div className="erp-avatar-fallback">
+                    {getInitials(user?.name || user?.username)}
+                  </div>
+                )}
+                <div className="erp-profile-name-block">
+                  <span className="erp-profile-name">{user?.name || user?.username || "Account"}</span>
+                  <span className="erp-profile-uid">{user?.uid || (user?.role === "staff" ? "Staff" : "Student")}</span>
+                </div>
+                <Icons.ChevronDown size={14} className="erp-chevron-icon" />
+              </button>
+
+              {profileDropdownOpen && (
+                <div className="erp-dropdown-menu" role="menu">
+                  <div className="erp-dropdown-header">
+                    <p className="erp-dropdown-user-name">{user?.name || user?.username}</p>
+                    <p className="erp-dropdown-user-email">{user?.email || "Academic User"}</p>
+                    <div style={{ marginTop: "6px" }}>
+                      <Badge variant={user?.role === "staff" ? "brand" : "neutral"} size="sm">
+                        {user?.role === "staff" ? "Administrative Access" : "Student Access"}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <div className="erp-dropdown-divider" />
+
+                  <Link
+                    to={`${basePath}/profile`}
+                    className="erp-dropdown-item"
+                    role="menuitem"
+                    onClick={() => setProfileDropdownOpen(false)}
+                  >
+                    <Icons.User size={15} />
+                    <span>My Profile & Settings</span>
+                  </Link>
+
+                  <Link
+                    to={`${basePath}/feedback`}
+                    className="erp-dropdown-item"
+                    role="menuitem"
+                    onClick={() => setProfileDropdownOpen(false)}
+                  >
+                    <Icons.MessageSquare size={15} />
+                    <span>Support & Feedback</span>
+                  </Link>
+
+                  <div className="erp-dropdown-divider" />
+
+                  <button
+                    type="button"
+                    className="erp-dropdown-item erp-dropdown-logout"
+                    role="menuitem"
+                    onClick={() => {
+                      setProfileDropdownOpen(false);
+                      setLogoutModalOpen(true);
+                    }}
+                  >
+                    <Icons.LogOut size={15} />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
-      {mobileMenuOpen && mobileMenu}
+
+        {/* Mobile Navigation Drawer */}
+        {mobileMenuOpen && (
+          <div className="erp-mobile-overlay" onClick={() => setMobileMenuOpen(false)}>
+            <div className="erp-mobile-drawer" onClick={(e) => e.stopPropagation()}>
+              <div className="erp-mobile-header">
+                <div className="erp-brand-container">
+                  <div className="erp-brand-logo-mark">
+                    <Icons.Shield size={18} />
+                  </div>
+                  <span className="erp-brand-name">AMS Enterprise</span>
+                </div>
+                <button
+                  type="button"
+                  className="erp-mobile-close-btn"
+                  onClick={() => setMobileMenuOpen(false)}
+                  aria-label="Close menu"
+                >
+                  <Icons.X size={18} />
+                </button>
+              </div>
+
+              <div className="erp-mobile-nav-list">
+                <div className="erp-mobile-section-label">Portal Navigation</div>
+                {currentLinks.map((item) => {
+                  const active = isLinkActive(item);
+                  const IconComp = item.icon;
+                  return (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      className={`erp-mobile-link ${active ? "active" : ""}`}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <IconComp size={18} />
+                      <span>{item.label}</span>
+                    </Link>
+                  );
+                })}
+
+                <div className="erp-mobile-section-label" style={{ marginTop: "16px" }}>
+                  Resources & Help
+                </div>
+                <Link
+                  to={`${basePath}/profile`}
+                  className="erp-mobile-link"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Icons.User size={18} />
+                  <span>Profile & Account</span>
+                </Link>
+                <Link
+                  to={`${basePath}/aboutus`}
+                  className="erp-mobile-link"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Icons.Info size={18} />
+                  <span>About AMS</span>
+                </Link>
+                <Link
+                  to={`${basePath}/privacypolicy`}
+                  className="erp-mobile-link"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Icons.Shield size={18} />
+                  <span>Privacy Policy</span>
+                </Link>
+                <Link
+                  to={`${basePath}/feedback`}
+                  className="erp-mobile-link"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Icons.MessageSquare size={18} />
+                  <span>System Feedback</span>
+                </Link>
+              </div>
+
+              <div className="erp-mobile-footer">
+                <button
+                  type="button"
+                  className="erp-btn erp-btn-secondary"
+                  style={{ width: "100%", justifyContent: "center" }}
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    setLogoutModalOpen(true);
+                  }}
+                >
+                  <Icons.LogOut size={16} />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </header>
+
+      {/* Logout Confirmation Modal */}
+      <ConfirmModal
+        isOpen={logoutModalOpen}
+        title="Sign Out of AMS"
+        message="Are you sure you want to log out of your session? You will need your credentials to log back in."
+        confirmLabel="Sign Out"
+        cancelLabel="Stay Logged In"
+        variant="danger"
+        onConfirm={handleLogout}
+        onCancel={() => setLogoutModalOpen(false)}
+      />
     </>
   );
 }

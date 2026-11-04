@@ -1,11 +1,15 @@
-.container {
+.app-root-container {
   width: 100%;
   min-height: 100vh;
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  overflow-x: hidden;
-  overflow-y: auto;
+  background-color: var(--bg-canvas, #f8fafc);
+  color: var(--text-primary, #0f172a);
   display: flex;
   flex-direction: column;
   position: relative;
+}
+
+/* Base link styles */
+a {
+  color: inherit;
+  text-decoration: none;
 }

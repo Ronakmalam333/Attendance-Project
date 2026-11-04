@@ -1,4 +1,15 @@
+const dns = require("dns");
 const { MongoClient } = require("mongodb");
+
+// Fix for Node.js / Windows DNS resolution issues with MongoDB Atlas SRV records
+try {
+  const servers = dns.getServers();
+  if (servers.length === 0 || servers.includes("127.0.0.1") || process.platform === "win32") {
+    dns.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]);
+  }
+} catch {
+  // Ignore if setting DNS servers fails
+}
 
 const uri = process.env.MONGODB_URI;
 

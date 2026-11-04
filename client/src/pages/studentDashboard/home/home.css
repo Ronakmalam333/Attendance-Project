@@ -1,44 +1,350 @@
+/* ==========================================================================
+   STUDENT DASHBOARD HOME (OVERVIEW) CSS
+   ========================================================================== */
+
 .home-contain {
-  min-height: calc(100vh - 70px);
-  background: var(--bg-primary);
-  padding: 0;
   width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
+  max-width: 1360px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .home {
-  max-width: 1400px;
-  margin: 0 auto;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-  min-height: calc(100vh - 140px);
-  animation: fadeIn 0.6s ease-out;
-  width: 100%;
-  box-sizing: border-box;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 20px;
+  align-items: stretch;
 }
 
-/* Tablet */
 @media (max-width: 1024px) {
   .home {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
-    min-height: auto;
+    gap: 16px;
   }
 }
 
-/* Mobile */
-@media (max-width: 768px) {
-  .home {
-    gap: 1rem;
+/* Middle Grid: Course Attendance Health & Academic Notices */
+.erp-home-middle-grid {
+  display: grid;
+  grid-template-columns: 1.25fr 0.75fr;
+  gap: 20px;
+  align-items: stretch;
+}
+
+@media (max-width: 1024px) {
+  .erp-home-middle-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 }
 
-/* Small Mobile */
-@media (max-width: 480px) {
-  .home {
-    gap: 0.75rem;
+.erp-section-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.erp-card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary, #0f172a);
+  margin: 0;
+  line-height: 1.25;
+}
+
+.erp-card-desc {
+  font-size: 0.8125rem;
+  color: var(--text-secondary, #64748b);
+  margin: 2px 0 0;
+  line-height: 1.4;
+}
+
+/* Course Health Matrix */
+.erp-course-health-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.erp-courses-health-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+  justify-content: space-between;
+}
+
+.erp-courses-health-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.erp-course-health-row {
+  display: grid;
+  grid-template-columns: 1.3fr 1.7fr 1fr;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  background-color: var(--bg-surface-subtle, #f8fafc);
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  border-radius: var(--radius-sm, 6px);
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.erp-course-health-row:hover {
+  border-color: var(--border-strong, #cbd5e1);
+  background-color: var(--bg-surface-hover, #f1f5f9);
+}
+
+@media (max-width: 768px) {
+  .erp-course-health-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
   }
+}
+
+.erp-course-info-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.erp-course-code-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.erp-course-code-badge {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  padding: 2px 6px;
+  border-radius: var(--radius-xs, 3px);
+  background-color: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  color: var(--text-primary, #0f172a);
+}
+
+.erp-course-full-name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-primary, #0f172a);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.erp-course-faculty-sub {
+  font-size: 0.6875rem;
+  color: var(--text-muted, #64748b);
+}
+
+.erp-course-progress-col {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.erp-course-pct-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+}
+
+.erp-course-held-text {
+  color: var(--text-secondary, #64748b);
+  font-weight: 500;
+  font-size: 0.6875rem;
+}
+
+.erp-course-pct-label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.text-good { color: var(--status-present, #10b981); }
+.text-warn { color: var(--status-late, #f59e0b); }
+.text-danger { color: var(--status-absent, #ef4444); }
+
+.fill-good { background-color: var(--status-present, #10b981); }
+.fill-warn { background-color: var(--status-late, #f59e0b); }
+.fill-danger { background-color: var(--status-absent, #ef4444); }
+
+.erp-progress-track {
+  width: 100%;
+  height: 5px;
+  background-color: var(--border-subtle, #e2e8f0);
+  border-radius: var(--radius-full, 9999px);
+  overflow: hidden;
+}
+
+.erp-progress-fill {
+  height: 100%;
+  border-radius: var(--radius-full, 9999px);
+  transition: width 0.4s ease;
+}
+
+.erp-course-status-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+@media (max-width: 768px) {
+  .erp-course-status-col {
+    align-items: flex-start;
+  }
+}
+
+.erp-course-margin-note {
+  font-size: 0.6875rem;
+  color: var(--text-muted, #64748b);
+  font-weight: 500;
+}
+
+/* Integrated ERP Telemetry Strip */
+.erp-academic-summary-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 10px 14px;
+  background-color: var(--bg-surface-subtle, #f8fafc);
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  border-radius: var(--radius-sm, 6px);
+  gap: 12px;
+}
+
+.erp-summary-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+  text-align: center;
+}
+
+.erp-summary-metric-label {
+  font-size: 0.6875rem;
+  color: var(--text-muted, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-weight: 600;
+}
+
+.erp-summary-metric-val {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+}
+
+.erp-summary-divider {
+  width: 1px;
+  height: 24px;
+  background-color: var(--border-subtle, #e2e8f0);
+}
+
+@media (max-width: 600px) {
+  .erp-academic-summary-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .erp-summary-divider {
+    display: none;
+  }
+}
+
+/* Notices Card */
+.erp-notices-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.erp-empty-broadcast-state {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background-color: var(--bg-surface-subtle, #f8fafc);
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  border-radius: var(--radius-sm, 6px);
+  margin: auto 0;
+}
+
+.erp-empty-broadcast-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-primary, #0f172a);
+  margin: 0 0 2px 0;
+}
+
+.erp-empty-broadcast-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted, #64748b);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.erp-notices-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.erp-notice-item {
+  padding: 10px 14px;
+  background-color: var(--bg-surface-subtle, #f8fafc);
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  border-radius: var(--radius-sm, 6px);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.erp-notice-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.erp-notice-tag {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+  padding: 2px 6px;
+  border-radius: var(--radius-xs, 3px);
+  background-color: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  color: var(--text-primary, #0f172a);
+}
+
+.erp-notice-date {
+  font-size: 0.6875rem;
+  color: var(--text-muted, #64748b);
+}
+
+.erp-notice-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-primary, #0f172a);
+  margin: 0;
+}
+
+.erp-notice-desc {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #475569);
+  margin: 0;
+  line-height: 1.35;
 }

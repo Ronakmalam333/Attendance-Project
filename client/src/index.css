@@ -1,129 +1,168 @@
-html, body {
-  -ms-touch-action: manipulation;
-  touch-action: manipulation;
-  overflow-y: auto;
-  overflow-x: hidden;
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  -webkit-user-select: none;
-  user-select: none;
-}
+/* ==========================================================================
+   AMS ENTERPRISE DESIGN SYSTEM & CSS TOKENS
+   Inspired by modern administrative ERPs (SAP Fiori, Workday, Linear, Stripe Dashboard)
+   Clean, authentic, high-density, minimal visual noise, WCAG AA compliant.
+   ========================================================================== */
 
 :root {
-  /* Light Theme Colors */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8fafc;
-  --bg-tertiary: #f1f5f9;
-  --bg-card: #ffffff;
-  --bg-hover: #e2e8f0;
-  
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
-  --text-tertiary: rgb(60, 60, 149);
-  --text-muted: #94a3b8;
-  
-  --accent-primary: #6366f1;
-  --accent-secondary: #8b5cf6;
-  --accent-success: #10b981;
-  --accent-warning: #f59e0b;
-  --accent-error: #ef4444;
-  
-  --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  --gradient-secondary: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  --gradient-card: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-  
-  --border-primary: #e2e8f0;
-  --border-secondary: #cbd5e1;
-  
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  
-  --transition-fast: 0.15s ease-in-out;
-  --transition-normal: 0.3s ease-in-out;
-  --transition-slow: 0.5s ease-in-out;
+  /* Surface & Canvas (Light) */
+  --bg-canvas: #f6f7f9;
+  --bg-surface: #ffffff;
+  --bg-surface-subtle: #f0f2f5;
+  --bg-surface-hover: #e4e7eb;
+
+  /* Borders & Dividers */
+  --border-subtle: #e1e4e8;
+  --border-strong: #cbd0d6;
+
+  /* Typography */
+  --text-primary: #191c21;
+  --text-secondary: #4b525d;
+  --text-muted: #8c939e;
+
+  /* Institutional Corporate Brand (Classic Enterprise Navy) */
+  --brand-primary: #1e40af;
+  --brand-primary-hover: #1e3a8a;
+  --brand-primary-light: #eff3fa;
+  --brand-primary-text: #ffffff;
+
+  /* Semantics: Present, Active, Success */
+  --status-present: #059669;
+  --status-present-bg: #ecfdf5;
+  --status-present-border: #a7f3d0;
+
+  /* Semantics: Absent, Danger, Revoked */
+  --status-absent: #dc2626;
+  --status-absent-bg: #fef2f2;
+  --status-absent-border: #fecaca;
+
+  /* Semantics: Late, Pending, Warning */
+  --status-late: #d97706;
+  --status-late-bg: #fffbeb;
+  --status-late-border: #fde68a;
+
+  /* Semantics: Info / Notification */
+  --status-info: #475569;
+  --status-info-bg: #f1f5f9;
+  --status-info-border: #cbd5e1;
+
+  /* Elevation & Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+  --shadow-dropdown: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+
+  /* Radius (Crisp, modern, non-bulbous) */
+  --radius-xs: 3px;
+  --radius-sm: 5px;
+  --radius-md: 7px;
+  --radius-lg: 10px;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Legacy aliases for backward compatibility */
+  --bg-primary: var(--bg-surface);
+  --bg-secondary: var(--bg-canvas);
+  --bg-tertiary: var(--bg-surface-subtle);
+  --bg-card: var(--bg-surface);
+  --bg-hover: var(--bg-surface-hover);
+  --accent-primary: var(--brand-primary);
+  --accent-success: var(--status-present);
+  --accent-warning: var(--status-late);
+  --accent-error: var(--status-absent);
+  --border-primary: var(--border-subtle);
 }
 
 [data-theme="dark"] {
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-tertiary: #334155;
-  --bg-card: #1e293b;
-  --bg-hover: #475569;
-  
-  --text-primary: #f1f5f9;
-  --text-secondary: #cbd5e1;
-  --text-muted: #64748b;
-  
-  --gradient-card: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-  
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
-  
-  --border-primary: #334155;
-  --border-secondary: #475569;
+  /* Surface & Canvas (Enterprise Titanium & Neutral Charcoal - Zero Purply/Bluey tint) */
+  --bg-canvas: #0e1013;
+  --bg-surface: #15181c;
+  --bg-surface-subtle: #1b1e23;
+  --bg-surface-hover: #22262d;
+
+  /* Borders & Dividers */
+  --border-subtle: #242830;
+  --border-strong: #333842;
+
+  /* Typography */
+  --text-primary: #f0f2f5;
+  --text-secondary: #9aa0aa;
+  --text-muted: #6b7280;
+
+  /* Brand Primary */
+  --brand-primary: #2563eb;
+  --brand-primary-hover: #1d4ed8;
+  --brand-primary-light: rgba(37, 99, 235, 0.08);
+  --brand-primary-text: #ffffff;
+
+  /* Semantics */
+  --status-present: #10b981;
+  --status-present-bg: rgba(16, 185, 129, 0.08);
+  --status-present-border: rgba(16, 185, 129, 0.2);
+
+  --status-absent: #ef4444;
+  --status-absent-bg: rgba(239, 68, 68, 0.08);
+  --status-absent-border: rgba(239, 68, 68, 0.2);
+
+  --status-late: #f59e0b;
+  --status-late-bg: rgba(245, 158, 11, 0.08);
+  --status-late-border: rgba(245, 158, 11, 0.2);
+
+  --status-info: #64748b;
+  --status-info-bg: rgba(100, 116, 139, 0.08);
+  --status-info-border: rgba(100, 116, 139, 0.2);
+
+  /* Elevation */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.35);
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
+  --shadow-dropdown: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+
+  /* Legacy aliases */
+  --bg-primary: var(--bg-surface);
+  --bg-secondary: var(--bg-canvas);
+  --bg-tertiary: var(--bg-surface-subtle);
+  --bg-card: var(--bg-surface);
+  --bg-hover: var(--bg-surface-hover);
+  --accent-primary: var(--brand-primary);
+  --border-primary: var(--border-subtle);
 }
 
-:root, [data-theme="light"], [data-theme="dark"] {
-  --color: var(--text-primary);
-  --color2: var(--accent-primary);
-  --color3: var(--accent-error);
-  --color4: var(--text-primary);
-  --primary-color: var(--bg-primary);
-  --secondary-color: var(--bg-secondary);
-  --font-color: var(--text-primary);
+/* Base Resets */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-body {
-  background: var(--bg-primary);
+html, body {
+  height: 100%;
+  width: 100%;
+  background-color: var(--bg-canvas);
   color: var(--text-primary);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  line-height: 1.6;
-  transition: var(--transition-normal);
-  overflow-y: auto;
-  overflow-x: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-::-webkit-scrollbar {
-  width: 8px;
+/* Allow text selection for ERP data inspection */
+* {
+  -webkit-user-select: auto;
+  user-select: auto;
 }
 
-::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
 }
 
-::-webkit-scrollbar-thumb {
-  background: var(--bg-tertiary);
-  border-radius: var(--radius-md);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--bg-hover);
-}
-
-::selection {
-  background: var(--accent-primary);
-  color: var(--text-primary);
-}
-
+/* Keyboard Accessibility */
 *:focus-visible {
-  outline: 2px solid var(--accent-primary);
+  outline: 2px solid var(--brand-primary);
   outline-offset: 2px;
 }
 
@@ -131,132 +170,184 @@ body {
   outline: none;
 }
 
-.btn {
+/* Tabular Numbers for Data & Statistics */
+.tabular-nums, table td, .metric-value, .token-pill {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   ENTERPRISE UTILITY CLASSES
+   ========================================================================== */
+
+/* Buttons */
+.erp-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: var(--radius-md);
+  gap: 6px;
+  padding: 7px 14px;
+  font-size: 0.8125rem;
   font-weight: 500;
-  font-size: 0.875rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
   cursor: pointer;
-  transition: var(--transition-fast);
-  text-decoration: none;
-  gap: 0.5rem;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  line-height: 1.25;
 }
 
-.btn-primary {
-  background: var(--gradient-primary);
-  color: white;
-  box-shadow: var(--shadow-md);
+.erp-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+.erp-btn-primary {
+  background-color: var(--brand-primary);
+  color: var(--brand-primary-text);
+  border-color: var(--brand-primary);
+}
+.erp-btn-primary:hover:not(:disabled) {
+  background-color: var(--brand-primary-hover);
+  border-color: var(--brand-primary-hover);
 }
 
-.btn-secondary {
-  background: var(--bg-tertiary);
+.erp-btn-secondary {
+  background-color: var(--bg-surface);
   color: var(--text-primary);
-  border: 1px solid var(--border-primary);
+  border-color: var(--border-subtle);
+}
+.erp-btn-secondary:hover:not(:disabled) {
+  background-color: var(--bg-surface-subtle);
+  border-color: var(--border-strong);
 }
 
-.btn-secondary:hover {
-  background: var(--bg-hover);
-  transform: translateY(-1px);
+.erp-btn-danger {
+  background-color: var(--status-absent);
+  color: #ffffff;
+  border-color: var(--status-absent);
+}
+.erp-btn-danger:hover:not(:disabled) {
+  filter: brightness(0.92);
 }
 
-.card {
-  background: var(--gradient-card);
-  border: 1px solid var(--border-primary);
-  border-radius: var(--radius-lg);
-  padding: 1.5rem;
-  box-shadow: var(--shadow-md);
-  transition: var(--transition-normal);
+.erp-btn-warning {
+  background-color: var(--status-late);
+  color: #ffffff;
+  border-color: var(--status-late);
 }
 
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-xl);
-  border-color: var(--accent-primary);
+.erp-btn-ghost {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border-color: transparent;
+}
+.erp-btn-ghost:hover:not(:disabled) {
+  background-color: var(--bg-surface-subtle);
+  color: var(--text-primary);
 }
 
-.input {
+/* Form Controls */
+.erp-input, .erp-select, .erp-textarea {
   width: 100%;
-  padding: 0.75rem 1rem;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-primary);
-  border-radius: var(--radius-md);
+  padding: 7px 11px;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
   color: var(--text-primary);
   font-size: 0.875rem;
-  transition: var(--transition-fast);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-.input:focus {
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+.erp-input:focus, .erp-select:focus, .erp-textarea:focus {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px var(--brand-primary-light);
 }
 
-.input::placeholder {
+.erp-input::placeholder, .erp-textarea::placeholder {
   color: var(--text-muted);
 }
 
-.status {
-  padding: 0.25rem 0.75rem;
-  border-radius: var(--radius-sm);
+.erp-label {
+  display: block;
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 5px;
   text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
-.status.present {
-  background: rgba(16, 185, 129, 0.2);
-  color: var(--accent-success);
-  border: 1px solid var(--accent-success);
+/* Card */
+.erp-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 20px;
+  position: relative;
 }
 
-.status.absent {
-  background: rgba(239, 68, 68, 0.2);
-  color: var(--accent-error);
-  border: 1px solid var(--accent-error);
+/* Table */
+.erp-table-container {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-surface);
 }
 
-.status.late {
-  background: rgba(245, 158, 11, 0.2);
-  color: var(--accent-warning);
-  border: 1px solid var(--accent-warning);
+.erp-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.8125rem;
 }
 
-.fade-in {
-  animation: fadeIn 0.5s ease-in-out;
+.erp-table th {
+  background-color: var(--bg-surface-subtle);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+.erp-table td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  vertical-align: middle;
 }
 
-.slide-up {
-  animation: slideUp 0.3s ease-out;
+.erp-table tbody tr {
+  transition: background-color var(--transition-fast);
 }
 
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
+.erp-table tbody tr:hover {
+  background-color: var(--bg-surface-subtle);
 }
 
-.spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--bg-tertiary);
-  border-top: 2px solid var(--accent-primary);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+.erp-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+/* Pulse animation for skeleton */
+@keyframes erpSkeletonPulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.45; }
+  100% { opacity: 1; }
+}
+
+@keyframes modalZoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }

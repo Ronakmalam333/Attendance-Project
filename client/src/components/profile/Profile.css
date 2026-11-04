@@ -1,539 +1,145 @@
-/* General Styles */
+/* ==========================================================================
+   PROFILE SETTINGS CSS
+   ========================================================================== */
 
-.profile-contain {
-  width: 100%;
-  min-height: calc(100vh - 70px);
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: none;
-}
-
-.profile-contain::-webkit-scrollbar {
-  display: none;
-}
-
-.profile {
-  width: 100%;
-  min-height: calc(100vh - 70px);
+.erp-profile-page {
+  max-width: 1360px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 2rem;
-  padding-bottom: 4rem;
-  animation: fadeIn 0.6s ease-out;
-  background: var(--bg-primary);
+  gap: 20px;
 }
 
-/* Header Section */
-.profile-header {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 2rem;
-  background: var(--gradient-card);
-  border: 1px solid var(--border-primary);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
-  width: 100%;
-  max-width: 800px;
-  margin-bottom: 2rem;
-  transition: var(--transition-normal);
-}
-
-.profile-header:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-xl);
-  border-color: var(--accent-primary);
-}
-
-.profile-pic-label {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  cursor: pointer;
-  overflow: hidden;
-  border: 4px solid var(--accent-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-tertiary);
-  transition: var(--transition-fast);
-}
-
-.profile-pic-label:hover {
-  transform: scale(1.05);
-  border-color: var(--accent-secondary);
-  box-shadow: var(--shadow-lg);
-}
-
-.profile-pic-label .profile-icon {
-  fill: var(--accent-primary);
-  transition: var(--transition-fast);
-}
-
-.profile-pic-label:hover .profile-icon {
-  fill: var(--accent-secondary);
-}
-
-.profile-pic {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.profile-info {
-  margin-top: 15px;
-}
-
-.profile-info h2 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.profile-info p {
-  margin: 0.5rem 0;
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-}
-
-.edit-button {
-  position: absolute;
-  top: 1.5rem;
-  right: 1.5rem;
-  background: var(--gradient-primary);
-  color: var(--text-primary);
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  font-size: 0.875rem;
-  font-weight: 600;
-  box-shadow: var(--shadow-md);
-  transition: var(--transition-fast);
-}
-
-.edit-button:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-}
-
-/* Profile Details Section */
-.profile-details {
-  margin-top: 2rem;
+.erp-profile-layout-grid {
   display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 1.5rem;
-  width: 100%;
-  max-width: 800px;
-  background: var(--gradient-card);
-  border: 1px solid var(--border-primary);
-  padding: 2rem;
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
-  transition: var(--transition-normal);
+  grid-template-columns: 340px 1fr;
+  gap: 20px;
+  align-items: start;
 }
 
-.profile-details:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-xl);
-  border-color: var(--accent-primary);
+@media (max-width: 900px) {
+  .erp-profile-layout-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
-.profile-field {
+.erp-profile-summary-card {
   display: flex;
   flex-direction: column;
-}
-
-.profile-field label {
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-}
-
-.profile-field input {
-  padding: 0.75rem;
-  border: 1px solid var(--border-primary);
-  border-radius: var(--radius-md);
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  outline: none;
-  font-size: 0.875rem;
-  transition: var(--transition-fast);
-}
-
-.profile-field input:focus {
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-}
-
-/* Logout Button */
-.logout-button {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  color: white;
-  border: none;
-  padding: 1rem 2rem;
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 600;
-  box-shadow: var(--shadow-lg);
-  transition: var(--transition-fast);
-  margin-top: 3rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  width: 100%;
-  max-width: 800px;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  position: relative;
-  overflow: hidden;
-}
-
-.logout-button::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.2),
-    transparent
-  );
-  transition: var(--transition-normal);
-}
-
-.logout-button:hover::before {
-  left: 100%;
-}
-
-.logout-button:hover {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(239, 68, 68, 0.4);
-}
-
-.logout-button:active {
-  transform: translateY(0);
-  box-shadow: var(--shadow-md);
-}
-
-/* Status Message */
-.status {
-  margin-top: 1.5rem;
-  padding: 1rem;
-  border-radius: var(--radius-md);
+  align-items: center;
   text-align: center;
-  font-size: 0.875rem;
-  font-weight: 500;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-primary);
-  color: var(--text-primary);
-  width: 100%;
-  max-width: 800px;
-  box-shadow: var(--shadow-md);
+  gap: 16px;
+  padding: 24px;
 }
 
-/* Edit Overlay */
-.edit-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(8px);
+.erp-profile-avatar-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.erp-avatar-upload-label {
+  cursor: pointer;
+  position: relative;
+  display: block;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--border-subtle, #e2e8f0);
+}
+
+.erp-profile-full-avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.erp-profile-avatar-fallback {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background-color: var(--bg-surface-subtle, #f1f5f9);
+  color: var(--brand-primary, #1d4ed8);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.3s ease-out;
 }
 
-.edit-popup {
-  background: var(--gradient-card);
-  border: 1px solid var(--border-primary);
-  padding: 2rem;
-  border-radius: var(--radius-xl);
-  width: 90%;
-  max-width: 450px;
-  box-shadow: var(--shadow-xl);
-  animation: slideUp 0.3s ease-out;
+.erp-avatar-hover-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.45);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  border-radius: 50%;
 }
 
-.edit-popup h2 {
-  margin-top: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 1.5rem;
-  text-align: center;
+.erp-avatar-upload-label:hover .erp-avatar-hover-overlay {
+  opacity: 1;
 }
 
-.done-button {
-  background: var(--gradient-primary);
-  color: var(--text-primary);
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  font-size: 0.875rem;
-  font-weight: 600;
-  box-shadow: var(--shadow-md);
-  transition: var(--transition-fast);
+.erp-profile-info-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.erp-profile-full-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+  margin: 0;
+}
+
+.erp-profile-email-text {
+  font-size: 0.8125rem;
+  color: var(--text-muted, #94a3b8);
+}
+
+.erp-profile-meta-list {
   width: 100%;
-  margin-top: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid var(--border-subtle, #e2e8f0);
+  padding-top: 16px;
+  text-align: left;
 }
 
-.done-button:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+.erp-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8125rem;
 }
 
-/* Media Queries for Responsiveness */
-
-/* Extra Small Devices - Mobile Portrait (up to 480px) */
-@media (max-width: 480px) {
-  .profile {
-    padding: 1rem;
-    padding-bottom: 2rem;
-  }
-
-  .profile-header {
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .profile-pic-label {
-    width: 100px;
-    height: 100px;
-    border-width: 3px;
-  }
-
-  .profile-info h2 {
-    font-size: 1.25rem;
-  }
-
-  .profile-info p {
-    font-size: 0.8rem;
-  }
-
-  .edit-button {
-    position: static;
-    margin-top: 1rem;
-    width: 100%;
-    padding: 0.625rem 1rem;
-    font-size: 0.8rem;
-  }
-
-  .profile-details {
-    padding: 1.5rem;
-    margin-top: 1.5rem;
-    gap: 1rem;
-  }
-
-  .profile-field input {
-    padding: 0.625rem;
-    font-size: 0.8rem;
-  }
-
-  .logout-button {
-    padding: 0.875rem 1.5rem;
-    font-size: 0.875rem;
-    margin-top: 2rem;
-  }
-
-  .edit-popup {
-    width: 95%;
-    padding: 1.5rem;
-  }
-
-  .edit-popup h2 {
-    font-size: 1.25rem;
-  }
+.erp-meta-label {
+  color: var(--text-secondary, #64748b);
 }
 
-/* Small Devices - Mobile Landscape (481px to 576px) */
-@media (min-width: 481px) and (max-width: 576px) {
-  .profile {
-    padding: 1.5rem;
-    padding-bottom: 3rem;
-  }
-
-  .profile-header {
-    padding: 1.75rem;
-  }
-
-  .profile-pic-label {
-    width: 110px;
-    height: 110px;
-  }
-
-  .profile-info h2 {
-    font-size: 1.35rem;
-  }
-
-  .edit-button {
-    padding: 0.625rem 1.25rem;
-    font-size: 0.825rem;
-  }
-
-  .profile-details {
-    padding: 1.75rem;
-    gap: 1.25rem;
-  }
-
-  .logout-button {
-    padding: 0.9rem 1.75rem;
-    font-size: 0.9rem;
-    margin-top: 2.5rem;
-  }
+.erp-meta-value {
+  font-weight: 600;
+  color: var(--text-primary, #0f172a);
 }
 
-/* Medium Devices - Tablets Portrait (577px to 768px) */
-@media (min-width: 577px) and (max-width: 768px) {
-  .profile {
-    padding: 1.75rem;
-  }
-
-  .profile-header {
-    flex-direction: row;
-    text-align: left;
-  }
-
-  .profile-info {
-    margin-left: 1.5rem;
-    margin-top: 0;
-  }
-
-  .profile-pic-label {
-    width: 130px;
-    height: 130px;
-  }
-
-  .profile-info h2 {
-    font-size: 1.5rem;
-  }
-
-  .profile-info p {
-    font-size: 0.9rem;
-  }
-
-  .profile-details {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .logout-button {
-    padding: 0.95rem 1.85rem;
-    font-size: 0.95rem;
-  }
+/* Details Card Form */
+.erp-profile-details-card {
+  padding: 24px;
 }
 
-/* Large Tablets - Tablets Landscape (769px to 1024px) */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .profile-header {
-    flex-direction: row;
-    text-align: left;
-  }
-
-  .profile-info {
-    margin-left: 1.75rem;
-    margin-top: 0;
-  }
-
-  .profile-pic-label {
-    width: 140px;
-    height: 140px;
-  }
-
-  .profile-info h2 {
-    font-size: 1.625rem;
-  }
-
-  .profile-info p {
-    font-size: 0.95rem;
-  }
-
-  .profile-details {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-  }
+.erp-profile-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }
 
-/* Desktop - Standard (1025px to 1440px) */
-@media (min-width: 1025px) and (max-width: 1440px) {
-  .profile-header {
-    flex-direction: row;
-    text-align: left;
-  }
-
-  .profile-info {
-    margin-left: 2rem;
-    margin-top: 0;
-  }
-
-  .profile-pic-label {
-    width: 150px;
-    height: 150px;
-  }
-
-  .profile-info h2 {
-    font-size: 1.75rem;
-  }
-
-  .profile-info p {
-    font-size: 1rem;
-  }
-
-  .profile-details {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* Large Desktop - Wide Screens (1441px and above) */
-@media (min-width: 1441px) {
-  .profile {
-    padding: 3rem;
-  }
-
-  .profile-header {
-    flex-direction: row;
-    text-align: left;
-    padding: 2.5rem;
-  }
-
-  .profile-info {
-    margin-left: 2.5rem;
-    margin-top: 0;
-  }
-
-  .profile-pic-label {
-    width: 160px;
-    height: 160px;
-  }
-
-  .profile-info h2 {
-    font-size: 2rem;
-  }
-
-  .profile-info p {
-    font-size: 1.1rem;
-  }
-
-  .profile-details {
-    grid-template-columns: repeat(2, 1fr);
-    padding: 2.5rem;
-  }
-
-  .logout-button {
-    font-size: 1.1rem;
+@media (max-width: 600px) {
+  .erp-profile-form-grid {
+    grid-template-columns: 1fr;
   }
 }

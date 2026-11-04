@@ -1,150 +1,31 @@
-.students-contain {
-    width: 100%;
-    min-height: calc(100vh - 70px);
-    padding: 2rem;
-    animation: fadeIn 0.6s ease-out;
-    overflow-x: auto;
-    background: var(--bg-primary);
+/* ==========================================================================
+   STUDENTS DIRECTORY CSS
+   ========================================================================== */
+
+.erp-students-page {
+  max-width: 1360px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.students-header {
-    background: var(--gradient-card);
-    border: 1px solid var(--border-primary);
-    border-radius: var(--radius-xl);
-    padding: 2rem;
-    box-shadow: var(--shadow-lg);
-    margin-bottom: 2rem;
+.erp-students-table-card {
+  padding: 0;
+  overflow: hidden;
 }
 
-.students-header h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    margin: 0;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.students-table-wrapper {
-    background: var(--gradient-card);
-    border: 1px solid var(--border-primary);
-    border-radius: var(--radius-xl);
-    padding: 2rem;
-    box-shadow: var(--shadow-lg);
-    overflow-x: auto;
-    transition: var(--transition-normal);
-}
-
-.students-table-wrapper:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-xl);
-    border-color: var(--accent-primary);
-}
-
-/* Table Styling */
-.students-table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
-    min-width: 600px;
-    background: var(--bg-tertiary);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-}
-
-.students-table th,
-.students-table td {
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid var(--border-primary);
-    white-space: nowrap;
-    color: var(--text-primary);
-}
-
-.students-table th {
-    background: var(--gradient-primary);
-    color: white;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-size: 0.875rem;
-}
-
-.students-table tr:nth-child(even) {
-    background: var(--bg-secondary);
-}
-
-.students-table tr:hover {
-    background: var(--bg-hover);
-}
-
-/* Tablet View */
-@media (max-width: 1024px) {
-    .students-contain {
-        padding: 1.5rem;
-    }
-    
-    .students-header {
-        padding: 1.5rem;
-    }
-    
-    .students-header h1 {
-        font-size: 1.75rem;
-    }
-    
-    .students-table th, 
-    .students-table td {
-        padding: 0.875rem 1rem;
-        font-size: 0.9rem;
-    }
-}
-
-/* Mobile View */
-@media (max-width: 768px) {
-    .students-contain {
-        padding: 1rem;
-    }
-    
-    .students-header {
-        padding: 1.25rem;
-    }
-    
-    .students-header h1 {
-        font-size: 1.5rem;
-    }
-    
-    .students-table-wrapper {
-        padding: 1rem;
-    }
-
-    .students-table th,
-    .students-table td {
-        padding: 0.75rem 0.875rem;
-        font-size: 0.85rem;
-    }
-}
-
-/* Extra Small Devices */
-@media (max-width: 480px) {
-    .students-contain {
-        padding: 0.75rem;
-    }
-    
-    .students-header {
-        padding: 1rem;
-    }
-    
-    .students-header h1 {
-        font-size: 1.25rem;
-    }
-    
-    .students-table-wrapper {
-        padding: 0.75rem;
-    }
-    
-    .students-table th,
-    .students-table td {
-        padding: 0.625rem 0.75rem;
-        font-size: 0.8rem;
-    }
+.erp-student-mini-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--bg-surface-subtle, #f1f5f9);
+  color: var(--brand-primary, #1d4ed8);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  flex-shrink: 0;
 }

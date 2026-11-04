@@ -2,25 +2,49 @@ import axios from "axios";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
+let onRequestStart = null;
+let onRequestEnd = null;
+
+export const setNetworkActivityListeners = (startFn, endFn) => {
+  onRequestStart = startFn;
+  onRequestEnd = endFn;
+};
+
 // Create a custom axios instance
 const api = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true, // needed if using cookies
 });
 
-// Attach Authorization header for every request
+// Attach Authorization header and loading listeners for every request
 api.interceptors.request.use(
   (config) => {
-    // Cookies are automatically sent with withCredentials: true
+    if (onRequestStart && !config.silent) {
+      onRequestStart();
+    }
     return config;
   },
-  (error) => Promise.reject(error),
+  (error) => {
+    if (onRequestEnd) {
+      onRequestEnd();
+    }
+    return Promise.reject(error);
+  },
 );
 
-// Response interceptor to handle 401 errors
+// Response interceptor to handle loading finish and 401 errors
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (onRequestEnd) {
+      onRequestEnd();
+    }
+    return response;
+  },
   (error) => {
+    if (onRequestEnd) {
+      onRequestEnd();
+    }
+
     if (error.response?.status === 401) {
       localStorage.removeItem("user");
       localStorage.removeItem("role");

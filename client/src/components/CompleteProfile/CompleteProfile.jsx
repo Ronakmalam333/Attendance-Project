@@ -1,8 +1,11 @@
-import { useState, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../context/AuthContext";
-import axios from "axios";
+import { useToast } from "../../context/ToastContext";
+import axios from "../../tokenManager";
+import Icons from "../ui/Icons";
+import Badge from "../ui/Badge";
 import "./CompleteProfile.css";
 
 function CompleteProfile() {
@@ -12,41 +15,34 @@ function CompleteProfile() {
     formState: { errors },
   } = useForm();
   const navigate = useNavigate();
+  const toast = useToast();
   const { user, login } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
 
   const isStudent = user?.role === "student";
-  const isStaff = user?.role === "staff";
 
   const onSubmit = async (data) => {
     setLoading(true);
     try {
       const profileData = isStudent
         ? {
-            name: data.name,
-            uid: data.uid,
+            name: data.name.trim(),
+            uid: data.uid.trim().toUpperCase(),
             course: data.course,
             semester: data.semester,
           }
         : {
-            // Staff only needs name and uid
-            name: data.name,
-            uid: data.uid,
+            name: data.name.trim(),
+            uid: data.uid.trim().toUpperCase(),
           };
 
-      const response = await axios.put(
-        `${import.meta.env.VITE_API_URL}/profile`,
-        profileData,
-        {
-          withCredentials: true,
-        },
-      );
+      await axios.put("/profile", profileData);
 
-      // Update user context with new profile data
+      // Update user context
       login({
         ...user,
-        name: data.name,
-        uid: data.uid,
+        name: data.name.trim(),
+        uid: data.uid.trim().toUpperCase(),
         ...(isStudent && {
           course: data.course,
           semester: data.semester,
@@ -54,157 +50,117 @@ function CompleteProfile() {
         profileCompleted: true,
       });
 
-      alert("Profile completed successfully!");
+      toast.success("Profile setup finalized successfully!", "Profile Completed");
       navigate(isStudent ? "/student" : "/staff");
     } catch (error) {
-      console.error("Error updating profile:", error);
       const errorMessage =
-        error.response?.data?.message ||
-        "Failed to update profile. Please try again.";
-      alert(errorMessage);
+        error.response?.data?.message || "Failed to update profile. Please try again.";
+      toast.error(errorMessage, "Profile Setup Failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className='complete-profile-container'>
-      <div className='complete-profile-card'>
-        <h1>Complete Your Profile</h1>
-        <p className='subtitle'>
-          {isStudent
-            ? "Please provide your full name, university ID, course, and semester information to continue"
-            : "Please provide your full name and staff ID to continue"}
-        </p>
+    <div className='erp-complete-profile-viewport'>
+      <div className='erp-complete-profile-card erp-card'>
+        <div className='erp-auth-header'>
+          <div className='erp-auth-logo-badge'>
+            <Icons.User size={22} />
+          </div>
+          <h1 className='erp-auth-title'>Complete Your Academic Profile</h1>
+          <p className='erp-auth-desc'>
+            {isStudent
+              ? "Link your university UID, degree course, and semester to finalize registration"
+              : "Verify your staff employee ID and departmental credentials"}
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className='profile-form'>
-          <div className='form-group'>
-            <label htmlFor='name'>Full Name</label>
+        <form onSubmit={handleSubmit(onSubmit)} className='erp-auth-form'>
+          <div className='erp-form-group'>
+            <label htmlFor='name' className='erp-label'>Full Legal Name</label>
             <input
               type='text'
               id='name'
-              placeholder={
-                isStudent ? "e.g., John Doe" : "e.g., Dr. Jane Smith"
-              }
+              placeholder={isStudent ? "e.g., Alex Johnson" : "e.g., Prof. Sarah Mitchell"}
               defaultValue={user?.name !== "Pending" ? user?.name : ""}
+              className={`erp-input ${errors.name ? "is-invalid" : ""}`}
               {...register("name", {
                 required: "Full name is required",
-                minLength: {
-                  value: 3,
-                  message: "Name must be at least 3 characters",
-                },
-                maxLength: {
-                  value: 50,
-                  message: "Name must not exceed 50 characters",
-                },
+                minLength: { value: 3, message: "Min 3 characters" },
               })}
-              className={errors.name ? "error-input" : ""}
             />
-            <small className='hint'>
-              Enter your full name as per university records
-            </small>
-            {errors.name && (
-              <p className='error-message'>{errors.name.message}</p>
-            )}
+            {errors.name && <span className='erp-field-error'>{errors.name.message}</span>}
           </div>
 
-          <div className='form-group'>
-            <label htmlFor='uid'>
-              {isStudent ? "University ID (UID)" : "Staff ID"}
+          <div className='erp-form-group'>
+            <label htmlFor='uid' className='erp-label'>
+              {isStudent ? "University Enrollment Number (UID)" : "Staff Identification Code"}
             </label>
             <input
               type='text'
               id='uid'
-              placeholder={isStudent ? "e.g., 24BTCSE001" : "e.g., STAFF001"}
+              placeholder={isStudent ? "e.g., 24BTCSE001" : "e.g., STAFF042"}
+              className={`erp-input ${errors.uid ? "is-invalid" : ""}`}
               {...register("uid", {
-                required: `${isStudent ? "University" : "Staff"} ID is required`,
-                pattern: {
-                  value: /^[A-Z0-9]+$/i,
-                  message: "ID should contain only letters and numbers",
-                },
-                minLength: {
-                  value: 5,
-                  message: "ID must be at least 5 characters",
-                },
-                maxLength: {
-                  value: 20,
-                  message: "ID must not exceed 20 characters",
-                },
+                required: "Identification ID is required",
+                minLength: { value: 3, message: "Min 3 characters" },
               })}
-              className={errors.uid ? "error-input" : ""}
             />
-            <small className='hint'>
-              {isStudent
-                ? "Enter your university-assigned ID (e.g., 24BTCSE001 for BTech CSE 2024)"
-                : "Enter your staff ID assigned by the institution"}
-            </small>
-            {errors.uid && (
-              <p className='error-message'>{errors.uid.message}</p>
-            )}
+            {errors.uid && <span className='erp-field-error'>{errors.uid.message}</span>}
           </div>
 
           {isStudent && (
-            <>
-              <div className='form-group'>
-                <label htmlFor='course'>Course</label>
+            <div className='erp-form-row-2col'>
+              <div className='erp-form-group'>
+                <label htmlFor='course' className='erp-label'>Course / Degree</label>
                 <select
                   id='course'
-                  {...register("course", {
-                    required: "Please select your course",
-                  })}
-                  className={errors.course ? "error-input" : ""}
+                  className={`erp-select ${errors.course ? "is-invalid" : ""}`}
+                  {...register("course", { required: "Please select course" })}
                 >
                   <option value=''>Select Course</option>
-                  <option value='BCA'>
-                    BCA - Bachelor of Computer Applications
-                  </option>
-                  <option value='MCA'>
-                    MCA - Master of Computer Applications
-                  </option>
                   <option value='BTech'>BTech - Bachelor of Technology</option>
+                  <option value='BCA'>BCA - Computer Applications</option>
+                  <option value='MCA'>MCA - Master of Computer Applications</option>
                   <option value='MTech'>MTech - Master of Technology</option>
                   <option value='BSc'>BSc - Bachelor of Science</option>
-                  <option value='MSc'>MSc - Master of Science</option>
-                  <option value='BBA'>
-                    BBA - Bachelor of Business Administration
-                  </option>
-                  <option value='MBA'>
-                    MBA - Master of Business Administration
-                  </option>
                 </select>
-                {errors.course && (
-                  <p className='error-message'>{errors.course.message}</p>
-                )}
+                {errors.course && <span className='erp-field-error'>{errors.course.message}</span>}
               </div>
 
-              <div className='form-group'>
-                <label htmlFor='semester'>Semester</label>
+              <div className='erp-form-group'>
+                <label htmlFor='semester' className='erp-label'>Current Semester</label>
                 <select
                   id='semester'
-                  {...register("semester", {
-                    required: "Please select your semester",
-                  })}
-                  className={errors.semester ? "error-input" : ""}
+                  className={`erp-select ${errors.semester ? "is-invalid" : ""}`}
+                  {...register("semester", { required: "Select semester" })}
                 >
                   <option value=''>Select Semester</option>
-                  <option value='1'>Semester 1</option>
-                  <option value='2'>Semester 2</option>
-                  <option value='3'>Semester 3</option>
-                  <option value='4'>Semester 4</option>
-                  <option value='5'>Semester 5</option>
-                  <option value='6'>Semester 6</option>
-                  <option value='7'>Semester 7</option>
-                  <option value='8'>Semester 8</option>
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
+                    <option key={s} value={s.toString()}>
+                      Semester {s}
+                    </option>
+                  ))}
                 </select>
-                {errors.semester && (
-                  <p className='error-message'>{errors.semester.message}</p>
-                )}
+                {errors.semester && <span className='erp-field-error'>{errors.semester.message}</span>}
               </div>
-            </>
+            </div>
           )}
 
-          <button type='submit' className='submit-button' disabled={loading}>
-            {loading ? "Saving..." : "Complete Profile"}
+          <button
+            type='submit'
+            className='erp-btn erp-btn-primary erp-auth-submit-btn'
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <span className='erp-spinner-sm' />
+                <span>Saving Profile...</span>
+              </>
+            ) : (
+              <span>Finalize & Enter Portal</span>
+            )}
           </button>
         </form>
       </div>

@@ -1,377 +1,114 @@
-.token-management {
-  max-width: 1400px;
+/* ==========================================================================
+   TOKEN MANAGEMENT CSS
+   ========================================================================== */
+
+.erp-token-mgmt-page {
+  max-width: 1360px;
   margin: 0 auto;
-  padding: 2rem;
-  background: var(--bg-primary);
-  min-height: calc(100vh - 70px);
-  animation: fadeIn 0.6s ease-out;
-}
-
-.header {
-  background: var(--gradient-card);
-  border: 1px solid var(--border-primary);
-  border-radius: var(--radius-xl);
-  padding: 2rem;
-  box-shadow: var(--shadow-lg);
-  margin-bottom: 2rem;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.header h1 {
-  font-size: 2rem;
+.erp-token-table-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.erp-token-display-chip {
+  font-family: ui-monospace, monospace;
+  font-size: 0.9375rem;
   font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm, 4px);
+  background-color: var(--bg-surface-subtle, #f1f5f9);
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  color: var(--text-primary, #0f172a);
+  letter-spacing: 0.08em;
+}
+
+.erp-icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #94a3b8);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.erp-icon-btn:hover {
+  color: var(--text-primary, #0f172a);
+  background-color: var(--bg-surface-subtle, #f1f5f9);
+}
+
+.erp-btn-trash {
+  color: var(--status-absent, #dc2626);
+}
+
+.erp-btn-trash:hover {
+  background-color: var(--status-absent-bg, #fef2f2);
+  color: var(--status-absent, #dc2626);
+}
+
+/* Modal Dialog */
+.erp-modal-dialog {
+  width: 100%;
+  max-width: 480px;
+  padding: 24px;
+  background-color: var(--bg-surface, #ffffff);
+  border-radius: var(--radius-lg, 10px);
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  box-shadow: var(--shadow-dropdown);
+  animation: modalZoomIn 140ms ease-out;
+}
+
+.erp-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.erp-modal-title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
   margin: 0;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
-.token-form {
-  background: var(--gradient-card);
-  border: 1px solid var(--border-primary);
-  padding: 2rem;
-  border-radius: var(--radius-xl);
-  margin-bottom: 2rem;
-  box-shadow: var(--shadow-lg);
-  transition: var(--transition-normal);
+.erp-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.token-form:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-xl);
-  border-color: var(--accent-primary);
+.erp-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-row {
+.erp-form-row-2col {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+  gap: 14px;
 }
 
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-}
-
-.form-group input,
-.form-group select {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--border-primary);
-  border-radius: var(--radius-md);
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  font-size: 0.875rem;
-  transition: var(--transition-fast);
-}
-
-.form-group input:focus,
-.form-group select:focus {
-  border-color: var(--accent-primary);
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-}
-
-.form-group select:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.token-input-group {
-  display: flex;
-  gap: 1rem;
-}
-
-.token-input-group input {
-  flex: 1;
-}
-
-.btn-generate {
-  padding: 0.75rem 1.5rem;
-  background: var(--gradient-secondary);
-  color: white;
-  border: none;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.875rem;
-  transition: var(--transition-fast);
-  box-shadow: var(--shadow-md);
-  white-space: nowrap;
-}
-
-.btn-generate:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-}
-
-.form-actions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 2rem;
-}
-
-.btn-primary,
-.btn-secondary {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.875rem;
-  transition: var(--transition-fast);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.btn-primary {
-  background: var(--gradient-primary);
-  color: white;
-  box-shadow: var(--shadow-md);
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-}
-
-.btn-secondary {
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-primary);
-}
-
-.btn-secondary:hover {
-  background: var(--bg-hover);
-}
-
-.tokens-table {
-  background: var(--gradient-card);
-  border: 1px solid var(--border-primary);
-  border-radius: var(--radius-xl);
-  overflow: hidden;
-  box-shadow: var(--shadow-lg);
-  transition: var(--transition-normal);
-}
-
-.tokens-table:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-xl);
-  border-color: var(--accent-primary);
-}
-
-.tokens-table table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--bg-tertiary);
-}
-
-.tokens-table th,
-.tokens-table td {
-  padding: 1rem 1.25rem;
-  text-align: left;
-  border-bottom: 1px solid var(--border-primary);
-  color: var(--text-primary);
-}
-
-.tokens-table th {
-  background: var(--gradient-primary);
-  color: white;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-size: 0.875rem;
-}
-
-.tokens-table tr:nth-child(even) {
-  background: var(--bg-secondary);
-}
-
-.tokens-table tr:hover {
-  background: var(--bg-hover);
-}
-
-.tokens-table tr.inactive {
-  opacity: 0.6;
-}
-
-.token-code {
-  font-family: 'Courier New', monospace;
-  font-weight: 700;
-  background: var(--bg-card);
-  padding: 0.5rem 0.75rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-primary);
-  letter-spacing: 1px;
-}
-
-.status {
-  padding: 0.25rem 0.75rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.status.active {
-  background: rgba(16, 185, 129, 0.2);
-  color: var(--accent-success);
-  border: 1px solid var(--accent-success);
-}
-
-.status.inactive {
-  background: rgba(239, 68, 68, 0.2);
-  color: var(--accent-error);
-  border: 1px solid var(--accent-error);
-}
-
-.actions {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.actions button {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  font-size: 0.75rem;
-  font-weight: 600;
-  transition: var(--transition-fast);
-  text-transform: uppercase;
-}
-
-.btn-edit {
-  background: var(--accent-primary);
-  color: white;
-}
-
-.btn-edit:hover {
-  background: var(--accent-secondary);
-}
-
-.btn-toggle.activate {
-  background: var(--accent-success);
-  color: white;
-}
-
-.btn-toggle.activate:hover {
-  background: #059669;
-}
-
-.btn-toggle.deactivate {
-  background: var(--accent-warning);
-  color: white;
-}
-
-.btn-toggle.deactivate:hover {
-  background: #d97706;
-}
-
-.btn-delete {
-  background: var(--accent-error);
-  color: white;
-}
-
-.btn-delete:hover {
-  background: #dc2626;
-}
-
-.no-tokens {
-  text-align: center;
-  padding: 3rem;
-  color: var(--text-muted);
-  font-style: italic;
-}
-
-.loading {
-  text-align: center;
-  padding: 3rem;
-  color: var(--text-secondary);
-}
-
-@media (max-width: 1024px) {
-  .token-management {
-    padding: 1.5rem;
-  }
-  
-  .header h1 {
-    font-size: 1.75rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .token-management {
-    padding: 1rem;
-  }
-  
-  .header {
-    padding: 1.5rem;
-  }
-  
-  .header h1 {
-    font-size: 1.5rem;
-  }
-  
-  .form-row {
+@media (max-width: 500px) {
+  .erp-form-row-2col {
     grid-template-columns: 1fr;
   }
-  
-  .token-form {
-    padding: 1.5rem;
-  }
-
-  .tokens-table {
-    overflow-x: auto;
-  }
-
-  .actions {
-    flex-direction: column;
-  }
-  
-  .actions button {
-    width: 100%;
-  }
 }
 
-@media (max-width: 480px) {
-  .token-management {
-    padding: 0.75rem;
-  }
-  
-  .header {
-    padding: 1rem;
-  }
-  
-  .header h1 {
-    font-size: 1.25rem;
-  }
-  
-  .token-form {
-    padding: 1rem;
-  }
-  
-  .tokens-table th,
-  .tokens-table td {
-    padding: 0.75rem 0.5rem;
-    font-size: 0.8rem;
-  }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+.erp-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-subtle, #e2e8f0);
 }

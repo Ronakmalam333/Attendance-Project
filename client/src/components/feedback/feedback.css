@@ -1,147 +1,131 @@
-.feedback-contain {
-    width: 100%;
-    height: 90vh;
-    padding: 2rem;
-    overflow: auto;
-    scrollbar-width: none;
-    animation: fadeIn 1s ease-out;
-    background: transparent;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+/* ==========================================================================
+   FEEDBACK & GRIEVANCE DESK CSS
+   ========================================================================== */
+
+.erp-feedback-page {
+  max-width: 1360px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.feedback-title {
-    text-align: center;
-    color: var(--color4);
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+.erp-feedback-layout-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 20px;
+  align-items: start;
 }
 
-.feedback-form {
-    width: 100%;
-    max-width: 600px;
-    background: var(--secondary-color);
-    padding: 2rem;
-    border-radius: 20px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-    backdrop-filter: blur(10px);
-    max-height: calc(100% - 100px);
-    overflow-y: auto;
-    margin: auto;
+@media (max-width: 1024px) {
+  .erp-feedback-layout-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
 }
 
-.form-group {
-    margin-bottom: 1.5rem;
+.erp-feedback-card {
+  padding: 24px;
 }
 
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: var(--color4);
-    font-weight: 600;
+.erp-feedback-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
-textarea {
-    width: 100%;
-    height: 150px;
-    padding: 0.8rem;
-    border: 2px solid #e0e0e0;
-    border-radius: 10px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    resize: vertical;
+.erp-star-rating-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-textarea:focus {
-    border-color: #3498db;
-    box-shadow: 0 0 8px rgba(52,152,219,0.2);
-    outline: none;
+.erp-star-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.625rem;
+  color: var(--border-strong, #cbd5e1);
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+  transition: color var(--transition-fast), transform var(--transition-fast);
 }
 
-.star-rating {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: center;
+.erp-star-btn.active {
+  color: var(--status-late, #f59e0b);
 }
 
-.star {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    font-size: 2.5rem;
-    transition: transform 0.2s ease;
+.erp-star-btn:hover {
+  transform: scale(1.15);
 }
 
-.star-icon {
-    color: black;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    transition: color 0.2s ease;
+.erp-rating-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-secondary, #475569);
+  margin-left: 8px;
 }
 
-.star.on .star-icon {
-    color: #ffd700;
+/* Sidebar */
+.erp-feedback-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.star:hover .star-icon {
-    color: #ffd700;
-    opacity: 0.7;
+.erp-support-info-card, .erp-support-contacts-card {
+  padding: 20px;
 }
 
-.char-counter {
-    text-align: right;
-    font-size: 0.9rem;
-    color: #7f8c8d;
-    margin-top: 0.3rem;
+.erp-support-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
 }
 
-.submit-btn {
-    background: rgb(16, 0, 163);
-    color: white;
-    padding: 1rem 2rem;
-    border: none;
-    border-radius: 50px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    width: 100%;
-    margin-top: 1rem;
+.erp-support-step-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  background-color: var(--bg-surface-subtle, #f8fafc);
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  border-radius: var(--radius-sm, 6px);
 }
 
-.submit-btn:hover {
-    opacity: 0.8;
+.erp-support-step-item strong {
+  font-size: 0.8125rem;
+  color: var(--text-primary, #0f172a);
 }
 
-.submit-btn h3.btn-text {
-    margin: 0;
-    font-size: 1.2rem;
-    font-weight: 600;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
-    color: var(--text-primary);
+.erp-support-step-item p {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #64748b);
+  margin: 0;
+  line-height: 1.4;
 }
 
-@media (max-width: 768px) {
-    .feedback-contain {
-        padding: 1rem;
-        height: 90vh;
-    }
-
-    .feedback-form {
-        padding: 1rem;
-        max-height: calc(100% - 80px);
-    }
-
-    .feedback-title {
-        font-size: 1.5rem;
-    }
-
-    .star {
-        font-size: 2rem;
-    }
+.erp-contact-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.feedback-contain::-webkit-scrollbar {
-    display: none;
+.erp-contact-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.75rem;
+}
+
+.erp-contact-item span {
+  color: var(--text-secondary, #64748b);
+}
+
+.erp-contact-item code {
+  font-family: monospace;
+  font-size: 0.8125rem;
+  color: var(--brand-primary, #1d4ed8);
+  font-weight: 600;
 }

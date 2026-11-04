@@ -1,357 +1,256 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import api from "../../tokenManager";
+import { useToast } from "../../context/ToastContext";
+import Icons from "../ui/Icons";
 import "./register.css";
 
+const coursesList = [
+  "B.Tech Computer Science & Engineering",
+  "B.Tech Information Technology",
+  "B.Tech Electronics & Communication",
+  "B.Tech Mechanical Engineering",
+  "B.Tech Civil Engineering",
+  "BCA (Computer Applications)",
+  "MCA (Master of Computer Applications)",
+];
+
 const Register = () => {
-  const [isCourseBox, setCourseBox] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState("");
-  const [selectedSemester, setSelectedSemester] = useState("");
   const navigate = useNavigate();
+  const toast = useToast();
+  const [activeRole, setActiveRole] = useState("student");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const {
     register,
     handleSubmit,
     watch,
     setValue,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      role: "student",
+      course: coursesList[0],
+      semester: "2",
+    },
+  });
 
-  const courseBox = (e) => {
-    e.preventDefault();
-    setCourseBox(true);
-  };
+  const password = watch("password");
 
-  const hideCourseBox = (e) => {
-    e.preventDefault();
-    if (e.target.closest(".course-input-contain")) return;
-    setCourseBox(false);
-  };
-
-  const handleBackButton = (e) => {
-    e.preventDefault();
-    setCourseBox(false);
-  };
-
-  const handleCourseSelect = (course) => {
-    setSelectedCourse(course);
-    setValue("course", course);
-  };
-
-  const handleSemesterSelect = (semester) => {
-    setSelectedSemester(semester);
-    setValue("semester", semester);
-    setCourseBox(false);
+  const handleRoleToggle = (role) => {
+    setActiveRole(role);
+    setValue("role", role);
   };
 
   const onSubmit = async (data) => {
+    setIsSubmitting(true);
     try {
-      const endpoint = data.role === "student" ? "/student" : "/staff";
+      const endpoint = activeRole === "student" ? "/student" : "/staff";
 
       const payload = {
-        firstname: data.firstname,
-        lastname: data.lastname,
-        email: data.email,
-        uid: data.uid,
+        firstname: data.firstname.trim(),
+        lastname: data.lastname.trim(),
+        email: data.email.trim().toLowerCase(),
+        uid: data.uid.trim().toUpperCase(),
         password: data.password,
-        role: data.role,
-        ...(data.role === "student" && {
+        role: activeRole,
+        ...(activeRole === "student" && {
           course: data.course,
           semester: data.semester,
         }),
       };
-      const response = await api.post(endpoint, payload);
 
-      alert(
-        `${
-          data.role === "student" ? "Student" : "Admin"
-        } registered successfully!`
+      await api.post(endpoint, payload);
+
+      toast.success(
+        `Account created successfully for ${activeRole === "student" ? "Student" : "Faculty"}! You can now sign in.`,
+        "Registration Complete"
       );
       navigate("/signin");
     } catch (error) {
-      console.error("Error during registration:", error);
-      alert(`Registration failed: ${error.response?.data?.message || error.message}`);
+      const errorMsg = error.response?.data?.message || "Registration failed. Please check inputs.";
+      toast.error(errorMsg, "Registration Error");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const password = watch("password");
-  const role = watch("role");
-
   return (
-    <div className='register-container'>
-      <div className='signup-img-contain'>
-        {/* <img
-          src='https://th.bing.com/th/id/OIP.4Jmh9M
-3SoTkPtk1COE2mhwHaHa?pid=ImgDet&w=206&h=206&c=7&dpr=1.7&cb=idpwebp2&o=7&rm=3'
-          alt='Signup'
-        ></img> */}
-      </div>
+    <div className='erp-register-viewport'>
+      <div className='erp-register-card erp-card'>
+        {/* Header */}
+        <div className='erp-auth-header'>
+          <div className='erp-auth-logo-badge'>
+            <Icons.GraduationCap size={22} />
+          </div>
+          <h1 className='erp-auth-title'>Academic Account Registration</h1>
+          <p className='erp-auth-desc'>
+            Enroll in the university attendance telemetry ecosystem
+          </p>
+        </div>
 
-      <div className='signup'>
-        <h1>Create Account</h1>
-        <form className='register-form' onSubmit={handleSubmit(onSubmit)}>
-          <div className='role-input'>
-            <label>
+        {/* Role Selection */}
+        <div className='erp-auth-role-tabs'>
+          <button
+            type='button'
+            className={`erp-auth-tab ${activeRole === "student" ? "active" : ""}`}
+            onClick={() => handleRoleToggle("student")}
+          >
+            <Icons.GraduationCap size={16} />
+            <span>Student Account</span>
+          </button>
+          <button
+            type='button'
+            className={`erp-auth-tab ${activeRole === "staff" ? "active" : ""}`}
+            onClick={() => handleRoleToggle("staff")}
+          >
+            <Icons.Shield size={16} />
+            <span>Faculty / Staff</span>
+          </button>
+        </div>
+
+        {/* Registration Form */}
+        <form onSubmit={handleSubmit(onSubmit)} className='erp-auth-form'>
+          <input type='hidden' {...register("role")} value={activeRole} />
+
+          {/* Name Row */}
+          <div className='erp-form-row-2col'>
+            <div className='erp-form-group'>
+              <label htmlFor='firstname' className='erp-label'>First Name</label>
               <input
-                {...register("role", { required: "Please select a role" })}
-                type='radio'
-                value='student'
-                defaultChecked
-              />{" "}
-              Student
-            </label>
-            <label>
+                id='firstname'
+                type='text'
+                placeholder='e.g., Alex'
+                className={`erp-input ${errors.firstname ? "is-invalid" : ""}`}
+                {...register("firstname", { required: "First name is required" })}
+              />
+              {errors.firstname && <span className='erp-field-error'>{errors.firstname.message}</span>}
+            </div>
+
+            <div className='erp-form-group'>
+              <label htmlFor='lastname' className='erp-label'>Last Name</label>
               <input
-                {...register("role", { required: "Please select a role" })}
-                type='radio'
-                value='staff'
-              />{" "}
-              Staff
-            </label>
-            {errors.role && <p className='error'>{errors.role.message}</p>}
+                id='lastname'
+                type='text'
+                placeholder='e.g., Johnson'
+                className={`erp-input ${errors.lastname ? "is-invalid" : ""}`}
+                {...register("lastname", { required: "Last name is required" })}
+              />
+              {errors.lastname && <span className='erp-field-error'>{errors.lastname.message}</span>}
+            </div>
           </div>
 
-          <div className='input-group'>
-            <input
-              {...register("firstname", { required: "First name is required" })}
-              type='text'
-              placeholder='First Name'
-              style={{
-                border: `${
-                  errors.firstname ? "2px solid red" : "2px solid #ddd"
-                }`,
-              }}
-            />
-            <input
-              {...register("lastname", { required: "Last name is required" })}
-              type='text'
-              placeholder='Last Name'
-              style={{
-                border: `${
-                  errors.lastname ? "2px solid red" : "2px solid #ddd"
-                }`,
-              }}
-            />
-            {errors.firstname && (
-              <p className='error'>{errors.firstname.message}</p>
-            )}
-            {errors.lastname && (
-              <p className='error'>{errors.lastname.message}</p>
-            )}
+          {/* Email & UID Row */}
+          <div className='erp-form-row-2col'>
+            <div className='erp-form-group'>
+              <label htmlFor='email' className='erp-label'>University Email</label>
+              <input
+                id='email'
+                type='email'
+                placeholder='student@rai.edu'
+                className={`erp-input ${errors.email ? "is-invalid" : ""}`}
+                {...register("email", {
+                  required: "Email is required",
+                  pattern: { value: /\S+@\S+\.\S+/, message: "Valid email required" },
+                })}
+              />
+              {errors.email && <span className='erp-field-error'>{errors.email.message}</span>}
+            </div>
+
+            <div className='erp-form-group'>
+              <label htmlFor='uid' className='erp-label'>
+                {activeRole === "student" ? "Enrollment / UID" : "Faculty Employee ID"}
+              </label>
+              <input
+                id='uid'
+                type='text'
+                placeholder='e.g., 230101'
+                className={`erp-input ${errors.uid ? "is-invalid" : ""}`}
+                {...register("uid", { required: "ID number is required" })}
+              />
+              {errors.uid && <span className='erp-field-error'>{errors.uid.message}</span>}
+            </div>
           </div>
 
-          <div className='input-group'>
-            <input
-              {...register("email", {
-                required: "Email is required",
-                pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-                  message: "Invalid email address",
-                },
-              })}
-              type='email'
-              placeholder='Email'
-              style={{
-                border: `${errors.email ? "2px solid red" : "2px solid #ddd"}`,
-              }}
-            />
-            {errors.email && <p className='error'>{errors.email.message}</p>}
-          </div>
+          {/* Student Specific: Course & Semester */}
+          {activeRole === "student" && (
+            <div className='erp-form-row-2col'>
+              <div className='erp-form-group'>
+                <label htmlFor='course' className='erp-label'>Degree Course</label>
+                <select id='course' className='erp-select' {...register("course", { required: true })}>
+                  {coursesList.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
 
-          <div className='input-group'>
-            <input
-              {...register("uid", {
-                required: "UID is required",
-                minLength: {
-                  value: 6,
-                  message: "UID must be at least 6 characters",
-                },
-              })}
-              type='text'
-              placeholder='UID'
-              style={{
-                border: `${errors.uid ? "2px solid red" : "2px solid #ddd"}`,
-              }}
-            />
-            {errors.uid && <p className='error'>{errors.uid.message}</p>}
-          </div>
-
-          {role === "student" && (
-            <div className='input-group'>
-              <button
-                className='course-btn'
-                onClick={courseBox}
-                style={{
-                  border: `${
-                    errors.course || errors.semester
-                      ? "2px solid red"
-                      : "2px solid #ddd"
-                  }`,
-                }}
-              >
-                {selectedCourse || "Select Course"}
-                {selectedSemester && ` - Sem ${selectedSemester}`}
-                <span>
-                  <svg
-                    xmlns='http://www.w3.org/2000/svg'
-                    height='24px'
-                    viewBox='0 -960 960 960'
-                    width='24px'
-                    fill='#000000'
-                  >
-                    <path d='M480-344 240-584l56-56 184 184 184-184 56 56-240 240Z' />
-                  </svg>
-                </span>
-              </button>
-              {(errors.course || errors.semester) && (
-                <p className='error'>
-                  {errors.course?.message || errors.semester?.message}
-                </p>
-              )}
-
-              <div
-                className='course'
-                onClick={hideCourseBox}
-                style={{ display: `${isCourseBox ? "flex" : "none"}` }}
-              >
-                <div className='course-input-contain'>
-                  <span
-                    className='backToRegister'
-                    style={{
-                      position: "absolute",
-                      top: "15px",
-                      left: "15px",
-                      cursor: "pointer",
-                    }}
-                    onClick={handleBackButton}
-                  >
-                    <svg
-                      xmlns='http://www.w3.org/2000/svg'
-                      height='30px'
-                      viewBox='0 -960 960 960'
-                      width='30px'
-                      fill='#000000'
-                    >
-                      <path d='M372.31-267.69 160-480l212.31-212.31L400.62-664l-164 164H800v40H236.62l164 164-28.31 28.31Z' />
-                    </svg>
-                  </span>
-
-                  <input
-                    {...register("course", {
-                      required:
-                        role === "student" ? "Course is required" : false,
-                      validate: (value) =>
-                        role !== "student" || !!value || "Course is required",
-                    })}
-                    type='hidden'
-                    value={selectedCourse}
-                  />
-                  <input
-                    {...register("semester", {
-                      required:
-                        role === "student" ? "Semester is required" : false,
-                      validate: (value) =>
-                        role !== "student" || !!value || "Semester is required",
-                    })}
-                    type='hidden'
-                    value={selectedSemester}
-                  />
-
-                  <div className='courses'>
-                    <div>
-                      {[
-                        "B-tech CSE",
-                        "B-tech ME",
-                        "B-tech ECE",
-                        "B-tech Civil",
-                        "MCA",
-                        "MBA",
-                      ].map((course) => (
-                        <span
-                          key={course}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleCourseSelect(course);
-                          }}
-                          className={
-                            selectedCourse === course ? "selected" : ""
-                          }
-                        >
-                          {course}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className='sem'>
-                    {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
-                      <span
-                        key={sem}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleSemesterSelect(sem.toString());
-                        }}
-                        className={
-                          selectedSemester === sem.toString() ? "selected" : ""
-                        }
-                      >
-                        {sem}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+              <div className='erp-form-group'>
+                <label htmlFor='semester' className='erp-label'>Current Semester</label>
+                <select id='semester' className='erp-select' {...register("semester", { required: true })}>
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
+                    <option key={s} value={s.toString()}>Semester {s}</option>
+                  ))}
+                </select>
               </div>
             </div>
           )}
 
-          <div className='input-group'>
-            <input
-              {...register("password", {
-                required: "Password is required",
-                minLength: {
-                  value: 4,
-                  message: "Password must be at least 4 characters",
-                },
-              })}
-              type='password'
-              placeholder='Password'
-              style={{
-                border: `${
-                  errors.password ? "2px solid red" : "2px solid #ddd"
-                }`,
-              }}
-            />
-            {errors.password && (
-              <p className='error'>{errors.password.message}</p>
-            )}
+          {/* Password Row */}
+          <div className='erp-form-row-2col'>
+            <div className='erp-form-group'>
+              <label htmlFor='password' className='erp-label'>Password</label>
+              <input
+                id='password'
+                type='password'
+                placeholder='Min 4 characters'
+                className={`erp-input ${errors.password ? "is-invalid" : ""}`}
+                {...register("password", {
+                  required: "Password required",
+                  minLength: { value: 4, message: "Min 4 characters" },
+                })}
+              />
+              {errors.password && <span className='erp-field-error'>{errors.password.message}</span>}
+            </div>
+
+            <div className='erp-form-group'>
+              <label htmlFor='confirmPassword' className='erp-label'>Confirm Password</label>
+              <input
+                id='confirmPassword'
+                type='password'
+                placeholder='Re-enter password'
+                className={`erp-input ${errors.confirmPassword ? "is-invalid" : ""}`}
+                {...register("confirmPassword", {
+                  validate: (value) => value === password || "Passwords do not match",
+                })}
+              />
+              {errors.confirmPassword && (
+                <span className='erp-field-error'>{errors.confirmPassword.message}</span>
+              )}
+            </div>
           </div>
 
-          <div className='input-group'>
-            <input
-              {...register("confirmpassword", {
-                required: "Confirm your password",
-                validate: (value) =>
-                  value === password || "Passwords do not match",
-              })}
-              type='password'
-              placeholder='Confirm Password'
-              style={{
-                border: `${
-                  errors.confirmpassword ? "2px solid red" : "2px solid #ddd"
-                }`,
-              }}
-            />
-            {errors.confirmpassword && (
-              <p className='error'>{errors.confirmpassword.message}</p>
+          <button
+            type='submit'
+            className='erp-btn erp-btn-primary erp-auth-submit-btn'
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <span className='erp-spinner-sm' />
+                <span>Registering Account...</span>
+              </>
+            ) : (
+              <span>Complete {activeRole === "student" ? "Student" : "Staff"} Registration</span>
             )}
-          </div>
-
-          <button type='submit'>Register</button>
+          </button>
         </form>
 
-        <div className='signin-btn'>
-          Already Have An Account{" "}
-          <span onClick={() => navigate("/signin")}>Sign In</span>
+        <div className='erp-auth-footer'>
+          <span>Already enrolled in the system? </span>
+          <Link to='/signin' className='erp-auth-link'>
+            Sign in
+          </Link>
         </div>
       </div>
     </div>

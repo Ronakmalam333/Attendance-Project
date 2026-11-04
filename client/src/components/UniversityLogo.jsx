@@ -24,18 +24,18 @@ const UniversityLogo = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          borderRadius: '12px',
+          borderRadius: '8px',
           overflow: 'hidden'
         }}
       >
         <svg viewBox="0 0 100 100" width={width} height={height}>
           <defs>
             <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style={{ stopColor: '#6366f1', stopOpacity: 1 }} />
-              <stop offset="100%" style={{ stopColor: '#8b5cf6', stopOpacity: 1 }} />
+              <stop offset="0%" style={{ stopColor: '#1e3a8a', stopOpacity: 1 }} />
+              <stop offset="100%" style={{ stopColor: '#1e40af', stopOpacity: 1 }} />
             </linearGradient>
           </defs>
-          <rect width="100" height="100" fill="url(#logoGradient)" rx="10"/>
+          <rect width="100" height="100" fill="url(#logoGradient)" rx="8"/>
           <text 
             x="50" 
             y="60" 

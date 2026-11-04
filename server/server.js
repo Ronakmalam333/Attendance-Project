@@ -1,5 +1,12 @@
 require("dotenv").config();
 
+const dns = require("dns");
+try {
+  dns.setServers(["8.8.8.8", "8.8.4.4", "1.1.1.1"]);
+} catch (e) {
+  // Ignore if restricted
+}
+
 const express = require("express");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
@@ -23,6 +30,7 @@ const student = require("./models/student");
 const staff = require("./models/staff");
 const attendance = require("./models/attendance");
 const AttendanceToken = require("./models/attendanceToken");
+const Feedback = require("./models/feedback");
 
 const app = express();
 connectDb();
@@ -1009,6 +1017,68 @@ app.delete(
     }
   },
 );
+
+// Submit Feedback (all authenticated users)
+app.post("/feedback", authenticateToken, async (req, res) => {
+  try {
+    const { category, rating, comment } = req.body;
+    if (!comment || !comment.trim()) {
+      return res.status(400).json({ message: "Comment is required" });
+    }
+
+    const newFeedback = new Feedback({
+      userId: req.user._id,
+      userModel: req.user.role === "staff" ? "staff" : "student",
+      userName: req.user.name || req.user.username,
+      userUid: req.user.uid,
+      category: category || "general",
+      rating: Number(rating) || 5,
+      comment: comment.trim(),
+    });
+
+    await newFeedback.save();
+    return res.status(201).json({ message: "Feedback submitted successfully", feedback: newFeedback });
+  } catch (err) {
+    console.error("Submit feedback error:", err);
+    return res.status(500).json({ message: "Failed to submit feedback" });
+  }
+});
+
+// Get Feedback (staff only)
+app.get("/feedback", authenticateToken, authorizeRoles("staff"), async (req, res) => {
+  try {
+    const list = await Feedback.find().sort({ createdAt: -1 }).limit(100);
+    return res.json(list);
+  } catch (err) {
+    console.error("Get feedback error:", err);
+    return res.status(500).json({ message: "Failed to fetch feedback" });
+  }
+});
+
+// Get Distinct Subjects dynamically from database
+app.get("/subjects", authenticateToken, async (req, res) => {
+  try {
+    const tokenSubjects = await AttendanceToken.distinct("subject");
+    const attendanceSubjects = await attendance.distinct("subject");
+    const distinctList = Array.from(new Set([...tokenSubjects, ...attendanceSubjects]))
+      .filter(Boolean)
+      .sort();
+    return res.json(distinctList);
+  } catch (err) {
+    console.error("Get distinct subjects error:", err);
+    return res.status(500).json({ message: "Failed to fetch subjects" });
+  }
+});
+
+// Academic Timetable Schedule endpoint
+app.get("/schedule", async (req, res) => {
+  try {
+    // Return empty schedule unless populated by department admin
+    return res.json({ mon: [], tue: [], wed: [], thu: [], fri: [], leave: [] });
+  } catch (err) {
+    return res.status(500).json({ message: "Failed to fetch timetable" });
+  }
+});
 
 // Global error handler
 app.use((err, req, res, next) => {

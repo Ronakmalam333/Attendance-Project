@@ -1,17 +1,19 @@
 import React, { useContext, useState, useEffect } from "react";
 import "./Profile.css";
 import { AuthContext } from "../../context/AuthContext";
+import { useToast } from "../../context/ToastContext";
 import { useNavigate } from "react-router-dom";
 import axios from "../../tokenManager";
+import Icons from "../ui/Icons";
+import Badge from "../ui/Badge";
+import Skeleton from "../ui/Skeleton";
+import ConfirmModal from "../ui/ConfirmModal";
 
-// ✅ Utility to normalize profile data safely
 const normalizeProfile = (data = {}) => {
   const fullName = (data.name || "").trim();
   const parts = fullName.split(/\s+/).filter(Boolean);
-
   const firstname = data.firstname || parts[0] || "";
-  const lastname =
-    data.lastname || (parts.length > 1 ? parts.slice(1).join(" ") : "");
+  const lastname = data.lastname || (parts.length > 1 ? parts.slice(1).join(" ") : "");
 
   return {
     ...data,
@@ -23,7 +25,10 @@ const normalizeProfile = (data = {}) => {
 const Profile = () => {
   const [profilePic, setProfilePic] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [statusMessage, setStatusMessage] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [logoutModalOpen, setLogoutModalOpen] = useState(false);
+
   const [profileData, setProfileData] = useState({
     firstname: "",
     lastname: "",
@@ -35,12 +40,13 @@ const Profile = () => {
   });
 
   const { user, logout } = useContext(AuthContext);
+  const toast = useToast();
   const navigate = useNavigate();
 
-  // Fetch profile data on mount
   useEffect(() => {
     const fetchProfile = async () => {
       try {
+        setLoading(true);
         const response = await axios.get("/profile");
         const normalized = normalizeProfile(response.data);
         setProfileData({
@@ -53,15 +59,13 @@ const Profile = () => {
           semester: normalized.semester || "",
         });
 
-        // Load profile picture if exists
         if (response.data.profilePicture) {
           setProfilePic(response.data.profilePicture);
         }
       } catch (error) {
-        console.error(
-          "Failed to fetch profile:",
-          error.response?.data?.message || error.message,
-        );
+        toast.error("Failed to load user profile information.");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -70,93 +74,59 @@ const Profile = () => {
 
   const handleProfilePicChange = async (event) => {
     const file = event.target.files[0];
-    if (file) {
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        setStatusMessage("File size must be less than 5MB");
-        setTimeout(() => setStatusMessage(null), 3000);
-        return;
-      }
+    if (!file) return;
 
-      // Validate file type
-      if (!file.type.startsWith("image/")) {
-        setStatusMessage("Please select a valid image file");
-        setTimeout(() => setStatusMessage(null), 3000);
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        // Compress the image before saving
-        const img = new Image();
-        img.onload = async () => {
-          const canvas = document.createElement("canvas");
-          const ctx = canvas.getContext("2d");
-
-          // Set max dimensions (resize large images)
-          const maxWidth = 400;
-          const maxHeight = 400;
-          let width = img.width;
-          let height = img.height;
-
-          if (width > height) {
-            if (width > maxWidth) {
-              height = Math.round((height * maxWidth) / width);
-              width = maxWidth;
-            }
-          } else {
-            if (height > maxHeight) {
-              width = Math.round((width * maxHeight) / height);
-              height = maxHeight;
-            }
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-          ctx.drawImage(img, 0, 0, width, height);
-
-          // Convert to base64 with compression (0.7 quality)
-          const compressedBase64 = canvas.toDataURL("image/jpeg", 0.7);
-          setProfilePic(compressedBase64);
-
-          // Save profile picture to backend immediately
-          try {
-            await axios.put("/profile", { profilePicture: compressedBase64 });
-            setStatusMessage("Profile picture updated successfully!");
-            setTimeout(() => setStatusMessage(null), 3000);
-          } catch (error) {
-            console.error("Error saving profile picture:", error);
-            const errorMsg =
-              error.response?.data?.message ||
-              error.message ||
-              "Failed to save profile picture";
-            setStatusMessage(errorMsg);
-            setTimeout(() => setStatusMessage(null), 3000);
-          }
-        };
-        img.src = reader.result;
-      };
-      reader.onerror = () => {
-        setStatusMessage("Error reading file");
-        setTimeout(() => setStatusMessage(null), 3000);
-      };
-      reader.readAsDataURL(file);
+    if (!file.type.startsWith("image/")) {
+      toast.warning("Please select a valid image file (PNG, JPG, WebP).");
+      return;
     }
-  };
 
-  const handleLogout = () => {
-    logout();
-    setProfileData({
-      firstname: "",
-      lastname: "",
-      name: "",
-      email: "",
-      uid: "",
-      course: "",
-      semester: "",
-    });
-    setProfilePic(null);
-    navigate("/"); // Redirect to login page after logout
+    if (file.size > 5 * 1024 * 1024) {
+      toast.warning("File size exceeds 5MB limit. Please choose a smaller photo.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const img = new Image();
+      img.onload = async () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        const maxWidth = 400;
+        const maxHeight = 400;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const compressedBase64 = canvas.toDataURL("image/jpeg", 0.75);
+        setProfilePic(compressedBase64);
+
+        try {
+          await axios.put("/profile", { profilePicture: compressedBase64 });
+          toast.success("Profile avatar updated successfully!");
+        } catch (error) {
+          toast.error("Failed to save profile picture on server.");
+        }
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleInputChange = (e) => {
@@ -165,8 +135,9 @@ const Profile = () => {
   };
 
   const handleSave = async () => {
+    setSaving(true);
     try {
-      let dataToSend = {
+      const dataToSend = {
         ...profileData,
         name: `${profileData.firstname} ${profileData.lastname}`.trim(),
       };
@@ -177,8 +148,7 @@ const Profile = () => {
       const result = response.data;
 
       setIsEditing(false);
-      setStatusMessage("Profile updated successfully!");
-      setTimeout(() => setStatusMessage(null), 3000);
+      toast.success("Profile details saved successfully.");
 
       if (result.user) {
         const normalized = normalizeProfile(result.user);
@@ -193,163 +163,229 @@ const Profile = () => {
         });
       }
     } catch (error) {
-      console.error("Error updating profile:", error);
-      const errorMessage =
-        error.response?.data?.message || "Error updating profile";
-      setStatusMessage("Failed to update profile: " + errorMessage);
-      setTimeout(() => setStatusMessage(null), 3000);
+      toast.error(error.response?.data?.message || "Failed to update profile details.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    setLogoutModalOpen(false);
+    try {
+      await logout();
+      toast.info("Signed out securely.");
+      navigate("/");
+    } catch (err) {
+      toast.error("Logout encounter an error.");
     }
   };
 
   return (
-    <div className='profile-contain'>
-      <div className='profile'>
-        <div className='profile-header'>
-          <label htmlFor='profile-upload' className='profile-pic-label'>
-            <input
-              type='file'
-              id='profile-upload'
-              accept='image/*'
-              onChange={handleProfilePicChange}
-              hidden
-            />
-            {profilePic ? (
-              <img src={profilePic} alt='Profile' className='profile-pic' />
-            ) : (
-              <span className='profile-icon'>
-                <svg
-                  xmlns='http://www.w3.org/2000/svg'
-                  height='40px'
-                  viewBox='0 -960 960 960'
-                  width='40px'
-                  fill='#000000'
-                >
-                  <path d='M440-440ZM120-120q-33 0-56.5-23.5T40-200v-480q0-33 23.5-56.5T120-760h126l74-80h240v80H355l-73 80H120v480h640v-360h80v360q0 33-23.5 56.5T760-120H120Zm640-560v-80h-80v-80h80v-80h80v80h80v80h-80v80h-80ZM440-260q75 0 127.5-52.5T620-440q0-75-52.5-127.5T440-620q-75 0-127.5 52.5T260-440q0 75 52.5 127.5T440-260Zm0-80q-42 0-71-29t-29-71q0-42 29-71t71-29q42 0 71 29t29 71q0 42-29 71t-71 29Z' />
-                </svg>
-              </span>
-            )}
-          </label>
-          <div className='profile-info'>
-            <h2>
-              {`${profileData.firstname} ${profileData.lastname}`.trim() ||
-                profileData.name ||
-                "User Name"}
-            </h2>
-            <p>{profileData.email}</p>
-          </div>
-          <button className='edit-button' onClick={() => setIsEditing(true)}>
-            Edit
-          </button>
+    <div className='erp-profile-page'>
+      {/* Header */}
+      <div className='erp-page-header'>
+        <div>
+          <h1 className='erp-page-title'>Account Profile & Settings</h1>
+          <p className='erp-page-subtitle'>
+            Manage institutional credentials, contact details, and account preferences.
+          </p>
         </div>
-
-        <div className='profile-details'>
-          <div className='profile-field'>
-            <label>Full Name</label>
-            <input
-              type='text'
-              value={
-                `${profileData.firstname || ""} ${profileData.lastname || ""}`.trim() ||
-                "No name available"
-              }
-              readOnly
-            />
-          </div>
-
-          <div className='profile-field'>
-            <label>UID</label>
-            <input type='text' value={profileData.uid || ""} readOnly />
-          </div>
-
-          <div className='profile-field'>
-            <label>Email</label>
-            <input type='text' value={profileData.email || ""} readOnly />
-          </div>
-
-          {user?.role === "student" && (
+        <div style={{ display: "flex", gap: "10px" }}>
+          {!isEditing ? (
+            <button
+              type='button'
+              className='erp-btn erp-btn-secondary'
+              onClick={() => setIsEditing(true)}
+              disabled={loading}
+            >
+              <Icons.Edit size={15} />
+              <span>Edit Details</span>
+            </button>
+          ) : (
             <>
-              <div className='profile-field'>
-                <label>Course</label>
-                <input type='text' value={profileData.course || ""} readOnly />
-              </div>
-              <div className='profile-field'>
-                <label>Semester</label>
-                <input
-                  type='text'
-                  value={profileData.semester || ""}
-                  readOnly
-                />
-              </div>
+              <button
+                type='button'
+                className='erp-btn erp-btn-ghost'
+                onClick={() => setIsEditing(false)}
+                disabled={saving}
+              >
+                Cancel
+              </button>
+              <button
+                type='button'
+                className='erp-btn erp-btn-primary'
+                onClick={handleSave}
+                disabled={saving}
+              >
+                {saving ? "Saving..." : "Save Changes"}
+              </button>
             </>
           )}
         </div>
+      </div>
 
-        {statusMessage && <p className='status'>{statusMessage}</p>}
-
-        <button className='logout-button' onClick={handleLogout}>
-          Logout
-        </button>
-
-        {isEditing && (
-          <div className='edit-overlay' onClick={() => setIsEditing(false)}>
-            <div className='edit-popup' onClick={(e) => e.stopPropagation()}>
-              <h2>Edit Profile</h2>
-              <div className='profile-field'>
-                <label>First Name</label>
-                <input
-                  type='text'
-                  name='firstname'
-                  value={profileData.firstname || ""}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className='profile-field'>
-                <label>Last Name</label>
-                <input
-                  type='text'
-                  name='lastname'
-                  value={profileData.lastname || ""}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className='profile-field'>
-                <label>Email</label>
-                <input
-                  type='text'
-                  name='email'
-                  value={profileData.email || ""}
-                  onChange={handleInputChange}
-                  disabled={user?.role === "staff"} // Staff cannot edit email
-                />
-              </div>
-              {user?.role === "student" && (
-                <>
-                  <div className='profile-field'>
-                    <label>Course</label>
-                    <input
-                      type='text'
-                      name='course'
-                      value={profileData.course || ""}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                  <div className='profile-field'>
-                    <label>Semester</label>
-                    <input
-                      type='text'
-                      name='semester'
-                      value={profileData.semester || ""}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                </>
+      <div className='erp-profile-layout-grid'>
+        {/* User Card */}
+        <div className='erp-profile-summary-card erp-card'>
+          <div className='erp-profile-avatar-wrapper'>
+            <label htmlFor='profile-upload' className='erp-avatar-upload-label' title='Change photo'>
+              <input
+                type='file'
+                id='profile-upload'
+                accept='image/*'
+                onChange={handleProfilePicChange}
+                hidden
+              />
+              {profilePic ? (
+                <img src={profilePic} alt='Profile' className='erp-profile-full-avatar' />
+              ) : (
+                <div className='erp-profile-avatar-fallback'>
+                  <Icons.User size={48} />
+                </div>
               )}
-              <button className='done-button' onClick={handleSave}>
-                Save
-              </button>
+              <div className='erp-avatar-hover-overlay'>
+                <Icons.Edit size={16} />
+              </div>
+            </label>
+          </div>
+
+          <div className='erp-profile-info-block'>
+            <h2 className='erp-profile-full-name'>
+              {profileData.firstname || profileData.lastname
+                ? `${profileData.firstname} ${profileData.lastname}`.trim()
+                : profileData.name || "Academic User"}
+            </h2>
+            <span className='erp-profile-email-text'>{profileData.email}</span>
+            <div style={{ marginTop: "6px" }}>
+              <Badge variant={user?.role === "staff" ? "brand" : "neutral"} size='sm'>
+                {user?.role === "staff" ? "Faculty Personnel" : "Enrolled Student"}
+              </Badge>
             </div>
           </div>
-        )}
+
+          <div className='erp-profile-meta-list'>
+            <div className='erp-meta-row'>
+              <span className='erp-meta-label'>Institutional UID</span>
+              <span className='erp-meta-value tabular-nums'>{profileData.uid || "N/A"}</span>
+            </div>
+            {profileData.course && (
+              <div className='erp-meta-row'>
+                <span className='erp-meta-label'>Course Program</span>
+                <span className='erp-meta-value'>{profileData.course}</span>
+              </div>
+            )}
+            {profileData.semester && (
+              <div className='erp-meta-row'>
+                <span className='erp-meta-label'>Current Term</span>
+                <span className='erp-meta-value'>Semester {profileData.semester}</span>
+              </div>
+            )}
+          </div>
+
+          <div style={{ marginTop: "auto", paddingTop: "16px", borderTop: "1px solid var(--border-subtle)" }}>
+            <button
+              type='button'
+              className='erp-btn erp-btn-secondary'
+              style={{ width: "100%", justifyContent: "center", color: "var(--status-absent)" }}
+              onClick={() => setLogoutModalOpen(true)}
+            >
+              <Icons.LogOut size={15} />
+              <span>Sign Out of Account</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Edit / Details Form */}
+        <div className='erp-profile-details-card erp-card'>
+          <h2 className='erp-card-title' style={{ marginBottom: "16px" }}>
+            {isEditing ? "Edit Personal & Academic Records" : "Verified Academic Profile"}
+          </h2>
+
+          <div className='erp-profile-form-grid'>
+            <div className='erp-form-group'>
+              <label className='erp-label'>First Name</label>
+              <input
+                type='text'
+                name='firstname'
+                value={profileData.firstname}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                className='erp-input'
+              />
+            </div>
+
+            <div className='erp-form-group'>
+              <label className='erp-label'>Last Name</label>
+              <input
+                type='text'
+                name='lastname'
+                value={profileData.lastname}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                className='erp-input'
+              />
+            </div>
+
+            <div className='erp-form-group'>
+              <label className='erp-label'>University Email (Read-Only)</label>
+              <input
+                type='email'
+                value={profileData.email}
+                disabled
+                className='erp-input'
+                style={{ opacity: 0.7 }}
+              />
+            </div>
+
+            <div className='erp-form-group'>
+              <label className='erp-label'>Institutional UID / Staff Code</label>
+              <input
+                type='text'
+                name='uid'
+                value={profileData.uid}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                className='erp-input tabular-nums'
+              />
+            </div>
+
+            <div className='erp-form-group'>
+              <label className='erp-label'>Academic Degree / Course</label>
+              <input
+                type='text'
+                name='course'
+                value={profileData.course}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                className='erp-input'
+              />
+            </div>
+
+            <div className='erp-form-group'>
+              <label className='erp-label'>Academic Semester</label>
+              <input
+                type='text'
+                name='semester'
+                value={profileData.semester}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                className='erp-input tabular-nums'
+              />
+            </div>
+          </div>
+        </div>
       </div>
+
+      <ConfirmModal
+        isOpen={logoutModalOpen}
+        title='Confirm Sign Out'
+        message='Are you sure you want to end your current session?'
+        confirmLabel='Sign Out'
+        cancelLabel='Stay Signed In'
+        variant='danger'
+        onConfirm={handleLogout}
+        onCancel={() => setLogoutModalOpen(false)}
+      />
     </div>
   );
 };

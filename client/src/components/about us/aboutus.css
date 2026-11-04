@@ -1,211 +1,301 @@
-.about-us-container {
-  width: 100%;
-  height: 90vh;
-  overflow-y: scroll;
-  scrollbar-width: none;
-  background-color: transparent;
-  padding: 2rem 10%;
-  box-sizing: border-box;
-  animation: fadeIn 1s ease-out;
-}
+/* ==========================================================================
+   ABOUT US & DOCUMENTATION CSS
+   ========================================================================== */
 
-/* Header Styles */
-.about-header {
-  text-align: center;
-  margin-bottom: 3rem;
-  padding: 2rem 0;
-  border-bottom: 2px solid var(--secondary-color);
-}
-
-.about-header h1 {
-  font-size: 2.8rem;
-  color: var(--color2);
-  margin-bottom: 0.5rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.tagline {
-  font-size: 1.2rem;
-  color: #5c677d;
-  font-weight: 300;
-  letter-spacing: 0.5px;
-}
-
-/* Section Common Styles */
-.content-section {
-  margin: 3rem 0;
-  padding: 2rem;
-  border-radius: 15px;
-  background: transparent;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
-
-.section-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.section-header h2 {
-  font-size: 2rem;
-  color: var(--color);
-  margin-bottom: 0.5rem;
-}
-
-.decorative-line {
-  width: 60px;
-  height: 3px;
-  background: var(--color);
+.erp-doc-page {
+  max-width: 1360px;
   margin: 0 auto;
-  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-/* Mission Section */
-.mission-statement {
-  font-size: 1.1rem;
-  line-height: 1.8;
-  color: #4a5568;
-  text-align: center;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-/* Features Grid */
-.features-grid {
+.erp-system-specs-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-  padding: 1rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
 }
 
-.feature-card {
-  text-align: center;
-  padding: 2rem;
-  border-radius: 12px;
-  background: var(--color1);
-  transition: transform 0.3s ease;
-}
-
-.feature-card:hover {
-  transform: translateY(-5px);
-}
-
-.feature-icon {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-}
-
-.feature-card h3 {
-  color: var(--color1);
-  margin-bottom: 0.8rem;
-}
-
-.feature-card p {
-  color: var(--bg);
-  font-size: 0.95rem;
-}
-
-/* Team Section */
-.team-grid {
-  display: flex;
-  justify-content: center;
-  gap: 3rem;
-  flex-wrap: wrap;
-}
-
-.team-card {
-  text-align: center;
-  width: 220px;
-  padding: 1.5rem;
-  border-radius: 12px;
-  background: var(--color1);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  transition: 0.3s ease-in-out;
-}
-
-.team-card:hover {
-  transition: 0.3s ease-in-out;
-  transform: scale(1.1);
-}
-
-.team-photo {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  margin: 0 auto 1rem;
-  background-color: #e2e8f0;
-  border: 3px solid var(--color2);
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.team-photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.team-card h3 {
-  color: var(--bg);
-  margin: 0.5rem 0;
-}
-
-.team-card p {
-  color: var(--color2);
-  font-size: 0.9rem;
-}
-
-/* Contact Section */
-.contact-section {
-  text-align: center;
-  background: var(--secondary-color);
-  color: var(--color);
-}
-
-.contact-section .section-header h2 {
-  color: var(--color);
-}
-
-.contact-section .decorative-line {
-  background: var(--color3);
-}
-
-.contact-info p {
-  font-size: 1.1rem;
-  margin: 1rem 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.contact-info a {
-  color: var(--color);
-  text-decoration: underline;
-  transition: color 0.3s ease, text-decoration 0.3s ease;
-}
-
-.contact-info a:hover {
-  color: var(--color2);
-  text-decoration: none;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .about-us-container {
-    padding: 1.5rem 5%;
+@media (max-width: 1024px) {
+  .erp-system-specs-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
+}
 
-  .about-header h1 {
-    font-size: 2rem;
-  }
-
-  .content-section {
-    padding: 1.5rem;
-  }
-
-  .features-grid {
+@media (max-width: 600px) {
+  .erp-system-specs-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.erp-spec-card {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.erp-spec-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary, #64748b);
+}
+
+.erp-spec-value {
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+  line-height: 1.2;
+}
+
+.erp-spec-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted, #94a3b8);
+}
+
+.erp-doc-card {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.erp-doc-text {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--text-secondary, #475569);
+  margin: 0;
+}
+
+.erp-pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+  .erp-pillars-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.erp-pillar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  background-color: var(--bg-surface-subtle, #f8fafc);
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  border-radius: var(--radius-md, 8px);
+}
+
+.erp-pillar-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm, 6px);
+  background-color: var(--brand-primary-light, rgba(59, 130, 246, 0.12));
+  color: var(--brand-primary, #1d4ed8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.erp-pillar-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary, #0f172a);
+  margin: 0 0 4px 0;
+}
+
+.erp-pillar-desc {
+  font-size: 0.8125rem;
+  color: var(--text-secondary, #64748b);
+  margin: 0;
+  line-height: 1.45;
+}
+
+.erp-team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+  max-width: 580px;
+}
+
+@media (max-width: 900px) {
+  .erp-team-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.erp-team-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 18px;
+  background-color: var(--bg-surface-subtle, #f8fafc);
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  border-radius: var(--radius-md, 8px);
+}
+
+.erp-team-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: var(--brand-primary-light, rgba(59, 130, 246, 0.12));
+  color: var(--brand-primary, #1d4ed8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.erp-team-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.erp-team-name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary, #0f172a);
+  margin: 0;
+}
+
+.erp-team-role {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--brand-primary, #1d4ed8);
+}
+
+.erp-team-dept {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #64748b);
+}
+
+.erp-team-email {
+  font-size: 0.6875rem;
+  font-family: monospace;
+  color: var(--text-muted, #94a3b8);
+  margin-top: 4px;
+}
+
+/* FAQs */
+.erp-faq-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.erp-faqs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 12px;
+}
+
+@media (max-width: 768px) {
+  .erp-faqs-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.erp-faq-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background-color: var(--bg-surface-subtle, #f8fafc);
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  border-radius: var(--radius-md, 8px);
+}
+
+.erp-faq-q-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.erp-faq-q-row h4 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary, #0f172a);
+  margin: 0;
+}
+
+.erp-faq-item p {
+  font-size: 0.8125rem;
+  color: var(--text-secondary, #64748b);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Campus Offices */
+.erp-offices-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.erp-offices-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 12px;
+}
+
+@media (max-width: 900px) {
+  .erp-offices-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.erp-office-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background-color: var(--bg-surface-subtle, #f8fafc);
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  border-radius: var(--radius-md, 8px);
+}
+
+.erp-office-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm, 6px);
+  background-color: var(--brand-primary-light, rgba(59, 130, 246, 0.12));
+  color: var(--brand-primary, #1d4ed8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.erp-office-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.erp-office-text h4 {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-primary, #0f172a);
+  margin: 0;
+}
+
+.erp-office-text p {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #64748b);
+  margin: 0;
+}
+
+.erp-office-text code {
+  font-size: 0.6875rem;
+  font-family: monospace;
+  color: var(--brand-primary, #1d4ed8);
+  margin-top: 3px;
 }

@@ -1,48 +1,47 @@
-import React, { useState, useContext, useEffect, useRef } from "react";
-import "./login.css";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useContext } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../context/AuthContext";
 import { tokenManager } from "../../tokenManager";
+import { useToast } from "../../context/ToastContext";
 import { useGoogleLogin } from "@react-oauth/google";
+import Icons from "../ui/Icons";
+import Badge from "../ui/Badge";
+import "./login.css";
 
 function Login() {
   const navigate = useNavigate();
-  const [emailFocused, setEmailFocused] = useState(false);
-  const [passwordFocused, setPasswordFocused] = useState(false);
-  const [emailValue, setEmailValue] = useState("");
-  const [passwordValue, setPasswordValue] = useState("");
-  const [eye, setEye] = useState(false);
-  const [googleRole, setGoogleRole] = useState(""); // For Google Sign-In role selection
-  const emailRef = useRef(null);
-  const passwordRef = useRef(null);
+  const toast = useToast();
+  const { login } = useContext(AuthContext);
+
+  const [activeRole, setActiveRole] = useState("student");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
-    watch,
-  } = useForm();
-  const { login } = useContext(AuthContext);
+  } = useForm({
+    defaultValues: {
+      role: "student",
+      username: "",
+      password: "",
+    },
+  });
 
-  // Watch the selected role from the form
-  const selectedRole = watch("role");
+  const handleRoleChange = (role) => {
+    setActiveRole(role);
+    setValue("role", role);
+  };
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
-        // Use the selected role from the form
-        const roleToUse = selectedRole || googleRole;
-
-        if (!roleToUse) {
-          alert(
-            "Please select a role (Student or Staff) before signing in with Google",
-          );
-          return;
-        }
-
         const result = await tokenManager.googleLogin({
           accessToken: tokenResponse.access_token,
-          role: roleToUse, // Send role to backend
+          role: activeRole,
         });
 
         login({
@@ -50,248 +49,185 @@ function Login() {
           role: result.role,
         });
 
-        // Check if profile needs to be completed (for both students and staff)
-        if (result.user.profileCompleted === false) {
+        toast.success(`Welcome back, ${result.user?.name || "User"}!`, "Authentication Successful");
+
+        if (result.user?.profileCompleted === false) {
           navigate("/complete-profile");
         } else {
           navigate(result.role === "student" ? "/student" : "/staff");
         }
       } catch (error) {
-        console.error(error);
-        alert(
-          "Google login failed: " +
-            (error.response?.data?.message || "Unknown error"),
-        );
+        const msg = error.response?.data?.message || "Google Single Sign-On failed. Please try again.";
+        toast.error(msg, "Google Sign-In Error");
       }
     },
-
     onError: () => {
-      alert("Google login failed");
+      toast.error("Google authentication dialog was closed or rejected.", "Sign-In Aborted");
     },
   });
 
-  const handleEmailFocus = () => setEmailFocused(true);
-  const handleEmailBlur = () => setEmailFocused(false);
-  const handlePasswordFocus = () => setPasswordFocused(true);
-  const handlePasswordBlur = () => setPasswordFocused(false);
-  const handleEye = () => setEye(!eye);
-
-  // Check for autofilled values
-  useEffect(() => {
-    const checkAutofill = () => {
-      if (emailRef.current) {
-        const isAutofilled =
-          emailRef.current.matches(":-webkit-autofill") ||
-          emailRef.current.value !== "";
-        if (isAutofilled) {
-          setEmailValue(emailRef.current.value || "autofilled");
-        }
-      }
-      if (passwordRef.current) {
-        const isAutofilled =
-          passwordRef.current.matches(":-webkit-autofill") ||
-          passwordRef.current.value !== "";
-        if (isAutofilled) {
-          setPasswordValue(passwordRef.current.value || "autofilled");
-        }
-      }
-    };
-
-    // Check immediately and after multiple delays (browsers autofill at different times)
-    checkAutofill();
-    const timer1 = setTimeout(checkAutofill, 100);
-    const timer2 = setTimeout(checkAutofill, 300);
-    const timer3 = setTimeout(checkAutofill, 500);
-
-    // Listen for animationstart event (Chrome triggers this on autofill)
-    const emailInput = emailRef.current;
-    const passwordInput = passwordRef.current;
-
-    const handleAnimationStart = () => {
-      setTimeout(checkAutofill, 50);
-    };
-
-    if (emailInput) {
-      emailInput.addEventListener("animationstart", handleAnimationStart);
-    }
-    if (passwordInput) {
-      passwordInput.addEventListener("animationstart", handleAnimationStart);
-    }
-
-    // Also check when the page gains focus or input event occurs
-    window.addEventListener("focus", checkAutofill);
-
-    return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
-      window.removeEventListener("focus", checkAutofill);
-      if (emailInput) {
-        emailInput.removeEventListener("animationstart", handleAnimationStart);
-      }
-      if (passwordInput) {
-        passwordInput.removeEventListener(
-          "animationstart",
-          handleAnimationStart,
-        );
-      }
-    };
-  }, []);
-
   const onSubmit = async (data) => {
-    const loginData = {
-      username: data.username,
-      password: data.password,
-      role: data.role,
-    };
-
+    setIsSubmitting(true);
     try {
-      const result = await tokenManager.login(loginData);
+      const result = await tokenManager.login({
+        username: data.username.trim(),
+        password: data.password,
+        role: activeRole,
+      });
 
-      // Login successful - cookies are automatically set by the server
       login({ ...result.user, role: result.role });
-      navigate(data.role === "student" ? "/student" : "/staff");
+      toast.success(`Authenticated as ${result.role === "staff" ? "Faculty/Admin" : "Student"}.`, "Welcome");
+      navigate(result.role === "student" ? "/student" : "/staff");
     } catch (error) {
-      console.error("Error during login:", error);
-      const errorMessage = error.response?.data?.message || "Network error";
-      alert("Login failed: " + errorMessage);
+      const errorMessage = error.response?.data?.message || "Invalid credentials or unauthorized role access.";
+      toast.error(errorMessage, "Login Failed");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className='signin-contain'>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <h1>Sign In</h1>
-        <p>
-          Don't have an Account?{" "}
-          <span onClick={() => navigate("/signup")}>Sign up</span>
-        </p>
-        <div className='input-area'>
-          <div className='role-input2'>
-            <label>
-              <input
-                {...register("role", { required: "Please select a role" })}
-                type='radio'
-                value='student'
-              />{" "}
-              Student
-            </label>
-            <label>
-              <input
-                {...register("role", { required: "Please select a role" })}
-                type='radio'
-                value='staff'
-              />{" "}
-              Staff
-            </label>
-            {errors.role && <p className='error'>{errors.role.message}</p>}
+    <div className='erp-auth-viewport'>
+      <div className='erp-auth-card erp-card'>
+        {/* Brand Banner */}
+        <div className='erp-auth-header'>
+          <div className='erp-auth-logo-badge'>
+            <Icons.Shield size={22} />
           </div>
-
-          <div
-            className={`input input-email ${
-              emailFocused || emailValue ? "focused" : ""
-            }`}
-          >
-            <label htmlFor='username' className='label email-label'>
-              Email / UID
-            </label>
-            <input
-              type='text'
-              className='email'
-              id='username'
-              ref={emailRef}
-              onFocus={handleEmailFocus}
-              onBlur={handleEmailBlur}
-              onChange={(e) => setEmailValue(e.target.value)}
-              onInput={(e) => setEmailValue(e.target.value)}
-              {...register("username", {
-                required: "Email / UID is required",
-              })}
-            />
-            {errors.username && (
-              <p className='error'>{errors.username.message}</p>
-            )}
-            <span className='bottom-border'></span>
-          </div>
-
-          <div
-            className={`input input-pass ${
-              passwordFocused || passwordValue ? "focused" : ""
-            }`}
-          >
-            <label htmlFor='password' className='label pass-label'>
-              Password
-            </label>
-            <input
-              type={eye ? "text" : "password"}
-              className='pass'
-              id='password'
-              ref={passwordRef}
-              onFocus={handlePasswordFocus}
-              onBlur={handlePasswordBlur}
-              onChange={(e) => setPasswordValue(e.target.value)}
-              onInput={(e) => setPasswordValue(e.target.value)}
-              {...register("password", {
-                required: "Password is required",
-                minLength: {
-                  value: 4,
-                  message: "Password must be at least 4 characters",
-                },
-              })}
-            />
-            {errors.password && (
-              <p className='error'>{errors.password.message}</p>
-            )}
-            <span className='bottom-border'></span>
-          </div>
-
-          <span className='forgot'>Forgot Password?</span>
+          <h1 className='erp-auth-title'>AMS Institutional Portal</h1>
+          <p className='erp-auth-desc'>
+            Attendance Management & Classroom Telemetry System
+          </p>
         </div>
 
-        <div className='submit-container'>
-          <button type='submit' className='submit'>
-            Login
+        {/* Role Selection Tabs */}
+        <div className='erp-auth-role-tabs'>
+          <button
+            type='button'
+            className={`erp-auth-tab ${activeRole === "student" ? "active" : ""}`}
+            onClick={() => handleRoleChange("student")}
+          >
+            <Icons.GraduationCap size={16} />
+            <span>Student Login</span>
           </button>
-          <p>or</p>
-          <div
-            className='google'
-            onClick={() => googleLogin()}
-            style={{ cursor: "pointer" }}
+          <button
+            type='button'
+            className={`erp-auth-tab ${activeRole === "staff" ? "active" : ""}`}
+            onClick={() => handleRoleChange("staff")}
           >
-            {" "}
-            <svg
-              width='35px'
-              height='35px'
-              viewBox='0 0 32 32'
-              xmlns='http://www.w3.org/2000/svg'
-            >
-              <path
-                d='M23.75,16A7.7446,7.7446,0,0,1,8.7177,18.6259L4.2849,22.1721A13.244,13.244,0,0,0,29.25,16'
-                fill='#00ac47'
-              />
-              <path
-                d='M23.75,16a7.7387,7.7387,0,0,1-3.2516,6.2987l4.3824,3.5059A13.2042,13.2042,0,0,0,29.25,16'
-                fill='#4285f4'
-              />
-              <path
-                d='M8.25,16a7.698,7.698,0,0,1,.4677-2.6259L4.2849,9.8279a13.177,13.177,0,0,0,0,12.3442l4.4328-3.5462A7.698,7.698,0,0,1,8.25,16Z'
-                fill='#ffba00'
-              />
-              <path
-                d='M16,8.25a7.699,7.699,0,0,1,4.558,1.4958l4.06-3.7893A13.2152,13.2152,0,0,0,4.2849,9.8279l4.4328,3.5462A7.756,7.756,0,0,1,16,8.25Z'
-                fill='#ea4435'
-              />
-              <path
-                d='M29.25,15v1L27,19.5H16.5V14H28.25A1,1,0,0,1,29.25,15Z'
-                fill='#4285f4'
-              />
-            </svg>
-            <p>Sign in with Google</p>
-          </div>
+            <Icons.Shield size={16} />
+            <span>Faculty / Staff</span>
+          </button>
         </div>
-      </form>
 
-      <div className='signin-banner'></div>
+        {/* Form */}
+        <form onSubmit={handleSubmit(onSubmit)} className='erp-auth-form'>
+          <input type='hidden' {...register("role")} value={activeRole} />
+
+          <div className='erp-form-group'>
+            <label htmlFor='username' className='erp-label'>
+              {activeRole === "student" ? "Student Email or UID" : "Faculty Email or Staff ID"}
+            </label>
+            <div className='erp-input-with-icon'>
+              <Icons.User size={16} className='erp-input-icon' />
+              <input
+                id='username'
+                type='text'
+                placeholder={activeRole === "student" ? "e.g., student@rai.edu or 230101" : "e.g., faculty@rai.edu"}
+                className={`erp-input ${errors.username ? "is-invalid" : ""}`}
+                autoComplete='username'
+                {...register("username", { required: "Please enter your university ID or email" })}
+              />
+            </div>
+            {errors.username && <span className='erp-field-error'>{errors.username.message}</span>}
+          </div>
+
+          <div className='erp-form-group'>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <label htmlFor='password' className='erp-label'>
+                Password
+              </label>
+            </div>
+            <div className='erp-input-with-icon'>
+              <Icons.Lock size={16} className='erp-input-icon' />
+              <input
+                id='password'
+                type={showPassword ? "text" : "password"}
+                placeholder='Enter password'
+                className={`erp-input ${errors.password ? "is-invalid" : ""}`}
+                autoComplete='current-password'
+                {...register("password", {
+                  required: "Password is required",
+                  minLength: { value: 4, message: "Password must be at least 4 characters" },
+                })}
+              />
+              <button
+                type='button'
+                className='erp-toggle-password-btn'
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
+            {errors.password && <span className='erp-field-error'>{errors.password.message}</span>}
+          </div>
+
+          <button
+            type='submit'
+            className='erp-btn erp-btn-primary erp-auth-submit-btn'
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <span className='erp-spinner-sm' />
+                <span>Authenticating...</span>
+              </>
+            ) : (
+              <span>Sign In to {activeRole === "student" ? "Student Portal" : "Faculty Console"}</span>
+            )}
+          </button>
+        </form>
+
+        <div className='erp-auth-divider'>
+          <span>or continue with Google SSO</span>
+        </div>
+
+        {/* Google Workspace SSO */}
+        <button
+          type='button'
+          className='erp-btn erp-btn-secondary erp-google-sso-btn'
+          onClick={() => googleLogin()}
+          disabled={isSubmitting}
+        >
+          <svg width='18' height='18' viewBox='0 0 24 24'>
+            <path
+              d='M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z'
+              fill='#4285F4'
+            />
+            <path
+              d='M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z'
+              fill='#34A853'
+            />
+            <path
+              d='M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z'
+              fill='#FBBC05'
+            />
+            <path
+              d='M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z'
+              fill='#EA4335'
+            />
+          </svg>
+          <span>University Google Account</span>
+        </button>
+
+        <div className='erp-auth-footer'>
+          <span>New student or academic personnel? </span>
+          <Link to='/signup' className='erp-auth-link'>
+            Create an Account
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

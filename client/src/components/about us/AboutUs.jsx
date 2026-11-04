@@ -1,126 +1,140 @@
-import React from 'react';
-import './aboutus.css';
+import React from "react";
+import Icons from "../ui/Icons";
+import Badge from "../ui/Badge";
+import "./aboutus.css";
 
-const features = [
+const corePillars = [
   {
-    icon: "📱",
-    title: "Real-time Tracking",
-    description: "Instant attendance recording with geolocation verification",
-    aria: "Mobile device"
+    icon: Icons.Clock,
+    title: "Real-time Attendance Telemetry",
+    description: "Instantaneous classroom verification using synchronized 4-character session tokens with automated expiration.",
   },
   {
-    icon: "📊",
-    title: "Analytics Dashboard",
-    description: "Comprehensive reports and data visualization tools",
-    aria: "Bar chart"
+    icon: Icons.Calendar,
+    title: "Institutional Analytics & Roster",
+    description: "Audit-ready reporting, automated compliance threshold monitoring (75% statutory rule), and student directories.",
   },
   {
-    icon: "🔒",
-    title: "Secure Platform",
-    description: "Military-grade encryption and privacy protection",
-    aria: "Lock"
-  }
+    icon: Icons.Shield,
+    title: "Enterprise Access Governance",
+    description: "Strict role-based access control (RBAC) separating administrative powers from student check-in portals.",
+  },
 ];
 
 const teamMembers = [
   {
-    name: "Anmol Sinha",
-    role: "Contributing Developer",
-    photo: "/images/team/anmol-sinha.png", // Replace with actual image URL
-    alt: "Anmol Sinha photo"
-  },
-  {
     name: "Ronak Malam",
-    role: "Founder & Lead Developer",
-    photo: "/images/team/ronak-malam.png",
-    alt: "Ronak Malam photo"
+    role: "Lead Architect & Developer",
+    dept: "Computer Science & Engineering",
+  },
+];
+
+const faqs = [
+  {
+    q: "How does AMS eliminate proxy attendance?",
+    a: "Session tokens are ephemeral 4-character alphanumeric codes generated live by professors in lecture halls. They auto-expire within minutes and require an active authenticated student session tied to their university UID.",
   },
   {
-    name: "Jugendra Kashyap",
-    role: "Project Participant",
-    photo: "/images/team/jugendra-kashyap.jpg", // Replace with actual image URL
-    alt: "Jugendra Kashyap photo"
-  }
+    q: "How is the 75% attendance rule monitored?",
+    a: "The telemetry engine aggregates theory lectures and laboratory contact hours continuously. When a student falls below 75%, visual indicators and advisory warnings trigger on both student and faculty dashboards.",
+  },
+  {
+    q: "What if Wi-Fi disconnection causes a missed check-in?",
+    a: "Students can request attendance reconciliation through their course instructor within 24 hours. Faculty can review timestamps and adjust records with audit trail justification.",
+  },
+  {
+    q: "Can attendance records be exported for university audits?",
+    a: "Yes. Both students and administrators can generate official cryptographically timestamped PDF transcripts and Excel rosters containing complete verification signatures.",
+  },
 ];
 
 const AboutUs = () => {
   return (
-    <div className="about-us-container">
-      <header className="about-header">
-        <h1>About AMS</h1>
-        <p className="tagline">Revolutionizing College Attendance Management</p>
-      </header>
-
-      <section className="content-section mission-section">
-        <div className="section-header">
-          <h2>Our Mission</h2>
-          <div className="decorative-line"></div>
+    <div className='erp-doc-page'>
+      {/* Header */}
+      <div className='erp-page-header'>
+        <div>
+          <h1 className='erp-page-title'>About AMS Enterprise</h1>
+          <p className='erp-page-subtitle'>
+            Next-Generation Academic Telemetry & Attendance Management System.
+          </p>
         </div>
-        <p className="mission-statement">
-          At AMS, we're committed to transforming traditional attendance management 
-          through innovative technology. Our goal is to streamline academic processes, 
-          enhance student engagement, and provide real-time insights for educational institutions.
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <Badge variant='brand'>System Version 2.4</Badge>
+          <Badge variant='present'>Active</Badge>
+        </div>
+      </div>
+
+      {/* Mission & Core Architecture */}
+      <div className='erp-doc-card erp-card'>
+        <h2 className='erp-card-title'>Institutional Mission & Platform Architecture</h2>
+        <p className='erp-doc-text'>
+          The Attendance Management System (AMS) was engineered to eliminate paper attendance registries, manual roll calls, and delayed reporting across modern higher education environments. By coupling temporary 4-character session codes with role-governed authorization, AMS guarantees data integrity, transparent student transcripts, and instant academic auditing.
         </p>
-      </section>
 
-      <section className="content-section features-section">
-        <div className="section-header">
-          <h2>Key Features</h2>
-          <div className="decorative-line"></div>
-        </div>
-        <div className="features-grid">
-          {features.map((feat) => (
-            <div className="feature-card" key={feat.title}>
-              <div className="feature-icon" role="img" aria-label={feat.aria}>{feat.icon}</div>
-              <h3>{feat.title}</h3>
-              <p>{feat.description}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="content-section team-section">
-        <div className="section-header">
-          <h2>Our Team</h2>
-          <div className="decorative-line"></div>
-        </div>
-        <div className="team-grid">
-          {teamMembers.map((member) => (
-            <div className="team-card" key={member.name}>
-              <div className="team-photo">
-                <img 
-                  src={member.photo} 
-                  alt={member.alt}
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.parentElement.style.backgroundColor = '#cbd5e0';
-                  }}
-                />
+        <div className='erp-pillars-grid'>
+          {corePillars.map((pillar, i) => {
+            const IconComponent = pillar.icon;
+            return (
+              <div key={i} className='erp-pillar-item'>
+                <div className='erp-pillar-icon'>
+                  <IconComponent size={20} />
+                </div>
+                <div>
+                  <h3 className='erp-pillar-title'>{pillar.title}</h3>
+                  <p className='erp-pillar-desc'>{pillar.description}</p>
+                </div>
               </div>
-              <h3>{member.name}</h3>
-              <p>{member.role}</p>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Lead Architecture & Engineering */}
+      <div className='erp-doc-card erp-card'>
+        <h2 className='erp-card-title' style={{ marginBottom: "16px" }}>
+          Lead Architect & Engineering
+        </h2>
+        <div className='erp-team-grid'>
+          {teamMembers.map((member, i) => (
+            <div key={i} className='erp-team-card'>
+              <div className='erp-team-avatar'>
+                <Icons.User size={20} />
+              </div>
+              <div className='erp-team-info'>
+                <h3 className='erp-team-name'>{member.name}</h3>
+                <span className='erp-team-role'>{member.role}</span>
+                <span className='erp-team-dept'>{member.dept}</span>
+              </div>
             </div>
           ))}
         </div>
-      </section>
+      </div>
 
-      <section className="content-section contact-section">
-        <div className="section-header">
-          <h2>Get in Touch</h2>
-          <div className="decorative-line"></div>
+      {/* Architecture & FAQs Grid */}
+      <div className='erp-card erp-faq-card'>
+        <div className='erp-section-header-row'>
+          <div>
+            <h2 className='erp-card-title'>Frequently Asked Questions & Academic Standards</h2>
+            <p className='erp-card-desc'>
+              Common policies regarding token verification, statutory 75% thresholds, and transcript audits.
+            </p>
+          </div>
+          <Badge variant='neutral'>Knowledge Base</Badge>
         </div>
-        <div className="contact-info">
-          <p>
-            📧 <a href="mailto:itzronakmalam94@gmail.com">itzronakmalam94@gmail.com</a>
-          </p>
-          <p>
-            📞 <a href="tel:+918264983605">+91 8264983605</a>
-          </p>
-          <p>
-            📍 Ahmedabad, Gujarat, India
-          </p>
+
+        <div className='erp-faqs-grid'>
+          {faqs.map((f, i) => (
+            <div key={i} className='erp-faq-item'>
+              <div className='erp-faq-q-row'>
+                <Icons.Info size={16} className='text-brand' />
+                <h4>{f.q}</h4>
+              </div>
+              <p>{f.a}</p>
+            </div>
+          ))}
         </div>
-      </section>
+      </div>
     </div>
   );
 };

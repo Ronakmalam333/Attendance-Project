@@ -1,0 +1,139 @@
+/* ==========================================================================
+   ERP MASTER LAYOUT & GROUNDED FOOTER
+   ========================================================================== */
+
+.erp-layout-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: var(--bg-canvas, #0e1013);
+  color: var(--text-primary, #f0f2f5);
+}
+
+.erp-layout-main {
+  flex: 1 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 20px 32px 20px;
+}
+
+@media (max-width: 768px) {
+  .erp-layout-main {
+    padding: 16px 12px 24px 12px;
+  }
+}
+
+/* Institutional Telemetry Footer */
+.erp-layout-footer {
+  flex-shrink: 0;
+  width: 100%;
+  border-top: 1px solid var(--border-subtle, #242830);
+  background-color: var(--bg-surface, #15181c);
+  padding: 12px 20px;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #9aa0aa);
+  transition: background-color var(--transition-normal), border-color var(--transition-normal);
+}
+
+.erp-footer-inner {
+  max-width: 1360px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.erp-footer-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary, #9aa0aa);
+}
+
+.erp-footer-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--status-present, #10b981);
+  display: inline-block;
+  box-shadow: 0 0 4px var(--status-present, #10b981);
+}
+
+.erp-footer-telemetry-text {
+  font-size: 0.75rem;
+  letter-spacing: 0.01em;
+}
+
+.text-highlight {
+  color: var(--text-primary, #f0f2f5);
+  font-weight: 500;
+}
+
+.erp-footer-center {
+  display: flex;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--text-muted, #6b7280);
+}
+
+.erp-author-name {
+  color: var(--text-primary, #f0f2f5);
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.erp-footer-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.erp-footer-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.erp-footer-link {
+  color: var(--text-secondary, #9aa0aa);
+  text-decoration: none;
+  font-size: 0.75rem;
+  transition: color var(--transition-fast);
+}
+
+.erp-footer-link:hover {
+  color: var(--text-primary, #f0f2f5);
+  text-decoration: underline;
+}
+
+.erp-footer-sep {
+  color: var(--border-strong, #333842);
+  font-size: 0.625rem;
+}
+
+.erp-footer-version-tag {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.6875rem;
+  padding: 2px 6px;
+  border-radius: var(--radius-xs, 3px);
+  background-color: var(--bg-surface-subtle, #1b1e23);
+  border: 1px solid var(--border-subtle, #242830);
+  color: var(--text-muted, #6b7280);
+}
+
+@media (max-width: 900px) {
+  .erp-footer-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .erp-footer-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
