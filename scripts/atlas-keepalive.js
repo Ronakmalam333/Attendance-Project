@@ -7,19 +7,31 @@ if (!uri) {
 }
 
 async function keepAlive() {
-  const client = new MongoClient(uri);
+  const client = new MongoClient(uri, {
+    serverSelectionTimeoutMS: 15000,
+    connectTimeoutMS: 15000,
+    maxPoolSize: 1,
+  });
 
   try {
     await client.connect();
-    await client.db("admin").command({ ping: 1 });
+
+    const result = await client.db("admin").command({ ping: 1 });
+
+    if (result.ok !== 1) {
+      throw new Error("MongoDB ping unsuccessful");
+    }
+
     console.log("MongoDB Atlas is reachable!");
+    console.log(`Last successful ping: ${new Date().toISOString()}`);
   } catch (error) {
-    console.error("MongoDB Atlas connection failed:", error);
-    process.exitCode = 1;
+    console.error("MongoDB Atlas connection failed:", error.message);
+    throw error;
   } finally {
     await client.close();
   }
 }
 
-keepAlive();
-
+keepAlive().catch(() => {
+  process.exitCode = 1;
+});

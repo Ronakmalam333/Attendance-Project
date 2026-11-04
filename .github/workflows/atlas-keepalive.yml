@@ -2,12 +2,15 @@ name: MongoDB Atlas Keep Alive
 
 on:
   schedule:
-    - cron: "0 0 */7 * *"
+    - cron: "17 0 * * *"
+
   workflow_dispatch:
 
 jobs:
   keep-alive:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -24,4 +27,3 @@ jobs:
         run: node scripts/atlas-keepalive.js
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
-
