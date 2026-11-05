@@ -251,3 +251,185 @@
 .erp-advisory-link:hover {
   text-decoration: underline;
 }
+
+/* Period Slot Cells in Grid */
+.erp-period-slot-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 4px;
+}
+
+.erp-slot-name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-primary, #0f172a);
+  line-height: 1.25;
+}
+
+.erp-slot-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.6875rem;
+  color: var(--text-muted, #64748b);
+}
+
+.erp-slot-room {
+  font-size: 0.6875rem;
+}
+
+.row-recess {
+  background-color: var(--bg-surface-subtle, #f1f5f9);
+}
+
+.col-today-cell {
+  background-color: var(--brand-primary-light, rgba(37, 99, 235, 0.04));
+}
+
+/* Two-column Subgrid */
+.erp-classes-subgrid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 18px;
+  align-items: stretch;
+}
+
+@media (max-width: 1024px) {
+  .erp-classes-subgrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Academic Calendar Card */
+.erp-academic-calendar-card {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.erp-calendar-milestones-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.erp-milestone-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm, 6px);
+  background-color: var(--bg-surface-subtle, #1b1e26);
+  border: 1px solid var(--border-subtle, #282d38);
+}
+
+.erp-milestone-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--brand-primary, #2563eb);
+  flex-shrink: 0;
+}
+
+.dot-warn {
+  background-color: var(--status-late, #f59e0b);
+}
+
+.dot-success {
+  background-color: var(--status-present, #10b981);
+}
+
+.erp-milestone-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.erp-milestone-info strong {
+  font-size: 0.8125rem;
+  color: var(--text-primary, #f1f5f9);
+}
+
+.erp-milestone-info span {
+  font-size: 0.6875rem;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.erp-milestone-date {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-primary, #f1f5f9);
+  padding: 2px 8px;
+  border-radius: 4px;
+  background-color: var(--bg-surface, #14171d);
+  border: 1px solid var(--border-subtle, #282d38);
+}
+
+.erp-calendar-notice-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm, 6px);
+  background-color: var(--bg-surface-subtle, #1b1e26);
+  border: 1px solid var(--border-subtle, #282d38);
+  font-size: 0.75rem;
+  color: var(--text-secondary, #94a3b8);
+  line-height: 1.4;
+}
+
+/* Faculty Office Hours Card */
+.erp-faculty-hours-card {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.erp-faculty-hours-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.erp-faculty-hour-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm, 6px);
+  background-color: var(--bg-surface-subtle, #1b1e26);
+  border: 1px solid var(--border-subtle, #282d38);
+}
+
+.erp-faculty-hour-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: var(--text-primary, #f1f5f9);
+}
+
+.erp-faculty-hour-sub {
+  font-size: 0.75rem;
+  color: var(--brand-primary, #3b82f6);
+  font-weight: 500;
+}
+
+.erp-faculty-hour-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.6875rem;
+  color: var(--text-secondary, #94a3b8);
+  margin-top: 4px;
+  border-top: 1px solid var(--border-subtle, #282d38);
+  padding-top: 6px;
+}

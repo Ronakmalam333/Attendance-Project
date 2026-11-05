@@ -84,9 +84,9 @@ const Register = () => {
           <div className='erp-auth-logo-badge'>
             <Icons.GraduationCap size={22} />
           </div>
-          <h1 className='erp-auth-title'>Academic Account Registration</h1>
+          <h1 className='erp-auth-title'>Create Account</h1>
           <p className='erp-auth-desc'>
-            Enroll in the university attendance telemetry ecosystem
+            Sign up to access attendance records and classes
           </p>
         </div>
 
@@ -98,7 +98,7 @@ const Register = () => {
             onClick={() => handleRoleToggle("student")}
           >
             <Icons.GraduationCap size={16} />
-            <span>Student Account</span>
+            <span>Student</span>
           </button>
           <button
             type='button'
@@ -106,7 +106,7 @@ const Register = () => {
             onClick={() => handleRoleToggle("staff")}
           >
             <Icons.Shield size={16} />
-            <span>Faculty / Staff</span>
+            <span>Faculty</span>
           </button>
         </div>
 
@@ -241,13 +241,13 @@ const Register = () => {
                 <span>Registering Account...</span>
               </>
             ) : (
-              <span>Complete {activeRole === "student" ? "Student" : "Staff"} Registration</span>
+              <span>Create {activeRole === "student" ? "Student" : "Faculty"} Account</span>
             )}
           </button>
         </form>
 
         <div className='erp-auth-footer'>
-          <span>Already enrolled in the system? </span>
+          <span>Already have an account? </span>
           <Link to='/signin' className='erp-auth-link'>
             Sign in
           </Link>

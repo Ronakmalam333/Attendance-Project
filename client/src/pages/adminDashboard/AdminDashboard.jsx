@@ -380,6 +380,82 @@ Generated from AMS Core Database API.
         </div>
       </div>
 
+      {/* Institutional Big Data & Bulk Operations Hub */}
+      <div className='erp-card erp-big-data-hub'>
+        <div className='erp-big-data-header'>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Icons.Database size={18} style={{ color: 'var(--brand-primary, #2563eb)' }} />
+              <h2 className='erp-card-title'>Institutional Big Data & Bulk Operations</h2>
+              <Badge variant='brand'>Enterprise Ready</Badge>
+            </div>
+            <p className='erp-card-desc'>
+              Production-grade ingestion pipeline for university-wide student cohorts, legacy attendance ledgers, and academic schedules.
+            </p>
+          </div>
+          <div className='erp-capacity-badge'>
+            <span className='erp-status-dot' />
+            <span>Tested for 10,000+ Records / Batch</span>
+          </div>
+        </div>
+
+        <div className='erp-big-data-grid'>
+          <div className='erp-big-data-item'>
+            <div className='erp-big-data-item-header'>
+              <Icons.Users size={16} />
+              <strong>Student Roster Ingestion</strong>
+            </div>
+            <p>Import new academic cohorts, lateral entries, and cross-department enrollments from .xlsx or .csv.</p>
+            <div className='erp-big-data-item-actions'>
+              <button
+                type='button'
+                className='erp-btn erp-btn-secondary erp-btn-sm'
+                onClick={() => navigate(`${basePath}/students`)}
+              >
+                <Icons.Plus size={13} />
+                <span>Open Roster Manager</span>
+              </button>
+            </div>
+          </div>
+
+          <div className='erp-big-data-item'>
+            <div className='erp-big-data-item-header'>
+              <Icons.Calendar size={16} />
+              <strong>Master Attendance Ingestion</strong>
+            </div>
+            <p>Upload historical classroom sheets and offline departmental workbooks directly into the institutional database.</p>
+            <div className='erp-big-data-item-actions'>
+              <button
+                type='button'
+                className='erp-btn erp-btn-secondary erp-btn-sm'
+                onClick={() => navigate(`${basePath}/attendence`)}
+              >
+                <Icons.Plus size={13} />
+                <span>Open Attendance Ingestion</span>
+              </button>
+            </div>
+          </div>
+
+          <div className='erp-big-data-item'>
+            <div className='erp-big-data-item-header'>
+              <Icons.FileText size={16} />
+              <strong>Statutory Compliance & Transcripts</strong>
+            </div>
+            <p>Audit 75% minimum classroom attendance compliance and generate accredited academic transcripts.</p>
+            <div className='erp-big-data-item-actions'>
+              <button
+                type='button'
+                className='erp-btn erp-btn-secondary erp-btn-sm'
+                onClick={handleExportData}
+              >
+                <Icons.Download size={13} />
+                <span>Export Master Ledger (CSV)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Logout Confirmation Modal */}
       <ConfirmModal
         isOpen={logoutModalOpen}

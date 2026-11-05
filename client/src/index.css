@@ -5,25 +5,25 @@
    ========================================================================== */
 
 :root {
-  /* Surface & Canvas (Light) */
-  --bg-canvas: #f6f7f9;
+  /* Surface & Canvas (Light - Corporate Slate) */
+  --bg-canvas: #f8fafc;
   --bg-surface: #ffffff;
-  --bg-surface-subtle: #f0f2f5;
-  --bg-surface-hover: #e4e7eb;
+  --bg-surface-subtle: #f1f5f9;
+  --bg-surface-hover: #e2e8f0;
 
   /* Borders & Dividers */
-  --border-subtle: #e1e4e8;
-  --border-strong: #cbd0d6;
+  --border-subtle: #e2e8f0;
+  --border-strong: #cbd5e1;
 
   /* Typography */
-  --text-primary: #191c21;
-  --text-secondary: #4b525d;
-  --text-muted: #8c939e;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
 
-  /* Institutional Corporate Brand (Classic Enterprise Navy) */
-  --brand-primary: #1e40af;
-  --brand-primary-hover: #1e3a8a;
-  --brand-primary-light: #eff3fa;
+  /* Institutional Corporate Brand (Executive Sapphire / Navy) */
+  --brand-primary: #1d4ed8;
+  --brand-primary-hover: #1e40af;
+  --brand-primary-light: #eff6ff;
   --brand-primary-text: #ffffff;
 
   /* Semantics: Present, Active, Success */
@@ -52,10 +52,10 @@
   --shadow-dropdown: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
 
   /* Radius (Crisp, modern, non-bulbous) */
-  --radius-xs: 3px;
-  --radius-sm: 5px;
-  --radius-md: 7px;
-  --radius-lg: 10px;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
   --radius-full: 9999px;
 
   /* Transitions */
@@ -76,48 +76,48 @@
 }
 
 [data-theme="dark"] {
-  /* Surface & Canvas (Enterprise Titanium & Neutral Charcoal - Zero Purply/Bluey tint) */
-  --bg-canvas: #0e1013;
-  --bg-surface: #15181c;
-  --bg-surface-subtle: #1b1e23;
-  --bg-surface-hover: #22262d;
+  /* Surface & Canvas (Executive Neutral Slate / Carbon - No AI Purple/Blue Sheen) */
+  --bg-canvas: #0c0e12;
+  --bg-surface: #14171d;
+  --bg-surface-subtle: #1b1e26;
+  --bg-surface-hover: #222631;
 
   /* Borders & Dividers */
-  --border-subtle: #242830;
-  --border-strong: #333842;
+  --border-subtle: #282d38;
+  --border-strong: #3a414f;
 
   /* Typography */
-  --text-primary: #f0f2f5;
-  --text-secondary: #9aa0aa;
-  --text-muted: #6b7280;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
 
-  /* Brand Primary */
+  /* Brand Primary (Restrained Institutional Navy / Cobalt) */
   --brand-primary: #2563eb;
   --brand-primary-hover: #1d4ed8;
-  --brand-primary-light: rgba(37, 99, 235, 0.08);
+  --brand-primary-light: rgba(37, 99, 235, 0.12);
   --brand-primary-text: #ffffff;
 
   /* Semantics */
   --status-present: #10b981;
-  --status-present-bg: rgba(16, 185, 129, 0.08);
-  --status-present-border: rgba(16, 185, 129, 0.2);
+  --status-present-bg: rgba(16, 185, 129, 0.1);
+  --status-present-border: rgba(16, 185, 129, 0.25);
 
   --status-absent: #ef4444;
-  --status-absent-bg: rgba(239, 68, 68, 0.08);
-  --status-absent-border: rgba(239, 68, 68, 0.2);
+  --status-absent-bg: rgba(239, 68, 68, 0.1);
+  --status-absent-border: rgba(239, 68, 68, 0.25);
 
   --status-late: #f59e0b;
-  --status-late-bg: rgba(245, 158, 11, 0.08);
-  --status-late-border: rgba(245, 158, 11, 0.2);
+  --status-late-bg: rgba(245, 158, 11, 0.1);
+  --status-late-border: rgba(245, 158, 11, 0.25);
 
   --status-info: #64748b;
-  --status-info-bg: rgba(100, 116, 139, 0.08);
-  --status-info-border: rgba(100, 116, 139, 0.2);
+  --status-info-bg: rgba(100, 116, 139, 0.1);
+  --status-info-border: rgba(100, 116, 139, 0.25);
 
   /* Elevation */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.35);
-  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.3);
-  --shadow-dropdown: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-card: 0 2px 10px -1px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-dropdown: 0 12px 24px -4px rgba(0, 0, 0, 0.6), 0 4px 8px -3px rgba(0, 0, 0, 0.5);
 
   /* Legacy aliases */
   --bg-primary: var(--bg-surface);
@@ -202,23 +202,33 @@ button, input, select, textarea {
 }
 
 .erp-btn-primary {
-  background-color: var(--brand-primary);
-  color: var(--brand-primary-text);
-  border-color: var(--brand-primary);
+  background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+  color: #ffffff;
+  border: 1px solid #2563eb;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  font-weight: 600;
+  transition: all var(--transition-fast);
 }
 .erp-btn-primary:hover:not(:disabled) {
-  background-color: var(--brand-primary-hover);
-  border-color: var(--brand-primary-hover);
+  background: linear-gradient(180deg, #2563eb 0%, #1e40af 100%);
+  border-color: #1d4ed8;
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.4);
+  transform: translateY(-1px);
+}
+.erp-btn-primary:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .erp-btn-secondary {
   background-color: var(--bg-surface);
   color: var(--text-primary);
-  border-color: var(--border-subtle);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 .erp-btn-secondary:hover:not(:disabled) {
   background-color: var(--bg-surface-subtle);
   border-color: var(--border-strong);
+  color: var(--text-primary);
 }
 
 .erp-btn-danger {

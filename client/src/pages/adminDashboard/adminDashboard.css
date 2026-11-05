@@ -181,3 +181,82 @@
   border-top: 1px solid var(--border-subtle, #e2e8f0);
   padding-top: 14px;
 }
+
+/* Institutional Big Data & Bulk Operations Hub */
+.erp-big-data-hub {
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.erp-big-data-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.erp-capacity-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: var(--radius-full, 9999px);
+  background-color: var(--bg-surface-subtle, #1b1e26);
+  border: 1px solid var(--border-subtle, #282d38);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--status-present, #10b981);
+}
+
+.erp-big-data-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .erp-big-data-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.erp-big-data-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 16px;
+  background-color: var(--bg-surface-subtle, #1b1e26);
+  border: 1px solid var(--border-subtle, #282d38);
+  border-radius: var(--radius-md, 8px);
+  transition: border-color var(--transition-fast);
+}
+
+.erp-big-data-item:hover {
+  border-color: var(--border-strong, #3a414f);
+}
+
+.erp-big-data-item-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: var(--text-primary, #f1f5f9);
+}
+
+.erp-big-data-item p {
+  font-size: 0.8125rem;
+  color: var(--text-secondary, #94a3b8);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.erp-big-data-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}

@@ -8,6 +8,11 @@
   position: relative;
 }
 
+[data-theme="dark"] .app-root-container {
+  background-color: var(--bg-canvas, #0c0e12);
+  background-image: none;
+}
+
 /* Base link styles */
 a {
   color: inherit;

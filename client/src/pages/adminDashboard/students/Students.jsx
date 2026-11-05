@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
+import ExcelJS from "exceljs";
 import api from "../../../tokenManager";
 import { useToast } from "../../../context/ToastContext";
 import Icons from "../../../components/ui/Icons";
@@ -10,9 +11,11 @@ import "./students.css";
 function Students() {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [importing, setImporting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [courseFilter, setCourseFilter] = useState("all");
   const [semesterFilter, setSemesterFilter] = useState("all");
+  const fileInputRef = useRef(null);
   const toast = useToast();
 
   const fetchStudents = async () => {
@@ -66,6 +69,147 @@ function Students() {
     });
   }, [students, courseFilter, semesterFilter, searchQuery]);
 
+  // Bulk Excel (.xlsx) / CSV Ingestion
+  const handleExcelUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.name.match(/\.(xlsx|xls|csv)$/i)) {
+      toast.warning("Please upload a valid .xlsx or .csv workbook.", "Invalid File Format");
+      return;
+    }
+
+    setImporting(true);
+    try {
+      const buffer = await file.arrayBuffer();
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(buffer);
+
+      const worksheet = workbook.worksheets[0];
+      if (!worksheet) {
+        throw new Error("No worksheets found in uploaded file.");
+      }
+
+      // Detect header row
+      const headerRow = worksheet.getRow(1);
+      const headers = [];
+      headerRow.eachCell((cell, colNumber) => {
+        headers[colNumber] = String(cell.value || "").trim().toLowerCase();
+      });
+
+      const parsedStudents = [];
+      worksheet.eachRow((row, rowNumber) => {
+        if (rowNumber === 1) return; // Skip headers
+
+        let name = "";
+        let uid = "";
+        let email = "";
+        let course = "General";
+        let semester = "1";
+
+        row.eachCell((cell, colNumber) => {
+          const h = headers[colNumber] || "";
+          const val = cell.value != null ? String(cell.value).trim() : "";
+
+          if (h.includes("name")) name = val;
+          else if (h.includes("uid") || h.includes("roll") || h.includes("enroll") || h.includes("id")) uid = val;
+          else if (h.includes("email") || h.includes("mail")) email = val;
+          else if (h.includes("course") || h.includes("branch") || h.includes("degree") || h.includes("dept")) course = val;
+          else if (h.includes("sem")) semester = val;
+        });
+
+        // Fallback positional if headers weren't named standard
+        if (!name && row.getCell(1).value) name = String(row.getCell(1).value).trim();
+        if (!uid && row.getCell(2).value) uid = String(row.getCell(2).value).trim();
+        if (!email && row.getCell(3).value) email = String(row.getCell(3).value).trim();
+        if (course === "General" && row.getCell(4).value) course = String(row.getCell(4).value).trim();
+        if (semester === "1" && row.getCell(5).value) semester = String(row.getCell(5).value).trim();
+
+        if (name || uid || email) {
+          parsedStudents.push({ name, uid, email, course, semester });
+        }
+      });
+
+      if (parsedStudents.length === 0) {
+        throw new Error("No student records detected in workbook. Check file format.");
+      }
+
+      toast.info(`Parsed ${parsedStudents.length} rows. Uploading to database...`, "Ingesting Roster");
+
+      const response = await api.post("/api/students/bulk-import", { students: parsedStudents });
+      toast.success(response.data.message || `Successfully imported ${parsedStudents.length} students!`, "Import Complete");
+
+      fetchStudents();
+    } catch (err) {
+      toast.error(err.response?.data?.message || err.message || "Failed to parse and import Excel file.");
+    } finally {
+      setImporting(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  // Download Sample Template for University Administrators
+  const handleDownloadTemplate = async () => {
+    try {
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet("Students");
+
+      worksheet.columns = [
+        { header: "Name", key: "name", width: 25 },
+        { header: "UID", key: "uid", width: 18 },
+        { header: "Email", key: "email", width: 30 },
+        { header: "Course", key: "course", width: 25 },
+        { header: "Semester", key: "semester", width: 12 },
+      ];
+
+      // Format header row
+      worksheet.getRow(1).font = { bold: true };
+      worksheet.getRow(1).fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FFE2E8F0" },
+      };
+
+      // Add sample rows
+      worksheet.addRow({
+        name: "Ronak Malam",
+        uid: "24BTCSE001",
+        email: "ronak.m@university.edu",
+        course: "Computer Science & Engineering",
+        semester: "4",
+      });
+      worksheet.addRow({
+        name: "Alex Johnson",
+        uid: "24BTCSE002",
+        email: "alex.j@university.edu",
+        course: "Computer Science & Engineering",
+        semester: "4",
+      });
+      worksheet.addRow({
+        name: "Sophia Martinez",
+        uid: "24BTCSE003",
+        email: "sophia.m@university.edu",
+        course: "Computer Science & Engineering",
+        semester: "4",
+      });
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "AMS-Student-Roster-Template.xlsx";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast.success("Excel template downloaded. Populate and upload anytime.", "Template Ready");
+    } catch (err) {
+      toast.error("Failed to generate Excel template.");
+    }
+  };
+
   const handleExportCSV = () => {
     if (!filteredStudents.length) {
       toast.warning("No student records to export.", "Empty Roster");
@@ -107,6 +251,15 @@ function Students() {
 
   return (
     <div className='erp-students-page'>
+      {/* Hidden File Input for Excel Import */}
+      <input
+        ref={fileInputRef}
+        type='file'
+        accept='.xlsx,.xls,.csv'
+        style={{ display: "none" }}
+        onChange={handleExcelUpload}
+      />
+
       {/* Page Header */}
       <div className='erp-page-header'>
         <div>
@@ -115,24 +268,49 @@ function Students() {
             Official student enrollment roster, academic credentials, and departmental groupings.
           </p>
         </div>
-        <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+        <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+          {/* Download Template Button */}
           <button
             type='button'
-            className='erp-btn erp-btn-secondary'
+            className='erp-btn erp-btn-ghost erp-btn-sm'
+            onClick={handleDownloadTemplate}
+            title='Download pre-formatted Excel template'
+          >
+            <Icons.Download size={14} />
+            <span>Excel Template</span>
+          </button>
+
+          {/* Import Excel Button */}
+          <button
+            type='button'
+            className='erp-btn erp-btn-primary erp-btn-sm'
+            onClick={() => fileInputRef.current && fileInputRef.current.click()}
+            disabled={importing}
+          >
+            <Icons.Upload size={14} />
+            <span>{importing ? "Importing Roster..." : "Import Excel (.xlsx)"}</span>
+          </button>
+
+          {/* Export CSV Button */}
+          <button
+            type='button'
+            className='erp-btn erp-btn-secondary erp-btn-sm'
             onClick={handleExportCSV}
             disabled={filteredStudents.length === 0}
           >
-            <Icons.Download size={15} />
-            <span>Export Roster CSV</span>
+            <Icons.Download size={14} />
+            <span>Export CSV</span>
           </button>
+
+          {/* Refresh Button */}
           <button
             type='button'
-            className='erp-btn erp-btn-ghost'
+            className='erp-btn erp-btn-ghost erp-btn-sm'
             onClick={fetchStudents}
             title='Refresh roster'
             disabled={loading}
           >
-            <Icons.Refresh size={15} />
+            <Icons.Refresh size={14} />
           </button>
         </div>
       </div>
@@ -215,7 +393,7 @@ function Students() {
           <EmptyState
             icon={Icons.Users}
             title='No students found'
-            description='No records matched your search parameters. Try resetting filters.'
+            description='No records matched your search parameters. You can import students via Excel or add new records.'
           />
         ) : (
           <div className='erp-table-container'>

@@ -438,6 +438,33 @@ const StudentAttendance = () => {
               University regulations require maintaining at least <strong>75%</strong> cumulative attendance across all registered courses.
             </p>
           </div>
+
+          {/* Statutory 75% Rule Simulator & Margin Meter */}
+          <div className='erp-margin-simulator-card'>
+            <div className='erp-simulator-header'>
+              <Icons.Shield size={14} className='text-brand' />
+              <strong>Statutory 75% Examination Standing</strong>
+            </div>
+            <div className='erp-simulator-body'>
+              <div className='erp-simulator-metric-row'>
+                <span>Current Status</span>
+                <Badge variant={parseFloat(metrics.rate) >= 75 ? "present" : "late"} size='sm'>
+                  {parseFloat(metrics.rate) >= 75 ? "Eligible" : "Attendance Shortage"}
+                </Badge>
+              </div>
+              <div className='erp-simulator-metric-row'>
+                <span>Safe Margin Sessions</span>
+                <strong className='tabular-nums'>
+                  {Math.max(0, Math.floor((metrics.present - 0.75 * metrics.total) / 0.75))} classes
+                </strong>
+              </div>
+              <p className='erp-simulator-explanation'>
+                {parseFloat(metrics.rate) >= 75
+                  ? "Your current cumulative presence satisfies statutory examination prerequisites."
+                  : "Attendance falls below statutory threshold. Attend forthcoming lectures to restore eligibility."}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 

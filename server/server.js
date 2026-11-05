@@ -31,6 +31,7 @@ const staff = require("./models/staff");
 const attendance = require("./models/attendance");
 const AttendanceToken = require("./models/attendanceToken");
 const Feedback = require("./models/feedback");
+const Timetable = require("./models/timetable");
 
 const app = express();
 connectDb();
@@ -1070,10 +1071,225 @@ app.get("/subjects", authenticateToken, async (req, res) => {
   }
 });
 
+// ============================================================================
+// UNIVERSITY BIG DATA INGESTION ENGINE (EXCEL / XLSX / CSV / ROSTERS)
+// ============================================================================
+
+// Bulk import students from Excel / CSV (Staff / Admin only)
+app.post(
+  ["/api/students/bulk-import", "/students/bulk-import"],
+  authenticateToken,
+  authorizeRoles("staff"),
+  async (req, res) => {
+    try {
+      const { students } = req.body;
+      if (!Array.isArray(students) || students.length === 0) {
+        return res.status(400).json({ message: "No student records provided for import." });
+      }
+
+      const defaultHashedPassword = await bcrypt.hash("ams@123", 10);
+      let insertedCount = 0;
+      let updatedCount = 0;
+      const errors = [];
+
+      const bulkOps = [];
+      for (let i = 0; i < students.length; i++) {
+        const item = students[i];
+        const rawName = (item.name || `${item.firstname || ""} ${item.lastname || ""}`).trim();
+        const rawUid = (item.uid || item.rollNo || item.rollNumber || "").trim().toUpperCase();
+        const rawEmail = (item.email || "").trim().toLowerCase();
+
+        if (!rawUid && !rawEmail) {
+          errors.push({ row: i + 1, error: "Missing both UID and Email" });
+          continue;
+        }
+
+        const studentUid = rawUid || rawEmail.split("@")[0].toUpperCase();
+        const studentEmail = rawEmail || `${studentUid.toLowerCase()}@university.edu`;
+        const studentName = rawName || `Student ${studentUid}`;
+        const course = (item.course || item.branch || item.department || "General").trim();
+        const semester = item.semester ? String(item.semester).trim() : "1";
+
+        bulkOps.push({
+          updateOne: {
+            filter: {
+              $or: [{ uid: studentUid }, { email: studentEmail }],
+            },
+            update: {
+              $set: {
+                name: studentName,
+                uid: studentUid,
+                email: studentEmail,
+                course,
+                semester,
+                profileCompleted: true,
+              },
+              $setOnInsert: {
+                password: defaultHashedPassword,
+                createdAt: new Date(),
+              },
+            },
+            upsert: true,
+          },
+        });
+      }
+
+      if (bulkOps.length > 0) {
+        const result = await student.bulkWrite(bulkOps, { ordered: false });
+        insertedCount = result.upsertedCount || 0;
+        updatedCount = result.modifiedCount || 0;
+      }
+
+      return res.json({
+        message: `Successfully processed ${bulkOps.length} student records (${insertedCount} new, ${updatedCount} updated).`,
+        total: students.length,
+        insertedCount,
+        updatedCount,
+        errorCount: errors.length,
+        errors: errors.slice(0, 10),
+      });
+    } catch (error) {
+      console.error("Bulk student import error:", error);
+      return res.status(500).json({ message: "Failed to process bulk student import." });
+    }
+  }
+);
+
+// Bulk import attendance records from Excel (Staff / Admin only)
+app.post(
+  ["/api/attendance/bulk-import", "/attendance/bulk-import"],
+  authenticateToken,
+  authorizeRoles("staff"),
+  async (req, res) => {
+    try {
+      const { records } = req.body;
+      if (!Array.isArray(records) || records.length === 0) {
+        return res.status(400).json({ message: "No attendance records provided." });
+      }
+
+      // Pre-fetch all students in bulk to map studentId by UID or Email
+      const allStudents = await student.find({}, "_id uid name email");
+      const uidToStudent = new Map();
+      const emailToStudent = new Map();
+      allStudents.forEach((s) => {
+        if (s.uid) uidToStudent.set(s.uid.toUpperCase(), s);
+        if (s.email) emailToStudent.set(s.email.toLowerCase(), s);
+      });
+
+      const docsToInsert = [];
+      const errors = [];
+
+      for (let i = 0; i < records.length; i++) {
+        const r = records[i];
+        const rawUid = (r.studentUid || r.rollNo || r.RollNo || "").trim().toUpperCase();
+        const rawEmail = (r.email || "").trim().toLowerCase();
+
+        const matchedStudent = uidToStudent.get(rawUid) || emailToStudent.get(rawEmail);
+        if (!matchedStudent) {
+          errors.push({ row: i + 1, error: `Student UID "${rawUid || rawEmail}" not found in registered directory.` });
+          continue;
+        }
+
+        const validDate = r.date ? new Date(r.date) : new Date();
+        const statusStr = (r.status || "Present").trim();
+        const normalizedStatus =
+          statusStr.toLowerCase() === "absent" ? "Absent" :
+          statusStr.toLowerCase() === "late" ? "Late" : "Present";
+
+        docsToInsert.push({
+          studentId: matchedStudent._id,
+          studentUid: matchedStudent.uid,
+          studentName: matchedStudent.name,
+          subject: (r.subject || "General").trim(),
+          faculty: (r.faculty || req.user.username || "Faculty").trim(),
+          date: validDate,
+          time: r.time || "09:15 AM",
+          status: normalizedStatus,
+          duration: r.duration || "1 Hour",
+        });
+      }
+
+      let insertedCount = 0;
+      if (docsToInsert.length > 0) {
+        const bulkOps = docsToInsert.map((d) => ({
+          updateOne: {
+            filter: { studentId: d.studentId, date: d.date, subject: d.subject },
+            update: { $set: d },
+            upsert: true,
+          },
+        }));
+
+        const result = await attendance.bulkWrite(bulkOps, { ordered: false });
+        insertedCount = (result.upsertedCount || 0) + (result.modifiedCount || 0);
+      }
+
+      return res.json({
+        message: `Successfully ingested ${insertedCount} attendance ledger records into institutional database.`,
+        total: records.length,
+        insertedCount,
+        skippedCount: errors.length,
+        errors: errors.slice(0, 10),
+      });
+    } catch (error) {
+      console.error("Bulk attendance import error:", error);
+      return res.status(500).json({ message: "Failed to import attendance ledger." });
+    }
+  }
+);
+
+// Bulk update master timetable schedule (Staff only)
+app.post(
+  ["/api/schedule/bulk-import", "/schedule/bulk-import"],
+  authenticateToken,
+  authorizeRoles("staff"),
+  async (req, res) => {
+    try {
+      const { timetable } = req.body;
+      if (!timetable) {
+        return res.status(400).json({ message: "Invalid timetable payload." });
+      }
+
+      const saved = await Timetable.findOneAndUpdate(
+        { academicYear: timetable.academicYear || "2024-25" },
+        {
+          $set: {
+            academicYear: timetable.academicYear || "2024-25",
+            department: timetable.department || "General",
+            mon: timetable.mon || [],
+            tue: timetable.tue || [],
+            wed: timetable.wed || [],
+            thu: timetable.thu || [],
+            fri: timetable.fri || [],
+            sat: timetable.sat || [],
+            leave: timetable.leave || [],
+          },
+        },
+        { upsert: true, new: true }
+      );
+
+      return res.json({ message: "Master timetable schedule published successfully.", timetable: saved });
+    } catch (error) {
+      console.error("Schedule bulk import error:", error);
+      return res.status(500).json({ message: "Failed to publish timetable schedule." });
+    }
+  }
+);
+
 // Academic Timetable Schedule endpoint
 app.get("/schedule", async (req, res) => {
   try {
-    // Return empty schedule unless populated by department admin
+    const liveTimetable = await Timetable.findOne().sort({ updatedAt: -1 });
+    if (liveTimetable) {
+      return res.json({
+        mon: liveTimetable.mon || [],
+        tue: liveTimetable.tue || [],
+        wed: liveTimetable.wed || [],
+        thu: liveTimetable.thu || [],
+        fri: liveTimetable.fri || [],
+        sat: liveTimetable.sat || [],
+        leave: liveTimetable.leave || [],
+      });
+    }
     return res.json({ mon: [], tue: [], wed: [], thu: [], fri: [], leave: [] });
   } catch (err) {
     return res.status(500).json({ message: "Failed to fetch timetable" });

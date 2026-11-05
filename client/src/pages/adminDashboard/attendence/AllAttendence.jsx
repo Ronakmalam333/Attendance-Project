@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import ExcelJS from "exceljs";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import axios from "../../../tokenManager";
@@ -12,9 +12,11 @@ import "./allattendence.css";
 const AllAttendance = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [importing, setImporting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [exporting, setExporting] = useState(false);
+  const fileInputRef = useRef(null);
   const toast = useToast();
 
   useEffect(() => {
@@ -53,48 +55,165 @@ const AllAttendance = () => {
     toast.info(`Updated status for ${updated[rowIndex].Name} from ${prevStatus} to ${value}.`);
   };
 
+  // Bulk Excel (.xlsx, .xls, .csv) Attendance Ledger Ingestion
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
-    if (!file.name.match(/\.(xlsx)$/i)) {
-      toast.warning("Please upload a valid .xlsx Excel workbook.", "Invalid File Format");
+    if (!file.name.match(/\.(xlsx|xls|csv)$/i)) {
+      toast.warning("Please upload a valid .xlsx, .xls, or .csv Excel workbook.", "Invalid File Format");
       return;
     }
 
-    setLoading(true);
+    setImporting(true);
     try {
       const buffer = await file.arrayBuffer();
       const workbook = new ExcelJS.Workbook();
       await workbook.xlsx.load(buffer);
 
       const worksheet = workbook.worksheets[0];
-      const parsedData = [];
-
-      worksheet.eachRow((row, rowIndex) => {
-        if (rowIndex === 1) return;
-        const [Name, RollNo, Status, Subject, Faculty] = row.values.slice(1);
-        parsedData.push({
-          Name: Name || "Student",
-          RollNo: RollNo || "N/A",
-          Status: Status || "Present",
-          Date: new Date().toISOString().split("T")[0],
-          Subject: Subject || "General",
-          Faculty: Faculty || "Faculty",
-          Time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        });
-      });
-
-      if (!parsedData.length || !parsedData[0].Name || !parsedData[0].Status) {
-        throw new Error("File must contain at least Name and Status columns");
+      if (!worksheet) {
+        throw new Error("No worksheets found in uploaded file.");
       }
 
-      setData(parsedData);
-      toast.success(`Imported ${parsedData.length} records from Excel sheet.`, "Upload Succeeded");
+      // Detect header row
+      const headerRow = worksheet.getRow(1);
+      const headers = [];
+      headerRow.eachCell((cell, colNumber) => {
+        headers[colNumber] = String(cell.value || "").trim().toLowerCase();
+      });
+
+      const parsedRecords = [];
+      worksheet.eachRow((row, rowIndex) => {
+        if (rowIndex === 1) return; // Skip headers
+
+        let name = "";
+        let rollNo = "";
+        let status = "Present";
+        let subject = "General Session";
+        let faculty = "Faculty";
+        let date = new Date().toISOString().split("T")[0];
+
+        row.eachCell((cell, colNumber) => {
+          const h = headers[colNumber] || "";
+          const val = cell.value != null ? String(cell.value).trim() : "";
+
+          if (h.includes("name") || h.includes("student")) name = val;
+          else if (h.includes("uid") || h.includes("roll") || h.includes("enroll") || h.includes("id")) rollNo = val;
+          else if (h.includes("status")) status = val;
+          else if (h.includes("subject") || h.includes("course") || h.includes("class")) subject = val;
+          else if (h.includes("faculty") || h.includes("prof") || h.includes("teacher")) faculty = val;
+          else if (h.includes("date")) date = val;
+        });
+
+        // Positional fallback if headers were unnamed or custom
+        if (!rollNo && row.getCell(1).value) rollNo = String(row.getCell(1).value).trim();
+        if (!name && row.getCell(2).value) name = String(row.getCell(2).value).trim();
+        if (date === new Date().toISOString().split("T")[0] && row.getCell(3).value) date = String(row.getCell(3).value).trim();
+        if (subject === "General Session" && row.getCell(4).value) subject = String(row.getCell(4).value).trim();
+        if (faculty === "Faculty" && row.getCell(5).value) faculty = String(row.getCell(5).value).trim();
+        if (status === "Present" && row.getCell(6).value) status = String(row.getCell(6).value).trim();
+
+        if (rollNo || name) {
+          parsedRecords.push({
+            rollNo: rollNo || name,
+            studentUid: rollNo || name,
+            studentName: name || "Student",
+            status: status || "Present",
+            subject: subject || "General Session",
+            faculty: faculty || "Faculty",
+            date: date || new Date().toISOString().split("T")[0],
+          });
+        }
+      });
+
+      if (!parsedRecords.length) {
+        throw new Error("No attendance rows detected in workbook. Please verify file columns.");
+      }
+
+      toast.info(`Ingesting ${parsedRecords.length} records into database...`, "Processing Ledger");
+
+      const response = await axios.post("/api/attendance/bulk-import", { records: parsedRecords });
+      toast.success(
+        response.data.message || `Successfully ingested ${parsedRecords.length} records!`,
+        "Attendance Ingested"
+      );
+
+      await fetchAttendanceData();
     } catch (error) {
-      toast.error(error.message || "Failed to parse Excel workbook.");
+      toast.error(error.response?.data?.message || error.message || "Failed to parse and import attendance file.");
     } finally {
-      setLoading(false);
+      setImporting(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  // Download Pre-Formatted Institutional Attendance Template
+  const handleDownloadTemplate = async () => {
+    try {
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet("Attendance Template");
+
+      worksheet.columns = [
+        { header: "Roll Number / UID", key: "rollNo", width: 22 },
+        { header: "Student Name", key: "name", width: 26 },
+        { header: "Date (YYYY-MM-DD)", key: "date", width: 18 },
+        { header: "Subject", key: "subject", width: 26 },
+        { header: "Faculty", key: "faculty", width: 22 },
+        { header: "Status (Present/Absent/Late)", key: "status", width: 26 },
+      ];
+
+      // Format header row
+      worksheet.getRow(1).font = { bold: true, color: { argb: "FFFFFFFF" } };
+      worksheet.getRow(1).fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FF1D4ED8" },
+      };
+      worksheet.getRow(1).alignment = { horizontal: "center", vertical: "middle" };
+
+      // Sample verified rows
+      const today = new Date().toISOString().split("T")[0];
+      worksheet.addRow({
+        rollNo: "24BTCSE001",
+        name: "Ronak Malam",
+        date: today,
+        subject: "Mobile App Development",
+        faculty: "Information Technology",
+        status: "Present",
+      });
+      worksheet.addRow({
+        rollNo: "24BTCSE002",
+        name: "Aarav Sharma",
+        date: today,
+        subject: "Mobile App Development",
+        faculty: "Information Technology",
+        status: "Present",
+      });
+      worksheet.addRow({
+        rollNo: "24BTCSE003",
+        name: "Priya Patel",
+        date: today,
+        subject: "Mobile App Development",
+        faculty: "Information Technology",
+        status: "Absent",
+      });
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "AMS-Attendance-Ledger-Template.xlsx";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+      toast.success("Attendance template downloaded.", "Ready for Data Entry");
+    } catch (err) {
+      toast.error("Failed to generate attendance template.");
     }
   };
 
@@ -190,14 +309,24 @@ const AllAttendance = () => {
           </p>
         </div>
         <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
-          <label className='erp-btn erp-btn-secondary' style={{ cursor: "pointer", margin: 0 }}>
+          <button
+            type='button'
+            onClick={handleDownloadTemplate}
+            className='erp-btn erp-btn-secondary'
+            title='Download pre-formatted attendance ledger template'
+          >
+            <Icons.Download size={15} />
+            <span>Template (.xlsx)</span>
+          </button>
+          <label className='erp-btn erp-btn-primary' style={{ cursor: "pointer", margin: 0 }}>
             <Icons.Plus size={15} />
-            <span>Import Excel (.xlsx)</span>
+            <span>{importing ? "Importing..." : "Import Excel (.xlsx)"}</span>
             <input
+              ref={fileInputRef}
               type='file'
-              accept='.xlsx'
+              accept='.xlsx,.xls,.csv'
               onChange={handleFileUpload}
-              disabled={loading}
+              disabled={loading || importing}
               style={{ display: "none" }}
             />
           </label>
@@ -213,7 +342,7 @@ const AllAttendance = () => {
           <button
             type='button'
             onClick={fetchAttendanceData}
-            disabled={loading}
+            disabled={loading || importing}
             className='erp-btn erp-btn-ghost'
             title='Refresh Ledger'
           >
