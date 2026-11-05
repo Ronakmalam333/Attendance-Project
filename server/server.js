@@ -649,16 +649,96 @@ app.post("/data", async (req, res) => {
 });
 
 app.get(
-  "/students",
+  ["/students", "/api/students"],
   authenticateToken,
   authorizeRoles("staff"),
   async (req, res) => {
     try {
-      const data = await student.find();
+      const data = await student.find().sort({ createdAt: -1 });
       return res.json(data);
     } catch (error) {
       console.error("Student fetch error:", error);
       return res.status(500).json({ message: "Failed to get students" });
+    }
+  },
+);
+
+// Add Single Student (staff only)
+app.post(
+  ["/students", "/api/students"],
+  authenticateToken,
+  authorizeRoles("staff"),
+  async (req, res) => {
+    try {
+      const { name, uid, email, course, semester, password } = req.body;
+      if (!name || !name.trim()) {
+        return res.status(400).json({ message: "Student full name is required" });
+      }
+      if (!uid || !uid.trim()) {
+        return res.status(400).json({ message: "Institutional UID / Roll No is required" });
+      }
+      if (!email || !email.trim()) {
+        return res.status(400).json({ message: "Institutional email address is required" });
+      }
+
+      const cleanUid = uid.trim().toUpperCase();
+      const cleanEmail = email.trim().toLowerCase();
+
+      const existing = await student.findOne({
+        $or: [{ uid: cleanUid }, { email: cleanEmail }],
+      });
+      if (existing) {
+        return res.status(409).json({
+          message: `A student with UID "${cleanUid}" or Email "${cleanEmail}" is already registered.`,
+        });
+      }
+
+      const plainPassword = password && password.trim() ? password.trim() : cleanUid;
+      const hashedPassword = await bcrypt.hash(plainPassword, 10);
+
+      const newStudent = new student({
+        name: name.trim(),
+        uid: cleanUid,
+        email: cleanEmail,
+        password: hashedPassword,
+        course: course && course.trim() ? course.trim() : "B.Tech Computer Science",
+        semester: Number(semester) || 1,
+      });
+
+      await newStudent.save();
+      return res.status(201).json({
+        message: `Student ${newStudent.name} (${cleanUid}) enrolled successfully.`,
+        student: newStudent,
+      });
+    } catch (error) {
+      console.error("Add student error:", error);
+      return res.status(500).json({ message: "Failed to enroll student" });
+    }
+  },
+);
+
+// Delete Student Record (staff only)
+app.delete(
+  ["/students/:id", "/api/students/:id"],
+  authenticateToken,
+  authorizeRoles("staff"),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const deletedStudent = await student.findByIdAndDelete(id);
+      if (!deletedStudent) {
+        return res.status(404).json({ message: "Student record not found" });
+      }
+
+      // Also clean up any orphan attendance records tied to this student
+      await attendance.deleteMany({ studentId: id });
+
+      return res.json({
+        message: `Student ${deletedStudent.name} (${deletedStudent.uid}) removed from roster.`,
+      });
+    } catch (error) {
+      console.error("Delete student error:", error);
+      return res.status(500).json({ message: "Failed to delete student" });
     }
   },
 );
@@ -844,12 +924,10 @@ app.get(
 
 // Get all attendance records (admin only)
 app.get(
-  "/attendance/all",
+  ["/attendance/all", "/api/attendance/all"],
   authenticateToken,
   authorizeRoles("staff"),
   async (req, res) => {
-    const { role } = req.user;
-
     try {
       const attendanceRecords = await attendance
         .find()
@@ -860,6 +938,70 @@ app.get(
     } catch (error) {
       console.error("Get all attendance error:", error);
       return res.status(500).json({ message: "Internal Server Error" });
+    }
+  },
+);
+
+// Update single attendance record status/subject/faculty (admin only)
+app.patch(
+  ["/attendance/:id", "/api/attendance/:id"],
+  authenticateToken,
+  authorizeRoles("staff"),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status, subject, faculty } = req.body;
+
+      const updateData = {};
+      if (status) {
+        // Normalize status to capitalized 'Present', 'Absent', 'Late'
+        const normalized = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+        updateData.status = normalized;
+      }
+      if (subject) updateData.subject = subject.trim();
+      if (faculty) updateData.faculty = faculty.trim();
+
+      const updatedRecord = await attendance.findByIdAndUpdate(
+        id,
+        updateData,
+        { new: true }
+      ).populate("studentId", "name uid email course semester");
+
+      if (!updatedRecord) {
+        return res.status(404).json({ message: "Attendance record not found" });
+      }
+
+      return res.json({
+        message: "Attendance status updated successfully",
+        record: updatedRecord,
+      });
+    } catch (error) {
+      console.error("Update attendance error:", error);
+      return res.status(500).json({ message: "Failed to update attendance record" });
+    }
+  },
+);
+
+// Delete single attendance record (admin only)
+app.delete(
+  ["/attendance/:id", "/api/attendance/:id"],
+  authenticateToken,
+  authorizeRoles("staff"),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const deletedRecord = await attendance.findByIdAndDelete(id);
+
+      if (!deletedRecord) {
+        return res.status(404).json({ message: "Attendance record not found" });
+      }
+
+      return res.json({
+        message: "Attendance record deleted successfully from ledger",
+      });
+    } catch (error) {
+      console.error("Delete attendance error:", error);
+      return res.status(500).json({ message: "Failed to delete attendance record" });
     }
   },
 );
@@ -1019,42 +1161,223 @@ app.delete(
   },
 );
 
-// Submit Feedback (all authenticated users)
-app.post("/feedback", authenticateToken, async (req, res) => {
-  try {
-    const { category, rating, comment } = req.body;
-    if (!comment || !comment.trim()) {
-      return res.status(400).json({ message: "Comment is required" });
+// Submit Feedback / Grievance (all authenticated users)
+app.post(
+  ["/feedback", "/api/feedback"],
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const { category, rating, comment } = req.body;
+      if (!comment || !comment.trim()) {
+        return res.status(400).json({ message: "Comment or discrepancy details are required" });
+      }
+
+      const { username, role } = req.user;
+      let userDoc = null;
+      if (role === "student") {
+        userDoc = await student.findOne({
+          $or: [{ uid: username }, { email: username }],
+        });
+      } else {
+        userDoc = await staff.findOne({
+          $or: [{ uid: username }, { email: username }],
+        });
+      }
+
+      const newFeedback = new Feedback({
+        userId: userDoc?._id || undefined,
+        userModel: role === "staff" ? "staff" : "student",
+        userName: userDoc?.name || username,
+        userUid: userDoc?.uid || username,
+        category: category || "general",
+        rating: Number(rating) || 5,
+        comment: comment.trim(),
+        status: "pending",
+      });
+
+      await newFeedback.save();
+      return res.status(201).json({
+        message: "Your feedback / grievance ticket has been registered successfully.",
+        feedback: newFeedback,
+      });
+    } catch (err) {
+      console.error("Submit feedback error:", err);
+      return res.status(500).json({ message: "Failed to submit feedback" });
     }
+  },
+);
 
-    const newFeedback = new Feedback({
-      userId: req.user._id,
-      userModel: req.user.role === "staff" ? "staff" : "student",
-      userName: req.user.name || req.user.username,
-      userUid: req.user.uid,
-      category: category || "general",
-      rating: Number(rating) || 5,
-      comment: comment.trim(),
-    });
+// Get My Feedback Tickets (all authenticated users - student & staff)
+app.get(
+  ["/feedback/my", "/api/feedback/my"],
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const { username, role } = req.user;
+      let userDoc = null;
+      if (role === "student") {
+        userDoc = await student.findOne({
+          $or: [{ uid: username }, { email: username }],
+        });
+      } else {
+        userDoc = await staff.findOne({
+          $or: [{ uid: username }, { email: username }],
+        });
+      }
 
-    await newFeedback.save();
-    return res.status(201).json({ message: "Feedback submitted successfully", feedback: newFeedback });
-  } catch (err) {
-    console.error("Submit feedback error:", err);
-    return res.status(500).json({ message: "Failed to submit feedback" });
-  }
-});
+      const queryOr = [{ userName: username }];
+      if (userDoc) {
+        queryOr.push({ userId: userDoc._id });
+        if (userDoc.uid) queryOr.push({ userUid: userDoc.uid });
+        if (userDoc.name) queryOr.push({ userName: userDoc.name });
+      }
 
-// Get Feedback (staff only)
-app.get("/feedback", authenticateToken, authorizeRoles("staff"), async (req, res) => {
-  try {
-    const list = await Feedback.find().sort({ createdAt: -1 }).limit(100);
-    return res.json(list);
-  } catch (err) {
-    console.error("Get feedback error:", err);
-    return res.status(500).json({ message: "Failed to fetch feedback" });
-  }
-});
+      const list = await Feedback.find({ $or: queryOr }).sort({ createdAt: -1 });
+      return res.json(list);
+    } catch (err) {
+      console.error("Get my feedback error:", err);
+      return res.status(500).json({ message: "Failed to fetch user feedback tickets" });
+    }
+  },
+);
+
+// Withdraw / Cancel Own Pending Ticket
+app.delete(
+  ["/feedback/my/:id", "/api/feedback/my/:id"],
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { username, role } = req.user;
+
+      let userDoc = null;
+      if (role === "student") {
+        userDoc = await student.findOne({
+          $or: [{ uid: username }, { email: username }],
+        });
+      } else {
+        userDoc = await staff.findOne({
+          $or: [{ uid: username }, { email: username }],
+        });
+      }
+
+      const ticket = await Feedback.findById(id);
+      if (!ticket) {
+        return res.status(404).json({ message: "Ticket not found" });
+      }
+
+      // Check ownership
+      const isOwner =
+        (userDoc && ticket.userId && ticket.userId.toString() === userDoc._id.toString()) ||
+        (userDoc && ticket.userUid === userDoc.uid) ||
+        ticket.userName === username ||
+        (userDoc && ticket.userName === userDoc.name);
+
+      if (!isOwner) {
+        return res.status(403).json({ message: "Unauthorized to withdraw this ticket" });
+      }
+
+      await Feedback.findByIdAndDelete(id);
+      return res.json({ message: "Ticket withdrawn successfully" });
+    } catch (err) {
+      console.error("Withdraw ticket error:", err);
+      return res.status(500).json({ message: "Failed to withdraw ticket" });
+    }
+  },
+);
+
+// Get All Feedback / Grievances with filters & search (staff only)
+app.get(
+  ["/feedback", "/api/feedback"],
+  authenticateToken,
+  authorizeRoles("staff"),
+  async (req, res) => {
+    try {
+      const { status, category, search } = req.query;
+      const filter = {};
+
+      if (status && status !== "all") {
+        filter.status = status;
+      }
+
+      if (category && category !== "all") {
+        filter.category = category;
+      }
+
+      if (search && search.trim()) {
+        const term = search.trim();
+        const regex = new RegExp(term, "i");
+        filter.$or = [
+          { userName: regex },
+          { userUid: regex },
+          { comment: regex },
+          { category: regex },
+        ];
+      }
+
+      const list = await Feedback.find(filter).sort({ createdAt: -1 });
+      return res.json(list);
+    } catch (err) {
+      console.error("Get feedback error:", err);
+      return res.status(500).json({ message: "Failed to fetch feedback" });
+    }
+  },
+);
+
+// Update Feedback Status & Official Remarks (staff only)
+app.patch(
+  ["/feedback/:id/status", "/api/feedback/:id/status"],
+  authenticateToken,
+  authorizeRoles("staff"),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status, responseComment } = req.body;
+
+      const updateData = {};
+      if (status) updateData.status = status;
+      if (responseComment !== undefined) updateData.responseComment = responseComment.trim();
+
+      if (status === "resolved" || status === "reviewed") {
+        updateData.resolvedBy = req.user.username;
+        updateData.resolvedAt = new Date();
+      }
+
+      const updated = await Feedback.findByIdAndUpdate(id, updateData, { new: true });
+      if (!updated) {
+        return res.status(404).json({ message: "Feedback ticket not found" });
+      }
+
+      return res.json({
+        message: `Ticket status marked as "${updated.status}" with official remarks.`,
+        feedback: updated,
+      });
+    } catch (err) {
+      console.error("Update feedback status error:", err);
+      return res.status(500).json({ message: "Failed to update feedback status" });
+    }
+  },
+);
+
+// Delete Feedback Ticket (staff only)
+app.delete(
+  ["/feedback/:id", "/api/feedback/:id"],
+  authenticateToken,
+  authorizeRoles("staff"),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const deleted = await Feedback.findByIdAndDelete(id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Feedback ticket not found" });
+      }
+      return res.json({ message: "Feedback ticket deleted successfully" });
+    } catch (err) {
+      console.error("Delete feedback error:", err);
+      return res.status(500).json({ message: "Failed to delete feedback ticket" });
+    }
+  },
+);
 
 // Get Distinct Subjects dynamically from database
 app.get("/subjects", authenticateToken, async (req, res) => {

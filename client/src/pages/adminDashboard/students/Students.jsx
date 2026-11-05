@@ -15,8 +15,67 @@ function Students() {
   const [searchQuery, setSearchQuery] = useState("");
   const [courseFilter, setCourseFilter] = useState("all");
   const [semesterFilter, setSemesterFilter] = useState("all");
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    uid: "",
+    email: "",
+    course: "B.Tech Computer Science",
+    semester: "1",
+    password: "",
+  });
   const fileInputRef = useRef(null);
   const toast = useToast();
+
+  const handleAddStudent = async (e) => {
+    e.preventDefault();
+    if (!formData.name.trim() || !formData.uid.trim() || !formData.email.trim()) {
+      toast.warning("Name, UID, and Email are mandatory.", "Required Fields");
+      return;
+    }
+
+    setIsAdding(true);
+    try {
+      const res = await api.post("/students", formData);
+      toast.success(res.data?.message || "Student enrolled successfully.", "Student Enrolled");
+      if (res.data.student) {
+        setStudents((prev) => [res.data.student, ...prev]);
+      } else {
+        fetchStudents();
+      }
+      setFormData({
+        name: "",
+        uid: "",
+        email: "",
+        course: "B.Tech Computer Science",
+        semester: "1",
+        password: "",
+      });
+      setShowAddModal(false);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to enroll student.");
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
+  const handleDeleteStudent = async (id, name, uid) => {
+    if (!window.confirm(`Are you sure you want to delete student "${name}" (${uid})? All linked attendance ledger records will also be permanently removed.`)) {
+      return;
+    }
+
+    const prevStudents = [...students];
+    setStudents((prev) => prev.filter((s) => s._id !== id));
+
+    try {
+      await api.delete(`/students/${id}`);
+      toast.success(`Student ${name} (${uid}) removed from roster.`);
+    } catch (err) {
+      setStudents(prevStudents);
+      toast.error(err.response?.data?.message || "Failed to delete student record.");
+    }
+  };
 
   const fetchStudents = async () => {
     setLoading(true);
@@ -269,6 +328,16 @@ function Students() {
           </p>
         </div>
         <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+          {/* Add Student Button */}
+          <button
+            type='button'
+            className='erp-btn erp-btn-primary erp-btn-sm'
+            onClick={() => setShowAddModal(true)}
+          >
+            <Icons.Plus size={14} />
+            <span>Add Student</span>
+          </button>
+
           {/* Download Template Button */}
           <button
             type='button'
@@ -283,7 +352,7 @@ function Students() {
           {/* Import Excel Button */}
           <button
             type='button'
-            className='erp-btn erp-btn-primary erp-btn-sm'
+            className='erp-btn erp-btn-secondary erp-btn-sm'
             onClick={() => fileInputRef.current && fileInputRef.current.click()}
             disabled={importing}
           >
@@ -405,6 +474,7 @@ function Students() {
                   <th>Email Address</th>
                   <th>Course / Degree</th>
                   <th>Semester</th>
+                  <th style={{ width: "60px", textAlign: "center" }}>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -434,6 +504,17 @@ function Students() {
                         {stu.semester ? `Semester ${stu.semester}` : "N/A"}
                       </span>
                     </td>
+                    <td style={{ textAlign: "center" }}>
+                      <button
+                        type='button'
+                        className='erp-btn erp-btn-ghost erp-btn-xs'
+                        style={{ color: "var(--color-danger, #f43f5e)", padding: "4px" }}
+                        onClick={() => handleDeleteStudent(stu._id, stu.name, stu.uid)}
+                        title={`Remove ${stu.name} from roster`}
+                      >
+                        <Icons.Trash size={14} />
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -441,6 +522,172 @@ function Students() {
           </div>
         )}
       </div>
+
+      {/* Add Single Student Modal Dialog */}
+      {showAddModal && (
+        <div
+          role='dialog'
+          aria-modal='true'
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 1000,
+            background: "rgba(6, 8, 12, 0.75)",
+            backdropFilter: "blur(4px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "20px",
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowAddModal(false);
+          }}
+        >
+          <div
+            className='erp-card'
+            style={{
+              width: "100%",
+              maxWidth: "500px",
+              background: "var(--bg-surface, #14171d)",
+              border: "1px solid var(--border-color, #282d38)",
+              boxShadow: "0 20px 40px rgba(0, 0, 0, 0.4)",
+              borderRadius: "12px",
+              padding: "24px",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+              <div>
+                <h3 className='erp-card-title' style={{ fontSize: "1.15rem", marginBottom: "4px" }}>
+                  Enroll New Student
+                </h3>
+                <p className='erp-card-desc' style={{ fontSize: "0.82rem" }}>
+                  Register an individual student record directly into the institution database.
+                </p>
+              </div>
+              <button
+                type='button'
+                className='erp-btn erp-btn-ghost erp-btn-xs'
+                onClick={() => setShowAddModal(false)}
+                title='Close'
+              >
+                <Icons.X size={16} />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddStudent} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+              <div>
+                <label className='erp-label' style={{ fontSize: "0.8rem", marginBottom: "6px", display: "block" }}>
+                  Full Name *
+                </label>
+                <input
+                  type='text'
+                  required
+                  placeholder='e.g., Jane Doe'
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className='erp-input'
+                  style={{ width: "100%" }}
+                />
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                <div>
+                  <label className='erp-label' style={{ fontSize: "0.8rem", marginBottom: "6px", display: "block" }}>
+                    Roll No / UID *
+                  </label>
+                  <input
+                    type='text'
+                    required
+                    placeholder='e.g., 24BTCSE015'
+                    value={formData.uid}
+                    onChange={(e) => setFormData({ ...formData, uid: e.target.value })}
+                    className='erp-input'
+                    style={{ width: "100%", textTransform: "uppercase" }}
+                  />
+                </div>
+                <div>
+                  <label className='erp-label' style={{ fontSize: "0.8rem", marginBottom: "6px", display: "block" }}>
+                    Semester *
+                  </label>
+                  <select
+                    value={formData.semester}
+                    onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
+                    className='erp-select'
+                    style={{ width: "100%" }}
+                  >
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
+                      <option key={sem} value={sem}>
+                        Semester {sem}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className='erp-label' style={{ fontSize: "0.8rem", marginBottom: "6px", display: "block" }}>
+                  Institutional Email *
+                </label>
+                <input
+                  type='email'
+                  required
+                  placeholder='e.g., jane.doe@university.edu'
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className='erp-input'
+                  style={{ width: "100%" }}
+                />
+              </div>
+
+              <div>
+                <label className='erp-label' style={{ fontSize: "0.8rem", marginBottom: "6px", display: "block" }}>
+                  Degree / Program
+                </label>
+                <input
+                  type='text'
+                  placeholder='e.g., B.Tech Computer Science'
+                  value={formData.course}
+                  onChange={(e) => setFormData({ ...formData, course: e.target.value })}
+                  className='erp-input'
+                  style={{ width: "100%" }}
+                />
+              </div>
+
+              <div>
+                <label className='erp-label' style={{ fontSize: "0.8rem", marginBottom: "6px", display: "block" }}>
+                  Initial Password (Optional - defaults to UID)
+                </label>
+                <input
+                  type='password'
+                  placeholder='Leave blank to use UID as initial password'
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className='erp-input'
+                  style={{ width: "100%" }}
+                />
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "8px" }}>
+                <button
+                  type='button'
+                  className='erp-btn erp-btn-secondary'
+                  onClick={() => setShowAddModal(false)}
+                  disabled={isAdding}
+                >
+                  Cancel
+                </button>
+                <button
+                  type='submit'
+                  className='erp-btn erp-btn-primary'
+                  disabled={isAdding}
+                >
+                  {isAdding ? "Enrolling..." : "Enroll Student"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

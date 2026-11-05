@@ -1,5 +1,5 @@
 /* ==========================================================================
-   FEEDBACK & GRIEVANCE DESK CSS
+   FEEDBACK & GRIEVANCE DESK CSS - EXECUTIVE CARBON SLATE
    ========================================================================== */
 
 .erp-feedback-page {
@@ -10,9 +10,145 @@
   gap: 20px;
 }
 
+/* Nav Tabs */
+.erp-feedback-nav-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--border-color, #282d38);
+  padding-bottom: 12px;
+}
+
+.erp-feedback-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: var(--radius-sm, 6px);
+  background: transparent;
+  color: var(--text-secondary, #94a3b8);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast, 150ms ease);
+}
+
+.erp-feedback-tab-btn:hover {
+  background: var(--bg-surface-subtle, #1a1e27);
+  color: var(--text-primary, #f1f5f9);
+}
+
+.erp-feedback-tab-btn.active {
+  background: var(--bg-surface-subtle, #1a1e27);
+  color: var(--brand-primary, #3b82f6);
+  border-color: var(--border-color, #282d38);
+  font-weight: 600;
+}
+
+/* Staff Console Grid & Metrics */
+.erp-staff-console-view,
+.erp-student-tickets-view {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.erp-feedback-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 900px) {
+  .erp-feedback-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .erp-feedback-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.erp-feedback-metric-card {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.erp-feedback-metric-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted, #64748b);
+}
+
+.erp-feedback-metric-val {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary, #f1f5f9);
+  line-height: 1;
+}
+
+/* Toolbar */
+.erp-feedback-toolbar {
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+/* Tickets Stream */
+.erp-tickets-stream {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.erp-ticket-card {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color var(--transition-fast, 150ms ease);
+}
+
+.erp-ticket-card:hover {
+  border-color: var(--border-strong, #3b4252);
+}
+
+.erp-ticket-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.erp-ticket-body {
+  font-size: 0.88rem;
+  color: var(--text-primary, #f1f5f9);
+}
+
+.erp-ticket-resolution-box {
+  margin-top: 4px;
+  padding: 12px 14px;
+  background: rgba(59, 130, 246, 0.06);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-left: 3px solid var(--brand-primary, #3b82f6);
+  border-radius: var(--radius-sm, 6px);
+}
+
+/* Form Layout Grid */
 .erp-feedback-layout-grid {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
+  grid-template-columns: 1.25fr 0.75fr;
   gap: 20px;
   align-items: start;
 }
@@ -44,7 +180,7 @@
   background: transparent;
   border: none;
   font-size: 1.625rem;
-  color: var(--border-strong, #cbd5e1);
+  color: var(--border-strong, #3b4252);
   cursor: pointer;
   padding: 0 4px;
   line-height: 1;
@@ -52,7 +188,7 @@
 }
 
 .erp-star-btn.active {
-  color: var(--status-late, #f59e0b);
+  color: #f59e0b;
 }
 
 .erp-star-btn:hover {
@@ -62,7 +198,7 @@
 .erp-rating-label {
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--text-secondary, #475569);
+  color: var(--text-secondary, #94a3b8);
   margin-left: 8px;
 }
 
@@ -73,7 +209,8 @@
   gap: 20px;
 }
 
-.erp-support-info-card, .erp-support-contacts-card {
+.erp-support-info-card,
+.erp-support-contacts-card {
   padding: 20px;
 }
 
@@ -89,19 +226,19 @@
   flex-direction: column;
   gap: 3px;
   padding: 10px 12px;
-  background-color: var(--bg-surface-subtle, #f8fafc);
-  border: 1px solid var(--border-subtle, #e2e8f0);
+  background-color: var(--bg-surface-subtle, #1a1e27);
+  border: 1px solid var(--border-subtle, #282d38);
   border-radius: var(--radius-sm, 6px);
 }
 
 .erp-support-step-item strong {
   font-size: 0.8125rem;
-  color: var(--text-primary, #0f172a);
+  color: var(--text-primary, #f1f5f9);
 }
 
 .erp-support-step-item p {
   font-size: 0.75rem;
-  color: var(--text-secondary, #64748b);
+  color: var(--text-secondary, #94a3b8);
   margin: 0;
   line-height: 1.4;
 }
@@ -120,12 +257,9 @@
 }
 
 .erp-contact-item span {
-  color: var(--text-secondary, #64748b);
+  color: var(--text-secondary, #94a3b8);
 }
 
-.erp-contact-item code {
-  font-family: monospace;
-  font-size: 0.8125rem;
-  color: var(--brand-primary, #1d4ed8);
-  font-weight: 600;
+.erp-contact-item strong {
+  color: var(--text-primary, #f1f5f9);
 }

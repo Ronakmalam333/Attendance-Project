@@ -47,12 +47,44 @@ const AllAttendance = () => {
     }
   };
 
-  const handleCellEdit = (rowIndex, value) => {
-    const updated = [...data];
-    const prevStatus = updated[rowIndex].Status;
-    updated[rowIndex].Status = value;
-    setData(updated);
-    toast.info(`Updated status for ${updated[rowIndex].Name} from ${prevStatus} to ${value}.`);
+  const handleCellEdit = async (recordId, value) => {
+    const targetRecord = data.find((r) => r._id === recordId);
+    if (!targetRecord) return;
+    const prevStatus = targetRecord.Status;
+    if (prevStatus === value) return;
+
+    // Optimistic UI update
+    setData((prev) =>
+      prev.map((r) => (r._id === recordId ? { ...r, Status: value } : r))
+    );
+
+    try {
+      await axios.patch(`/attendance/${recordId}`, { status: value });
+      toast.success(`Updated status for ${targetRecord.Name} to ${value}.`);
+    } catch (err) {
+      // Rollback on server failure
+      setData((prev) =>
+        prev.map((r) => (r._id === recordId ? { ...r, Status: prevStatus } : r))
+      );
+      toast.error(err.response?.data?.message || "Failed to update attendance status in database.");
+    }
+  };
+
+  const handleDeleteRecord = async (recordId, studentName) => {
+    if (!window.confirm(`Delete attendance entry for ${studentName || "this student"}?`)) {
+      return;
+    }
+
+    const prevData = [...data];
+    setData((prev) => prev.filter((r) => r._id !== recordId));
+
+    try {
+      await axios.delete(`/attendance/${recordId}`);
+      toast.success(`Attendance record removed from ledger.`);
+    } catch (err) {
+      setData(prevData);
+      toast.error(err.response?.data?.message || "Failed to delete attendance record from database.");
+    }
   };
 
   // Bulk Excel (.xlsx, .xls, .csv) Attendance Ledger Ingestion
@@ -414,6 +446,7 @@ const AllAttendance = () => {
                     <th>Subject</th>
                     <th>Faculty</th>
                     <th>Attendance Status</th>
+                    <th style={{ width: "60px", textAlign: "center" }}>Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -426,7 +459,7 @@ const AllAttendance = () => {
                         : "late";
 
                     return (
-                      <tr key={index}>
+                      <tr key={row._id || index}>
                         <td className='tabular-nums text-muted'>{row.Date}</td>
                         <td style={{ fontWeight: 600, color: "var(--text-primary)" }}>{row.Name}</td>
                         <td>
@@ -439,13 +472,24 @@ const AllAttendance = () => {
                         <td>
                           <select
                             value={row.Status}
-                            onChange={(e) => handleCellEdit(index, e.target.value)}
+                            onChange={(e) => handleCellEdit(row._id, e.target.value)}
                             className={`erp-status-select status-${statusVariant}`}
                           >
                             <option value='Present'>Present</option>
                             <option value='Absent'>Absent</option>
                             <option value='Late'>Late</option>
                           </select>
+                        </td>
+                        <td style={{ textAlign: "center" }}>
+                          <button
+                            type='button'
+                            onClick={() => handleDeleteRecord(row._id, row.Name)}
+                            className='erp-btn erp-btn-ghost erp-btn-xs'
+                            style={{ color: "var(--color-danger, #f43f5e)", padding: "4px" }}
+                            title={`Delete attendance log for ${row.Name}`}
+                          >
+                            <Icons.Trash size={14} />
+                          </button>
                         </td>
                       </tr>
                     );
