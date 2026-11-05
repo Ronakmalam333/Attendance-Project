@@ -3,11 +3,13 @@
    ========================================================================== */
 
 .erp-admin-dashboard {
-  max-width: 1360px;
+  width: 100%;
+  max-width: 1540px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  flex: 1;
 }
 
 .erp-admin-header {

@@ -15,10 +15,10 @@
 }
 
 .erp-navbar-inner {
-  max-width: 1360px;
+  max-width: 1540px;
   height: 100%;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 clamp(16px, 2vw, 28px);
   display: flex;
   align-items: center;
   gap: 16px;

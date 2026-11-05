@@ -1,28 +1,38 @@
 /* ==========================================================================
-   PROFILE SETTINGS CSS
+   PROFILE SETTINGS CSS - EXECUTIVE CARBON SLATE
    ========================================================================== */
 
 .erp-profile-page {
-  max-width: 1360px;
+  width: 100%;
+  max-width: 1540px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  flex: 1;
 }
 
 .erp-profile-layout-grid {
   display: grid;
-  grid-template-columns: 340px 1fr;
+  grid-template-columns: 360px 1fr;
   gap: 20px;
   align-items: start;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1080px) {
   .erp-profile-layout-grid {
     grid-template-columns: 1fr;
   }
 }
 
+.erp-profile-left-col,
+.erp-profile-right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* User Identity Card */
 .erp-profile-summary-card {
   display: flex;
   flex-direction: column;
@@ -43,7 +53,7 @@
   display: block;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid var(--border-subtle, #e2e8f0);
+  border: 3px solid var(--border-subtle, #282d38);
 }
 
 .erp-profile-full-avatar {
@@ -58,8 +68,8 @@
   width: 96px;
   height: 96px;
   border-radius: 50%;
-  background-color: var(--bg-surface-subtle, #f1f5f9);
-  color: var(--brand-primary, #1d4ed8);
+  background-color: var(--bg-surface-subtle, #1a1e27);
+  color: var(--brand-primary, #3b82f6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -68,13 +78,13 @@
 .erp-avatar-hover-overlay {
   position: absolute;
   inset: 0;
-  background-color: rgba(15, 23, 42, 0.45);
+  background-color: rgba(6, 8, 12, 0.6);
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: opacity var(--transition-fast);
+  transition: opacity var(--transition-fast, 150ms ease);
   border-radius: 50%;
 }
 
@@ -90,15 +100,15 @@
 }
 
 .erp-profile-full-name {
-  font-size: 1.125rem;
+  font-size: 1.15rem;
   font-weight: 700;
-  color: var(--text-primary, #0f172a);
+  color: var(--text-primary, #f1f5f9);
   margin: 0;
 }
 
 .erp-profile-email-text {
   font-size: 0.8125rem;
-  color: var(--text-muted, #94a3b8);
+  color: var(--text-secondary, #94a3b8);
 }
 
 .erp-profile-meta-list {
@@ -106,9 +116,8 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  border-top: 1px solid var(--border-subtle, #e2e8f0);
-  padding-top: 16px;
-  text-align: left;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle, #282d38);
 }
 
 .erp-meta-row {
@@ -119,27 +128,164 @@
 }
 
 .erp-meta-label {
-  color: var(--text-secondary, #64748b);
+  color: var(--text-secondary, #94a3b8);
 }
 
 .erp-meta-value {
-  font-weight: 600;
-  color: var(--text-primary, #0f172a);
+  color: var(--text-primary, #f1f5f9);
+  font-weight: 500;
 }
 
-/* Details Card Form */
+/* Security specs card */
+.erp-profile-security-card {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.erp-security-specs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.erp-spec-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border-subtle, #282d38);
+}
+
+.erp-spec-item:last-child {
+  border-bottom: none;
+}
+
+.erp-spec-item span {
+  color: var(--text-secondary, #94a3b8);
+}
+
+.erp-spec-item strong {
+  color: var(--text-primary, #f1f5f9);
+  font-size: 0.78rem;
+}
+
+/* Profile Form Details */
 .erp-profile-details-card {
   padding: 24px;
 }
 
 .erp-profile-form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .erp-profile-form-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Governance Rules Box */
+.erp-profile-governance-card {
+  padding: 20px 24px;
+}
+
+.erp-governance-rules-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 12px;
+}
+
+@media (max-width: 860px) {
+  .erp-governance-rules-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.erp-gov-rule-box {
+  padding: 14px;
+  background-color: var(--bg-surface-subtle, #1a1e27);
+  border: 1px solid var(--border-subtle, #282d38);
+  border-radius: var(--radius-sm, 6px);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.erp-gov-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--brand-primary, #3b82f6);
+  letter-spacing: 0.05em;
+}
+
+.erp-gov-rule-box strong {
+  font-size: 0.85rem;
+  color: var(--text-primary, #f1f5f9);
+}
+
+.erp-gov-rule-box p {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #94a3b8);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Notification & Communication Preferences */
+.erp-profile-notifications-card {
+  padding: 20px 24px;
+}
+
+.erp-prefs-toggle-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.erp-pref-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 14px;
+  background: var(--bg-surface-subtle, #1a1e27);
+  border: 1px solid var(--border-subtle, #282d38);
+  border-radius: var(--radius-sm, 6px);
+}
+
+.erp-pref-toggle-row strong {
+  font-size: 0.82rem;
+  color: var(--text-primary, #f1f5f9);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.erp-pref-toggle-row p {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #94a3b8);
+  margin: 0;
+}
+
+.erp-toggle-pill {
+  padding: 5px 12px;
+  border-radius: var(--radius-full, 9999px);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border-color, #282d38);
+  background: transparent;
+  color: var(--text-secondary, #94a3b8);
+  transition: all var(--transition-fast, 150ms ease);
+}
+
+.erp-toggle-pill.active {
+  background: var(--status-present-bg, rgba(16, 185, 129, 0.15));
+  border-color: var(--status-present, #10b981);
+  color: var(--status-present, #10b981);
 }

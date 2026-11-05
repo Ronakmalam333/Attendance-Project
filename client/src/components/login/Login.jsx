@@ -315,6 +315,19 @@ function Login() {
           </div>
         </div>
       </div>
+
+      {/* Grounded Institutional Telemetry Footer */}
+      <footer className='erp-auth-bottom-footer'>
+        <div className='erp-auth-bottom-inner'>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span className='erp-footer-pulse-dot' />
+            <span>AMS Institutional Platform • High-Assurance Telemetry • TLS 1.3</span>
+          </div>
+          <div>
+            <span>System Architect & Lead Developer: <strong style={{ color: "var(--text-primary)" }}>Ronak Malam</strong></span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

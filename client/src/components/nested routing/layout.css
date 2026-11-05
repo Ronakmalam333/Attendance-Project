@@ -7,16 +7,19 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  background-color: var(--bg-canvas, #0e1013);
-  color: var(--text-primary, #f0f2f5);
+  background-color: var(--bg-canvas, #0c0e12);
+  color: var(--text-primary, #f1f5f9);
 }
 
 .erp-layout-main {
-  flex: 1 0 auto;
+  flex: 1 1 auto;
   width: 100%;
+  max-width: 1540px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  padding: 24px 20px 32px 20px;
+  padding: clamp(16px, 2vw, 28px);
+  box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
@@ -29,16 +32,16 @@
 .erp-layout-footer {
   flex-shrink: 0;
   width: 100%;
-  border-top: 1px solid var(--border-subtle, #242830);
-  background-color: var(--bg-surface, #15181c);
+  border-top: 1px solid var(--border-subtle, #282d38);
+  background-color: var(--bg-surface, #14171d);
   padding: 12px 20px;
   font-size: 0.75rem;
-  color: var(--text-secondary, #9aa0aa);
+  color: var(--text-secondary, #94a3b8);
   transition: background-color var(--transition-normal), border-color var(--transition-normal);
 }
 
 .erp-footer-inner {
-  max-width: 1360px;
+  max-width: 1540px;
   margin: 0 auto;
   display: flex;
   align-items: center;

@@ -1,31 +1,184 @@
 /* ==========================================================================
-   STUDENTS DIRECTORY CSS
+   STUDENTS DIRECTORY CSS - EXECUTIVE CARBON SLATE
    ========================================================================== */
 
 .erp-students-page {
-  max-width: 1360px;
+  width: 100%;
+  max-width: 1540px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  flex: 1;
 }
 
+/* KPI Summary Bar */
+.erp-students-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 960px) {
+  .erp-students-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 540px) {
+  .erp-students-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.erp-students-kpi-card {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.erp-students-kpi-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted, #64748b);
+}
+
+.erp-students-kpi-val-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.erp-students-kpi-val {
+  font-size: 1.625rem;
+  font-weight: 700;
+  color: var(--text-primary, #f1f5f9);
+  line-height: 1;
+}
+
+/* Table Card */
 .erp-students-table-card {
   padding: 0;
   overflow: hidden;
+  min-height: 340px;
+  display: flex;
+  flex-direction: column;
 }
 
 .erp-student-mini-avatar {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background-color: var(--bg-surface-subtle, #f1f5f9);
-  color: var(--brand-primary, #1d4ed8);
+  background-color: var(--bg-surface-subtle, #1a1e27);
+  color: var(--brand-primary, #3b82f6);
   font-size: 0.6875rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--border-subtle, #e2e8f0);
+  border: 1px solid var(--border-subtle, #282d38);
   flex-shrink: 0;
+}
+
+/* Bottom Operational Hub */
+.erp-students-bottom-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 20px;
+  align-items: stretch;
+}
+
+@media (max-width: 1024px) {
+  .erp-students-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.erp-students-ingest-card,
+.erp-students-cohort-card {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Dropzone */
+.erp-students-dropzone {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  background-color: var(--bg-surface-subtle, #1a1e27);
+  border: 1px dashed var(--border-strong, #3a414f);
+  border-radius: var(--radius-md, 8px);
+  cursor: pointer;
+  transition: all var(--transition-fast, 150ms ease);
+}
+
+.erp-students-dropzone:hover {
+  border-color: var(--brand-primary, #3b82f6);
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+.erp-dropzone-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm, 6px);
+  background-color: rgba(59, 130, 246, 0.12);
+  color: var(--brand-primary, #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.erp-dropzone-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.erp-dropzone-text strong {
+  font-size: 0.88rem;
+  color: var(--text-primary, #f1f5f9);
+}
+
+.erp-dropzone-text p {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #94a3b8);
+  margin: 0;
+}
+
+.erp-dropzone-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 6px;
+}
+
+/* Cohort list */
+.erp-cohort-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.erp-cohort-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.erp-cohort-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }

@@ -482,6 +482,41 @@ function Feedback() {
               ))
             )}
           </div>
+
+          {/* Institutional Quality Framework & Escalation Standards */}
+          <div className='erp-feedback-governance-hub erp-card'>
+            <div className='erp-card-heading-block'>
+              <div className='erp-card-icon-pill'>
+                <Icons.Shield size={16} />
+              </div>
+              <div>
+                <h3 className='erp-card-title' style={{ fontSize: "1rem" }}>
+                  Institutional Quality Assurance & Escalation Protocol
+                </h3>
+                <p className='erp-card-desc'>
+                  Operational SLAs and cross-departmental resolution guidelines for faculty evaluators.
+                </p>
+              </div>
+            </div>
+
+            <div className='erp-feedback-sla-grid'>
+              <div className='erp-sla-tier-card'>
+                <span className='erp-sla-tier-tag priority'>Tier 1 • Urgent (24h)</span>
+                <strong>Check-in & Token Discrepancies</strong>
+                <p>Faculty cross-references classroom timestamp with broadcast token logs to adjust the master ledger.</p>
+              </div>
+              <div className='erp-sla-tier-card'>
+                <span className='erp-sla-tier-tag medium'>Tier 2 • Standard (48h)</span>
+                <strong>Timetable & Roster Scheduling</strong>
+                <p>Reviewed by department heads and semester leads to ensure classroom schedule accuracy.</p>
+              </div>
+              <div className='erp-sla-tier-card'>
+                <span className='erp-sla-tier-tag normal'>Tier 3 • Platform (72h)</span>
+                <strong>Feature Requests & Bug Reports</strong>
+                <p>Processed by the Academic Operations cell and system engineering team.</p>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -593,6 +628,41 @@ function Feedback() {
               ))}
             </div>
           )}
+
+          {/* Student Grievance Guidance Card */}
+          <div className='erp-feedback-governance-hub erp-card' style={{ marginTop: "16px" }}>
+            <div className='erp-card-heading-block'>
+              <div className='erp-card-icon-pill'>
+                <Icons.Info size={16} />
+              </div>
+              <div>
+                <h3 className='erp-card-title' style={{ fontSize: "1rem" }}>
+                  Student Attendance Discrepancy Protocol & Rights
+                </h3>
+                <p className='erp-card-desc'>
+                  How your submissions are verified, reviewed by faculty, and escalated.
+                </p>
+              </div>
+            </div>
+
+            <div className='erp-feedback-sla-grid'>
+              <div className='erp-sla-tier-card'>
+                <span className='erp-sla-tier-tag priority'>Step 1 • Logging</span>
+                <strong>Ticket Ingestion & Timestamping</strong>
+                <p>Every ticket is tagged with your authenticated UID and routed to the corresponding department.</p>
+              </div>
+              <div className='erp-sla-tier-card'>
+                <span className='erp-sla-tier-tag medium'>Step 2 • Verification</span>
+                <strong>Faculty Session Review</strong>
+                <p>Your professor checks attendance broadcast timestamps against your session attempt.</p>
+              </div>
+              <div className='erp-sla-tier-card'>
+                <span className='erp-sla-tier-tag normal'>Step 3 • SLA 48h</span>
+                <strong>Master Ledger Rectification</strong>
+                <p>Upon verification, your attendance status is officially updated and reflected in your transcript.</p>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
