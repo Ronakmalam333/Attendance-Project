@@ -3,22 +3,88 @@ import api from "../../tokenManager";
 import Icons from "../ui/Icons";
 import "./Chatbot.css";
 
-const quickPrompts = [
-  "How do I mark my attendance with a token?",
-  "What is the minimum attendance requirement?",
-  "How are late attendances calculated?",
-  "Who do I contact for attendance discrepancy?",
+const quickGuides = [
+  { label: "📝 Mark Attendance", query: "How do I mark my attendance with a token?" },
+  { label: "⚖️ 75% Rule", query: "What is the statutory 75% attendance rule and policy?" },
+  { label: "🔑 Faculty Token", query: "How does faculty generate and manage attendance tokens?" },
+  { label: "🔄 Discrepancy Fix", query: "How do I fix a missed attendance or 24h discrepancy?" },
+  { label: "📁 Excel Bulk Import", query: "How can faculty bulk import students using Excel?" },
+  { label: "🎫 Grievance Ticket", query: "How do I submit an attendance or academic grievance ticket?" },
+  { label: "📊 Export PDF / Excel", query: "How do I export attendance records as PDF or Excel?" },
+  { label: "👨‍💻 Who Built AMS?", query: "Who is the Project Originator & Lead Developer?" },
 ];
+
+/**
+ * Lightweight formatting parser for assistant responses
+ * Converts **bold**, `code`, bullet points, and newlines into rich JSX elements
+ */
+const FormattedMessage = ({ text }) => {
+  if (!text) return null;
+
+  // Split text by lines
+  const lines = text.split("\n");
+
+  return (
+    <div className='erp-formatted-msg'>
+      {lines.map((line, lineIdx) => {
+        // Line-level formatting
+        const trimmed = line.trim();
+
+        // Empty line becomes a spacer
+        if (!trimmed) {
+          return <div key={lineIdx} style={{ height: "6px" }} />;
+        }
+
+        // Parse inline **bold** and `code`
+        const parseInline = (str) => {
+          // Regex to match **bold** or `code`
+          const parts = [];
+          let lastIndex = 0;
+          const inlineRegex = /(\*\*([^*]+)\*\*|`([^`]+)`)/g;
+          let match;
+
+          while ((match = inlineRegex.exec(str)) !== null) {
+            // Push text before match
+            if (match.index > lastIndex) {
+              parts.push(str.substring(lastIndex, match.index));
+            }
+            if (match[2]) {
+              // **bold**
+              parts.push(<strong key={`b-${match.index}`}>{match[2]}</strong>);
+            } else if (match[3]) {
+              // `code`
+              parts.push(<code key={`c-${match.index}`}>{match[3]}</code>);
+            }
+            lastIndex = inlineRegex.lastIndex;
+          }
+
+          if (lastIndex < str.length) {
+            parts.push(str.substring(lastIndex));
+          }
+
+          return parts.length > 0 ? parts : str;
+        };
+
+        // Render line with appropriate margins
+        return (
+          <div key={lineIdx} style={{ marginBottom: "2px" }}>
+            {parseInline(line)}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+const INITIAL_WELCOME = {
+  text: "Hello! 👋 I am your **AMS Academic Assistant**.\n\nI have complete knowledge of the entire Attendance Management System platform — including token submission, the 75% attendance rule, faculty session controls, Excel bulk ingestion, grievance tickets, PDF transcripts, and developer info.\n\nHow can I help you today? You can type any question or pick a quick topic below!",
+  sender: "bot",
+  time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+};
 
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    {
-      text: "Hello! I am your AMS Academic Assistant. You can ask me about class attendance, session tokens, academic policies, or timetables.",
-      sender: "bot",
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    },
-  ]);
+  const [messages, setMessages] = useState([INITIAL_WELCOME]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
@@ -31,7 +97,7 @@ const Chatbot = () => {
     if (isOpen) {
       scrollToBottom();
     }
-  }, [messages, isOpen]);
+  }, [messages, isOpen, isTyping]);
 
   const handleSend = async (messageText) => {
     const textToSend = messageText || input;
@@ -58,11 +124,11 @@ const Chatbot = () => {
           time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         },
       ]);
-    } catch (error) {
+    } catch {
       setMessages((prev) => [
         ...prev,
         {
-          text: "The assistance server is momentarily unavailable. Please check your connection or contact the campus administrator.",
+          text: "The assistance server is momentarily unavailable. Please check your network connection or verify your server session.",
           sender: "bot",
           time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         },
@@ -70,6 +136,10 @@ const Chatbot = () => {
     } finally {
       setIsTyping(false);
     }
+  };
+
+  const handleClearChat = () => {
+    setMessages([INITIAL_WELCOME]);
   };
 
   return (
@@ -89,21 +159,39 @@ const Chatbot = () => {
                 </span>
               </div>
             </div>
-            <button
-              type='button'
-              className='erp-chatbot-close-btn'
-              onClick={() => setIsOpen(false)}
-              aria-label='Close Assistant'
-            >
-              <Icons.X size={16} />
-            </button>
+            <div className='erp-chatbot-header-actions'>
+              <button
+                type='button'
+                className='erp-chatbot-icon-btn'
+                onClick={handleClearChat}
+                title='Clear Conversation'
+                aria-label='Clear Conversation'
+              >
+                <Icons.RotateCcw size={15} />
+              </button>
+              <button
+                type='button'
+                className='erp-chatbot-icon-btn'
+                onClick={() => setIsOpen(false)}
+                title='Close Assistant'
+                aria-label='Close Assistant'
+              >
+                <Icons.X size={16} />
+              </button>
+            </div>
           </div>
 
           {/* Messages Body */}
           <div className='erp-chatbot-body'>
             {messages.map((msg, i) => (
               <div key={i} className={`erp-chat-msg ${msg.sender}`}>
-                <div className='erp-chat-bubble'>{msg.text}</div>
+                <div className='erp-chat-bubble'>
+                  {msg.sender === "bot" ? (
+                    <FormattedMessage text={msg.text} />
+                  ) : (
+                    msg.text
+                  )}
+                </div>
                 <span className='erp-chat-time tabular-nums'>{msg.time}</span>
               </div>
             ))}
@@ -120,30 +208,29 @@ const Chatbot = () => {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Quick Prompts */}
-          {messages.length <= 3 && (
-            <div className='erp-chatbot-chips'>
-              {quickPrompts.slice(0, 2).map((chip, idx) => (
-                <button
-                  key={idx}
-                  type='button'
-                  className='erp-chip-btn'
-                  onClick={() => handleSend(chip)}
-                >
-                  {chip}
-                </button>
-              ))}
-            </div>
-          )}
+          {/* Quick Topic Chips Tray */}
+          <div className='erp-chatbot-chips-tray'>
+            {quickGuides.map((item, idx) => (
+              <button
+                key={idx}
+                type='button'
+                className='erp-chip-btn'
+                onClick={() => handleSend(item.query)}
+                disabled={isTyping}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
 
-          {/* Input Footer */}
+          {/* Footer Input */}
           <div className='erp-chatbot-footer'>
             <input
               type='text'
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSend()}
-              placeholder='Type academic question...'
+              placeholder='Ask any question about AMS...'
               className='erp-chat-input'
               disabled={isTyping}
             />
@@ -163,7 +250,7 @@ const Chatbot = () => {
           type='button'
           className='erp-chatbot-trigger'
           onClick={() => setIsOpen(true)}
-          title='Academic Assistant'
+          title='AMS Academic Assistant'
           aria-label='Open Academic Assistant'
         >
           <Icons.Bot size={22} />

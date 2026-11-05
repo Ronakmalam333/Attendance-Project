@@ -37,7 +37,7 @@ function NavbarLayout() {
 
             <div className="erp-footer-center">
               <span className="erp-footer-author">
-                System Architect & Lead Developer: <strong className="erp-author-name">Ronak Malam</strong>
+                Project Originator & Lead Developer: <strong className="erp-author-name">Ronak Malam</strong>
               </span>
             </div>
 

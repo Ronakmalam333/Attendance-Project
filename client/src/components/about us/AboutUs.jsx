@@ -24,7 +24,7 @@ const corePillars = [
 const teamMembers = [
   {
     name: "Ronak Malam",
-    role: "Lead Architect & Developer",
+    role: "Project Originator & Lead Developer",
     dept: "Computer Science & Engineering",
   },
 ];
@@ -90,10 +90,10 @@ const AboutUs = () => {
         </div>
       </div>
 
-      {/* Lead Architecture & Engineering */}
+      {/* Project Originator & Lead Developer */}
       <div className='erp-doc-card erp-card'>
         <h2 className='erp-card-title' style={{ marginBottom: "16px" }}>
-          Lead Architect & Engineering
+          Project Originator & Lead Developer
         </h2>
         <div className='erp-team-grid'>
           {teamMembers.map((member, i) => (

@@ -92,13 +92,18 @@ PORT=5000
 - `GET /students` - Get all students (Staff)
 - `POST /chatbot` - AI chatbot interaction
 
-## Security Features
+## Security & Validation Features
 
 - JWT-based authentication
 - Password hashing with bcrypt
 - Environment variables for sensitive data
-- Role-based access control
+- Role-based access control (RBAC)
+- Multi-tier Email Validation (Syntax verification, disposable/temporary email prevention, and DNS MX/A record recheck & fallback system)
 - Input validation and sanitization
+
+## Project Originator & Lead Developer
+
+- **Ronak Malam** — Project Originator & Lead Developer ([itzronakmalam94@gmail.com](mailto:itzronakmalam94@gmail.com))
 
 ## Contributing
 

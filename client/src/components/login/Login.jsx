@@ -170,7 +170,7 @@ function Login() {
           </div>
 
           <div className='erp-showcase-footer'>
-            <span>Designed & Architected by <strong>Ronak Malam</strong></span>
+            <span>Project Originator & Lead Developer: <strong>Ronak Malam</strong></span>
             <span>v2.4</span>
           </div>
         </div>
@@ -324,7 +324,7 @@ function Login() {
             <span>AMS Institutional Platform • High-Assurance Telemetry • TLS 1.3</span>
           </div>
           <div>
-            <span>System Architect & Lead Developer: <strong style={{ color: "var(--text-primary)" }}>Ronak Malam</strong></span>
+            <span>Project Originator & Lead Developer: <strong style={{ color: "var(--text-primary)" }}>Ronak Malam</strong></span>
           </div>
         </div>
       </footer>
