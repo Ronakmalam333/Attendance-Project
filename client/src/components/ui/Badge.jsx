@@ -29,9 +29,15 @@ export const Badge = ({
         };
       case "brand":
         return {
-          backgroundColor: "var(--brand-primary-light, #eff6ff)",
-          color: "var(--brand-primary, #2563eb)",
-          border: "1px solid var(--status-info-border, #bfdbfe)",
+          backgroundColor: "rgba(51, 65, 85, 0.08)",
+          color: "var(--primary, #334155)",
+          border: "1px solid var(--border-strong, #cbd5e1)",
+        };
+      case "info":
+        return {
+          backgroundColor: "var(--status-info-bg, #f0f9ff)",
+          color: "var(--info, #0284c7)",
+          border: "1px solid var(--status-info-border, #bae6fd)",
         };
       default:
         return {

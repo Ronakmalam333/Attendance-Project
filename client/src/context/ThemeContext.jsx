@@ -11,17 +11,14 @@ export const useTheme = () => {
 };
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState('dark');
+  // Slate Enterprise: Light-first interface with dark slate sidebar for optimal readability
+  const [theme, setTheme] = useState('light');
 
   useEffect(() => {
-    // Check for saved theme preference or default to system preference
+    // Check for explicit saved theme preference, otherwise default to light
     const savedTheme = localStorage.getItem('theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
     if (savedTheme) {
       setTheme(savedTheme);
-    } else if (systemPrefersDark) {
-      setTheme('dark');
     } else {
       setTheme('light');
     }

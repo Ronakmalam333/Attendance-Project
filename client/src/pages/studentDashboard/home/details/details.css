@@ -5,12 +5,12 @@
 .erp-student-details-card {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 14px;
+  justify-content: flex-start;
+  gap: 12px;
   background-color: var(--bg-surface, #ffffff);
   border: 1px solid var(--border-subtle, #e2e8f0);
   border-radius: var(--radius-lg, 10px);
-  padding: 18px 20px;
+  padding: 16px 20px;
   box-shadow: var(--shadow-card);
   height: 100%;
 }
@@ -111,7 +111,7 @@
 .erp-details-divider {
   height: 1px;
   background-color: var(--border-subtle, #e2e8f0);
-  margin: 2px 0;
+  margin: 2px 0 4px 0;
 }
 
 /* Today's Schedule Overview */
@@ -119,6 +119,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  flex: 1;
 }
 
 .erp-schedule-header-row {
